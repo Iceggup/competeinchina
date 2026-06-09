@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concierge Admin — Compete in China</title>
+<style>
+:root {
+  --bg:#f3f4f6; --card:#fff; --text:#111827; --text2:#6b7280; --accent:#2563eb;
+  --accent-h:#1d4ed8; --border:#e5e7eb; --green:#059669; --amber:#d97706;
+  --red:#ef4444; --radius:10px; --shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;padding:24px;}
+h1{font-size:22px;margin-bottom:4px;}
+h2{font-size:16px;margin-bottom:12px;}
+.subtitle{color:var(--text2);font-size:13px;margin-bottom:24px;}
+
+/* Layout */
+.layout{display:flex;gap:20px;max-width:1400px;margin:0 auto;}
+.sidebar{width:320px;flex-shrink:0;}
+.main{flex:1;}
+
+/* Cards */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px;}
+
+/* Registration list */
+.reg-item{padding:12px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .15s;}
+.reg-item:hover{border-color:var(--accent);background:#f8faff;}
+.reg-item.active{border-color:var(--accent);background:#eff6ff;}
+.reg-item .name{font-weight:600;font-size:14px;}
+.reg-item .meta{font-size:12px;color:var(--text2);margin-top:2px;}
+
+/* Badges */
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;}
+.badge-green{background:#ecfdf5;color:var(--green);}
+.badge-amber{background:#fffbeb;color:var(--amber);}
+.badge-blue{background:#eff6ff;color:var(--accent);}
+.badge-red{background:#fef2f2;color:var(--red);}
+
+/* Fields */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;}
+.field span, .field div{font-size:13px;}
+
+/* Buttons */
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent-h);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:hover{background:#dc2626;}
+
+/* Competition selector */
+.comp-select{padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;width:100%;margin-bottom:8px;}
+
+/* Status row */
+.status-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;}
+.status-chip{padding:5px 12px;border-radius:14px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:#fafbfc;transition:all .15s;}
+.status-chip:hover{border-color:var(--accent);}
+.status-chip.selected{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* Submission list */
+.sub-list-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;}
+.sub-list-item .info{flex:1;}
+.sub-list-item .comp-name{font-weight:600;font-size:13px;}
+.sub-list-item .comp-status{font-size:11px;color:var(--text2);}
+
+/* Empty state */
+.empty{padding:40px 20px;text-align:center;color:var(--text2);}
+
+/* Stats row */
+.stats{display:flex;gap:12px;margin-bottom:16px;}
+.stat-card{flex:1;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;text-align:center;}
+.stat-card .num{font-size:28px;font-weight:700;}
+.stat-card .lbl{font-size:11px;color:var(--text2);margin-top:2px;}
+
+/* Toast */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;}
+.toast.show{opacity:1;}
+
+@media(max-width:900px){.layout{flex-direction:column;}.sidebar{width:100%;}}
+</style>
+</head>
+<body>
+
+<h1>Concierge Admin Panel</h1>
+<p class="subtitle">Manage team registrations, assign competitions, and update submission statuses.</p>
+
+<div class="stats" id="statsRow"></div>
+
+<div class="layout">
+  <!-- Sidebar: Registration List -->
+  <div class="sidebar">
+    <div class="card">
+      <h2>Registered Teams</h2>
+      <div id="regList"><div class="empty">No registrations yet.</div></div>
+    </div>
+    <div class="card">
+      <button class="btn btn-sm" onclick="exportData()" style="width:100%;margin-bottom:8px;">Export All Data (JSON)</button>
+      <button class="btn btn-sm" onclick="loadSampleData()" style="width:100%;">Load Sample Data</button>
+    </div>
+  </div>
+
+  <!-- Main: Team Detail + Competition Assignment -->
+  <div class="main" id="mainPanel">
+    <div class="card">
+      <div class="empty">Select a team from the left to manage their submissions.</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ═══════════ DATA LAYER ═══════════
+// Now reads from API server instead of localStorage
+const API_BASE = '/api/admin';
+
+async function apiGet(path) {
+  const resp = await fetch(API_BASE + path);
+  if (!resp.ok) throw new Error('API error ' + resp.status);
+  return resp.json();
+}
+
+async function apiPost(path, data) {
+  const resp = await fetch(API_BASE + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!resp.ok) return resp.json().then(e => { throw new Error(e.error || 'API error'); });
+  return resp.json();
+}
+
+async function apiDel(path) {
+  const resp = await fetch(API_BASE + path, { method: 'DELETE' });
+  if (!resp.ok) throw new Error('API error');
+  return resp.json();
+}
+
+async function getRegistrations() {
+  try { return await apiGet('/registrations'); } catch(e) { return []; }
+}
+
+async function getApplications() {
+  try { return await apiGet('/concierge'); } catch(e) { return []; }
+}
+
+async function saveApplication(app) {
+  return apiPost('/concierge', app);
+}
+
+async function deleteApplication(id) {
+  return apiDel('/concierge/' + id);
+}
+
+// ═══════════ RENDER ═══════════
+var selectedRegIndex = -1;
+var competitions = [];
+var currentApps = [];
+
+// Load competitions list
+fetch('competitions.json')
+  .then(function(r) { return r.json(); })
+  .then(function(data) { competitions = data; })
+  .catch(function() {});
+
+async function init() {
+  await renderRegList();
+  await renderStats();
+}
+
+async function renderStats() {
+  var regs = await getRegistrations();
+  var apps = await getApplications();
+  var row = document.getElementById('statsRow');
+  if (!row) return;
+  row.innerHTML =
+    '<div class="stat-card"><div class="num" style="color:var(--accent);">' + regs.length + '</div><div class="lbl">Registrations</div></div>' +
+    '<div class="stat-card"><div class="num" style="color:var(--green);">' + apps.length + '</div><div class="lbl">Active Submissions</div></div>' +
+    '<div class="stat-card"><div class="num" style="color:var(--amber);">' + apps.filter(function(a){return a.status==='under_review';}).length + '</div><div class="lbl">Under Review</div></div>' +
+    '<div class="stat-card"><div class="num" style="color:var(--red);">' + apps.filter(function(a){return a.status==='winner';}).length + '</div><div class="lbl">Winners</div></div>';
+}
+
+async function renderRegList() {
+  var regs = await getRegistrations();
+  var list = document.getElementById('regList');
+  if (regs.length === 0) {
+    list.innerHTML = '<div class="empty">No registrations yet.<br><small>Teams submit via the registration form.</small></div>';
+    return;
+  }
+  var html = '';
+  regs.forEach(function(r, i) {
+    var cls = (i === selectedRegIndex) ? ' active' : '';
+    html += '<div class="reg-item' + cls + '" onclick="selectReg(' + i + ')">';
+    html += '<div class="name">' + escapeHtml(r.team_name || 'Unnamed Team') + '</div>';
+    html += '<div class="meta">' + escapeHtml(r.contact_name || 'No contact') + ' · ' + escapeHtml(r.country || '?') + '</div>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
+async function selectReg(index) {
+  selectedRegIndex = index;
+  await renderRegList();
+  await renderDetail(index);
+}
+
+async function renderDetail(index) {
+  var regs = await getRegistrations();
+  var r = regs[index];
+  if (!r) return;
+
+  var email = r.contact_email || '';
+  // Get existing apps for this team
+  var apps = await getApplications();
+  currentApps = apps.filter(function(a) { return a.email === email; });
+
+  var html = '<div class="card"><h2>' + escapeHtml(r.team_name || 'Team') + '</h2>';
+  html += '<div class="field"><label>Contact</label><span>' + escapeHtml(r.contact_name || '—') + ' (' + escapeHtml(r.contact_role || '—') + ')</span></div>';
+  html += '<div class="field"><label>Email</label><span>' + escapeHtml(r.contact_email || '—') + '</span></div>';
+  html += '<div class="field"><label>WhatsApp</label><span>' + escapeHtml(r.contact_phone || '—') + '</span></div>';
+  html += '<div class="field"><label>Country · Stage</label><span>' + escapeHtml(r.country || '—') + ' · ' + escapeHtml(r.stage || '—') + '</span></div>';
+  html += '<div class="field"><label>Industry</label><span>' + escapeHtml(r.industry || '—') + '</span></div>';
+  html += '<div class="field"><label>One-Liner</label><div>' + escapeHtml(r.oneliner || '—') + '</div></div>';
+  html += '<div class="field"><label>China Cities</label><span>' + escapeHtml(r.cn_cities || '—') + '</span></div>';
+  html += '<div class="field"><label>Pitch Deck</label><span>' + (r.pitch_deck ? '<a href="' + escapeHtml(r.pitch_deck) + '" target="_blank">View Link</a>' : '—') + '</span></div>';
+  html += '</div>';
+
+  // Existing Submissions
+  html += '<div class="card"><h2>Current Submissions (' + currentApps.length + ')</h2>';
+  if (currentApps.length === 0) {
+    html += '<div class="empty" style="padding:20px;">No competitions assigned yet.</div>';
+  } else {
+    currentApps.forEach(function(app, ai) {
+      var statusLabels = {'submitted':'Submitted','under_review':'Under Review','shortlisted':'Shortlisted','finalist':'Finalist','winner':'Winner','not_selected':'Not Selected'};
+      var statusBadge = {'submitted':'badge-blue','under_review':'badge-amber','shortlisted':'badge-amber','finalist':'badge-green','winner':'badge-green','not_selected':'badge-red'};
+      html += '<div class="sub-list-item">';
+      html += '<div class="info"><div class="comp-name">' + escapeHtml(app.compName) + '</div>';
+      html += '<div class="comp-status"><span class="badge ' + (statusBadge[app.status]||'badge-blue') + '">' + (statusLabels[app.status]||app.status) + '</span> · Deadline: ' + escapeHtml(app.deadline||'—') + '</div></div>';
+      html += '<button class="btn btn-sm btn-danger" onclick="removeApp(' + ai + ',\'' + email + '\')">Remove</button>';
+      html += '</div>';
+    });
+  }
+  html += '</div>';
+
+  // Add New Submission
+  html += '<div class="card"><h2>Add New Submission</h2>';
+  html += '<select class="comp-select" id="compSelect"><option value="">— Select Competition —</option>';
+  if (competitions.length > 0) {
+    competitions.forEach(function(c) {
+      html += '<option value="' + escapeHtml(c.id||'') + '" data-name="' + escapeHtml(c.title||'') + '" data-deadline="' + escapeHtml(c.deadline||'') + '">' + escapeHtml(c.title||'') + ' (' + escapeHtml(c.city||'') + ')</option>';
+    });
+  }
+  html += '</select>';
+  html += '<div class="status-row">';
+  html += '<span class="status-chip selected" data-status="submitted" onclick="selectStatus(this)">Submitted</span>';
+  html += '<span class="status-chip" data-status="under_review" onclick="selectStatus(this)">Under Review</span>';
+  html += '<span class="status-chip" data-status="shortlisted" onclick="selectStatus(this)">Shortlisted</span>';
+  html += '<span class="status-chip" data-status="finalist" onclick="selectStatus(this)">Finalist</span>';
+  html += '<span class="status-chip" data-status="winner" onclick="selectStatus(this)">Winner</span>';
+  html += '<span class="status-chip" data-status="not_selected" onclick="selectStatus(this)">Not Selected</span>';
+  html += '</div>';
+  html += '<button class="btn btn-primary" onclick="addSubmission(\'' + email + '\')" style="margin-top:12px;">Add Submission</button>';
+  html += '</div>';
+
+  // WhatsApp quick link
+  html += '<div class="card" style="text-align:center;">';
+  html += '<a href="https://wa.me/85252072721" target="_blank" class="btn" style="background:#25d366;color:#fff;">Chat on WhatsApp</a>';
+  html += '</div>';
+
+  document.getElementById('mainPanel').innerHTML = html;
+}
+
+var selectedStatus = 'submitted';
+function selectStatus(el) {
+  document.querySelectorAll('.status-chip').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  selectedStatus = el.dataset.status;
+}
+
+async function addSubmission(email) {
+  var sel = document.getElementById('compSelect');
+  if (!sel.value) { showToast('Please select a competition'); return; }
+  var opt = sel.options[sel.selectedIndex];
+  var compName = opt.dataset.name || sel.value;
+  var deadline = opt.dataset.deadline || '';
+
+  var apps = await getApplications();
+  // Check duplicate
+  var exists = apps.some(function(a) { return a.email === email && a.compId === sel.value; });
+  if (exists) { showToast('This competition is already assigned to this team.'); return; }
+
+  try {
+    await saveApplication({
+      email: email,
+      compId: sel.value,
+      compName: compName,
+      deadline: deadline,
+      status: selectedStatus
+    });
+    showToast('Submission added! Team will see it on their dashboard.');
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  }
+  
+  currentApps = (await getApplications()).filter(function(a) { return a.email === email; });
+  await selectReg(selectedRegIndex);
+  await renderStats();
+}
+
+async function removeApp(index, email) {
+  if (!confirm('Remove this submission? The team will no longer see it on their dashboard.')) return;
+  var apps = await getApplications();
+  var teamApps = apps.filter(function(a) { return a.email === email; });
+  if (index >= 0 && index < teamApps.length) {
+    var toRemove = teamApps[index];
+    try {
+      await deleteApplication(toRemove.id);
+      showToast('Submission removed.');
+    } catch(e) {
+      showToast('Error: ' + e.message);
+    }
+    currentApps = (await getApplications()).filter(function(a) { return a.email === email; });
+    await selectReg(selectedRegIndex);
+    await renderStats();
+  }
+}
+
+async function exportData() {
+  var data;
+  try {
+    var resp = await fetch('/api/admin/export');
+    data = await resp.json();
+  } catch(e) {
+    data = {
+      registrations: await getRegistrations(),
+      applications: await getApplications(),
+      exportedAt: new Date().toISOString()
+    };
+  }
+  var blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'concierge_data_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported!');
+}
+
+async function loadSampleData() {
+  var sampleRegs = [{
+    team_name: 'NeuroScan AI',
+    country: 'Singapore',
+    team_size: '4–10 people',
+    stage: 'Pilot / MVP',
+    oneliner: 'AI-powered medical imaging for early cancer detection',
+    contact_name: 'Sarah Chen',
+    contact_role: 'CEO & Co-Founder',
+    contact_email: 'sarah@neuroscan.ai',
+    contact_phone: '+65 9123 4567',
+    contact_linkedin: 'https://linkedin.com/in/sarahchen',
+    industry: 'Healthcare & Biotech',
+    keywords: 'AI, Medical Imaging, Deep Learning',
+    product_desc: 'NeuroScan uses deep learning to analyze CT and MRI scans...',
+    cn_cities: 'Shenzhen, Shanghai',
+    pitch_deck: 'https://drive.google.com/neuroscan-deck'
+  },{
+    team_name: 'GreenVolt Energy',
+    country: 'Germany',
+    team_size: '11–30 people',
+    stage: 'Growth / Scaling',
+    oneliner: 'Next-gen solid-state battery technology for EVs',
+    contact_name: 'Markus Weber',
+    contact_role: 'CTO',
+    contact_email: 'markus@greenvolt.de',
+    contact_phone: '+49 170 1234567',
+    industry: 'New Energy / Materials',
+    keywords: 'Solid-state battery, EV, Energy storage',
+    cn_cities: 'Hefei, Beijing',
+    pitch_deck: 'https://drive.google.com/greenvolt-deck'
+  }];
+  
+  var regs = await getRegistrations();
+  var added = 0;
+  for (var i = 0; i < sampleRegs.length; i++) {
+    var s = sampleRegs[i];
+    if (!regs.some(function(r) { return r.contact_email === s.contact_email; })) {
+      try { await apiPost('/registrations', s); added++; } catch(e) {}
+      regs.push(s);
+    }
+  }
+  await init();
+  showToast('Sample data loaded! (' + regs.length + ' registrations, ' + added + ' synced)');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

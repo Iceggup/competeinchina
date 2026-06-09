@@ -1,0 +1,255 @@
+[
+  {
+    "id": 1,
+    "title": "ITEC 2026 — Beijing Chaoyang International Talent Entrepreneurship Conference",
+    "city": "Beijing",
+    "deadline": "2026-08-31",
+    "prize": "¥54.5M total (86 slots, max ¥5M Special Prize)",
+    "prizeCategory": "huge",
+    "industries": [
+      "AI",
+      "Robotics",
+      "Aerospace",
+      "Digital Economy",
+      "Biotech & Pharma",
+      "General"
+    ],
+    "level": "District",
+    "desc": "14th edition. Prize + Investment + Loan triple engine. Three tracks: Talent, Industry, Special.",
+    "highlights": [
+      "¥54.5M total prize pool with 86 award slots",
+      "CICC Capital, Hillhouse, Plum Ventures investment consortium",
+      "Policy matching, landing services, office space included",
+      "Special track for robotics, photonics, and disruptive tech"
+    ],
+    "applyUrl": "https://www.chytalents.gov.cn/",
+    "englishUrl": "https://exploreitec.com/",
+    "stage": "Preliminary",
+    "titleCN": "2026北京朝阳国际人才创业大会（ITEC）"
+  },
+  {
+    "id": 2,
+    "title": "Shenzhen International Innovation Competition (10th Edition)",
+    "city": "Shenzhen",
+    "deadline": "2026-08-31",
+    "prize": "¥9.42M pool (Grand: ¥1.5M; ¥5B VC fund)",
+    "prizeCategory": "large",
+    "industries": [
+      "AI",
+      "Biotech & Pharma",
+      "New Energy",
+      "Advanced Manufacturing",
+      "Semiconductors",
+      "Digital Economy",
+      "General"
+    ],
+    "level": "City",
+    "desc": "12 overseas branch stations. One of China's largest and most rewarding competitions for global innovators.",
+    "highlights": [
+      "12 overseas stations: Boston, London, Paris, Toronto, Sydney + 7 more",
+      "Grand Prize: ¥1.5M (¥500K immediate + ¥1M landing fund)",
+      "¥5B venture capital pool from 20+ leading VCs",
+      "Up to 24 months free workspace across 434 startup spaces"
+    ],
+    "applyUrl": "http://cn.itcsz.cn/",
+    "englishUrl": "",
+    "stage": "Registration",
+    "titleCN": "第10届深圳国际创新大赛"
+  },
+  {
+    "id": 3,
+    "title": "Jiangsu Talent Innovation & Entrepreneurship Competition 2026",
+    "city": "Nanjing",
+    "deadline": "2026-07-31",
+    "prize": "¥20K (1st) / ¥10K (2nd) / ¥8K (3rd) + Policy Fast-Track",
+    "prizeCategory": "small",
+    "industries": [
+      "AI",
+      "Semiconductors",
+      "Advanced Manufacturing",
+      "Biotech & Pharma",
+      "New Materials",
+      "New Energy",
+      "General"
+    ],
+    "level": "Provincial",
+    "desc": "5 overseas divisions. Winners get direct access to Jiangsu's Dual Innovation Plan interview.",
+    "highlights": [
+      "5 overseas divisions: Munich, Boston, LA, Melbourne, Seoul",
+      "Two categories: Innovation (pre-registration) & Entrepreneurship (registered)",
+      "Direct access to provincial talent program interviews",
+      "Priority recommendation for national-level programs"
+    ],
+    "applyUrl": "http://jssrcfwypt.org.cn/",
+    "englishUrl": "",
+    "stage": "Regional Selection",
+    "titleCN": "2026江苏人才创新创业大赛"
+  },
+  {
+    "id": 4,
+    "title": "12th China Returnee Entrepreneurship Competition & International Sci-Tech Contest",
+    "city": "Suzhou",
+    "deadline": "2026-06-22",
+    "prize": "Cash prizes + comprehensive support services",
+    "prizeCategory": "small",
+    "industries": [
+      "Biotech & Pharma",
+      "Semiconductors",
+      "Medical Devices",
+      "Advanced Manufacturing",
+      "General"
+    ],
+    "level": "National",
+    "desc": "Upgraded with new International Talent Sci-Tech Contest track. 5,500+ returnee projects since 2015.",
+    "highlights": [
+      "New International Talent Sci-Tech Contest track",
+      "Full-chain: competition, mentoring, landing, industrialization",
+      "International Sci-Tech Talent China Tour program",
+      "Suzhou biotech and semiconductor ecosystem matchmaking"
+    ],
+    "applyUrl": "http://oseccn.com/",
+    "englishUrl": "",
+    "stage": "Registration",
+    "titleCN": "2026杭州钱塘区创新创业大赛"
+  },
+  {
+    "id": 5,
+    "title": "Hefei Global 'Kepiao' Innovation Competition 2026",
+    "city": "Hefei",
+    "deadline": "",
+    "prize": "Free housing + rent subsidy + funding matching",
+    "prizeCategory": "small",
+    "industries": [
+      "AI",
+      "Advanced Manufacturing",
+      "New Energy",
+      "Semiconductors",
+      "Digital Economy",
+      "General"
+    ],
+    "level": "City",
+    "desc": "15 days free accommodation for all qualifying teams. No overseas vs. domestic split.",
+    "highlights": [
+      "15 days free accommodation for all qualifying teams",
+      "Up to 6 months rent subsidy + free coworking desk",
+      "Single track for all teams — online pitch via Tencent Meeting",
+      "Entry into USTC Silicon Valley Project Library for ongoing matchmaking"
+    ],
+    "applyUrl": "https://www.ustc-si.com/",
+    "englishUrl": "",
+    "stage": "Open",
+    "titleCN": "2026成都双创大赛"
+  },
+  {
+    "id": 6,
+    "title": "Huachuang Star 2026 — National Innovation & Entrepreneurship Competition (3rd Edition)",
+    "city": "Multi-city",
+    "deadline": "",
+    "prize": "Multi-city prizes + landing support per city",
+    "prizeCategory": "medium",
+    "industries": [
+      "AI",
+      "Biotech & Pharma",
+      "New Materials",
+      "New Energy",
+      "Advanced Manufacturing",
+      "Digital Economy",
+      "General"
+    ],
+    "level": "National",
+    "desc": "One application, 14 Chinese cities + overseas tracks. 10 industry tracks.",
+    "highlights": [
+      "14 hub cities: Shanghai, Beijing, Shenzhen, Wuhan, Hangzhou, Hefei, Chengdu + more",
+      "10 industry tracks covering AI, biotech, new materials, traditional industries",
+      "Two pathways: Team Group (pre-registration) / Enterprise Group (registered)",
+      "Test multiple ecosystems with one application"
+    ],
+    "applyUrl": "https://weixin.qq.com/",
+    "englishUrl": "",
+    "stage": "Open",
+    "titleCN": "2026西安创新创业大赛"
+  },
+  {
+    "id": 7,
+    "title": "Win in Guangzhou + Jingu Cup — GBA Innovation Competition",
+    "city": "Guangzhou",
+    "deadline": "2026-06-30",
+    "prize": "Investment-as-award + cash up to ¥50K",
+    "prizeCategory": "small",
+    "industries": [
+      "AI",
+      "Biotech & Pharma",
+      "Digital Economy",
+      "Advanced Manufacturing",
+      "General"
+    ],
+    "level": "City",
+    "desc": "Investment-as-award model. Three tracks: Seed, Startup, Growth.",
+    "highlights": [
+      "Investment-as-award model + cash prizes up to ¥50K",
+      "Three categories: Seed (0-3yr), Startup (3-5yr), Growth (5yr+)",
+      "Greater Bay Area ecosystem access",
+      "Government support for landing in Guangzhou"
+    ],
+    "applyUrl": "https://www.gz.gov.cn/",
+    "englishUrl": "",
+    "stage": "Registration",
+    "titleCN": "2026广州国际创新大赛"
+  },
+  {
+    "id": 8,
+    "title": "Xiamen 'Talents Gather in Fujian' Global Innovation Competition",
+    "city": "Xiamen",
+    "deadline": "2026-06-30",
+    "prize": "~¥4M pool + ¥100K settlement bonus (30% extra for foreign nationals)",
+    "prizeCategory": "large",
+    "industries": [
+      "Semiconductors",
+      "Biotech & Pharma",
+      "Advanced Manufacturing",
+      "New Materials",
+      "General"
+    ],
+    "level": "Provincial",
+    "desc": "Provincial B-level talent recognition. 30% bonus for foreign nationals.",
+    "highlights": [
+      "Provincial B-level talent recognition (¥100K settlement bonus)",
+      "30% additional bonus for foreign national winners",
+      "Focus on Electronics & IT, Biotech, Advanced Manufacturing",
+      "Fujian provincial government backing"
+    ],
+    "applyUrl": "https://www.fujiantalent.com/",
+    "englishUrl": "",
+    "stage": "Registration",
+    "titleCN": "2026合肥创新创业大赛"
+  },
+  {
+    "id": 9,
+    "title": "Startup in Shanghai 2026",
+    "city": "Shanghai",
+    "deadline": "2026-05-31",
+    "prize": "Free office space + innovation fund (¥5M+ angel required)",
+    "prizeCategory": "medium",
+    "industries": [
+      "AI",
+      "Biotech & Pharma",
+      "Semiconductors",
+      "New Energy",
+      "Advanced Manufacturing",
+      "New Materials",
+      "General"
+    ],
+    "level": "City",
+    "desc": "14th edition. Nearly 70,000 tech companies since 2012 — 94 have gone public. CLOSED for 2026.",
+    "highlights": [
+      "14 editions, nearly 70,000 participants, 94 IPOs since 2012",
+      "6 months free office space for finalists",
+      "Priority access to tech-finance loans and VC matchmaking",
+      "Core team members prioritized for talent program recommendations"
+    ],
+    "applyUrl": "https://www.startup-sh.cn/cyds/en",
+    "englishUrl": "",
+    "stage": "Closed",
+    "titleCN": "2026常州国际滨江创业大赛"
+  }
+]

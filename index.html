@@ -1,0 +1,3005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compete in China — All Innovation Competitions, One Platform</title>
+<meta name="description" content="Discover 200+ China innovation competitions for overseas startups. Filter by city, industry, prize, and deadline. One account, one dashboard, one submission.">
+<style>
+  :root {
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface-alt: #f0f4f8;
+    --text: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-light: #eff6ff;
+    --green: #10b981;
+    --green-light: #ecfdf5;
+    --amber: #f59e0b;
+    --amber-light: #fffbeb;
+    --red: #ef4444;
+    --red-light: #fef2f2;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --teal: #0d9488;
+    --teal-light: #f0fdfa;
+    --orange: #f97316;
+    --orange-light: #fff7ed;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Nav ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+  .nav-logo {
+    font-weight: 700; font-size: 16px; color: var(--text);
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+  }
+  .nav-logo-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: var(--accent); color: #fff; display: flex;
+    align-items: center; justify-content: center; font-size: 13px;
+    font-weight: 800;
+  }
+  .nav-links { display: flex; align-items: center; gap: 16px; }
+  .nav-link {
+    font-size: 13.5px; color: var(--text-secondary); font-weight: 500;
+    cursor: pointer; padding: 4px 0; border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .nav-link:hover, .nav-link.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-cta {
+    background: var(--accent); color: #fff; border: none; padding: 7px 16px;
+    border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .nav-cta:hover { background: var(--accent-hover); }
+
+  /* ── Layout ── */
+  .app { max-width: 1280px; margin: 0 auto; padding: 24px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center; padding: 48px 20px 40px;
+    background: linear-gradient(180deg, var(--accent-light) 0%, transparent 100%);
+    border-radius: var(--radius);
+    margin-bottom: 32px;
+  }
+  .hero h1 { font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .hero p { font-size: 15px; color: var(--text-secondary); max-width: 520px; margin: 0 auto 20px; }
+  .hero-stats { display: flex; justify-content: center; gap: 32px; margin-top: 8px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat-num { font-size: 22px; font-weight: 700; color: var(--accent); }
+  .hero-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── SVG Icon System ── */
+  .icon-sm { width: 16px; height: 16px; flex-shrink: 0; }
+  .icon-md { width: 24px; height: 24px; flex-shrink: 0; }
+  .icon-lg { width: 40px; height: 40px; flex-shrink: 0; }
+
+  /* ── Filter Bar ── */
+  .filter-bar {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;
+    padding: 16px; background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
+    align-items: flex-end;
+  }
+  .filter-bar label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 3px; }
+  .filter-bar select {
+    padding: 8px 32px 8px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 13px; color: var(--text);
+    background: var(--surface); cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  .filter-bar select:focus { outline: none; border-color: var(--accent); }
+  .filter-count { margin-left: auto; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  .filter-reset {
+    background: none; border: none; color: var(--accent); font-size: 12px;
+    cursor: pointer; font-weight: 500;
+  }
+  .filter-reset:hover { text-decoration: underline; }
+
+  /* ── Competition Grid ── */
+  .comp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 16px;
+  }
+  .comp-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid var(--border-light);
+    padding: 20px; cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .comp-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent); opacity: 0; transition: opacity 0.2s;
+  }
+  .comp-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent);
+  }
+  .comp-card:hover::before { opacity: 1; }
+  .comp-card-badge {
+    position: absolute; top: 16px; right: 16px;
+    font-size: 11px; font-weight: 700; padding: 3px 10px;
+    border-radius: 10px; z-index: 1;
+  }
+  .badge-open { background: var(--green-light); color: var(--green); }
+  .badge-urgent { background: var(--amber-light); color: var(--amber); }
+  .badge-soon { background: var(--red-light); color: var(--red); }
+  .comp-card-city {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .comp-card-city .city-dot {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+  }
+  .comp-card-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--text); line-height: 1.3; }
+  .comp-card-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .comp-card-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .comp-card-tag {
+    font-size: 11px; padding: 4px 10px; border-radius: 6px;
+    background: var(--surface-alt); color: var(--text-secondary);
+    font-weight: 500; display: flex; align-items: center; gap: 4px;
+  }
+  .comp-card-prize {
+    font-size: 12px; font-weight: 600; color: var(--purple);
+    background: var(--purple-light); padding: 4px 10px; border-radius: 6px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .comp-card-deadline {
+    font-size: 12px; font-weight: 600;
+    padding: 4px 10px; border-radius: 6px;
+  }
+  .deadline-normal { background: var(--accent-light); color: var(--accent); }
+  .deadline-urgent { background: var(--amber-light); color: var(--amber); }
+  .deadline-soon { background: var(--red-light); color: var(--red); }
+
+  /* ── Industry Icon Colors ── */
+  .ind-ai { color: #7c3aed; }
+  .ind-biotech { color: #059669; }
+  .ind-semi { color: #2563eb; }
+  .ind-energy { color: #d97706; }
+  .ind-manu { color: #dc2626; }
+  .ind-materials { color: #0891b2; }
+  .ind-aero { color: #4f46e5; }
+  .ind-robo { color: #9333ea; }
+  .ind-digital { color: #0d9488; }
+  .ind-medical { color: #db2777; }
+
+  /* ── Competition Detail Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,23,42,0.5); z-index: 200;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 16px;
+    max-width: 680px; width: 100%; max-height: 85vh;
+    overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    padding: 32px;
+  }
+  .modal-close {
+    float: right; background: none; border: none; font-size: 22px;
+    color: var(--text-muted); cursor: pointer; padding: 4px; line-height: 1;
+  }
+  .modal-city { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .modal-title { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .modal-meta-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+  .modal-meta-item { background: var(--surface-alt); border-radius: var(--radius-sm); padding: 12px; }
+  .modal-meta-item .label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+  .modal-meta-item .value { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 2px; }
+  .modal-actions { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent); color: #fff; border: none; padding: 12px 24px;
+    border-radius: 24px; font-size: 14px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary {
+    background: var(--surface); color: var(--accent); border: 1.5px solid var(--accent);
+    padding: 12px 24px; border-radius: 24px; font-size: 14px; font-weight: 600;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.15s;
+  }
+  .btn-secondary:hover { background: var(--accent-light); }
+
+  /* ── Dashboard Page ── */
+  .dash-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .dash-header h2 { font-size: 22px; font-weight: 700; }
+  .dash-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 16px; margin-bottom: 32px; }
+  .dash-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
+    padding: 20px;
+  }
+  .dash-card h3 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .dash-stat { font-size: 26px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+  .dash-stat-label { font-size: 12px; color: var(--text-muted); }
+  .tracking-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .tracking-item:last-child { border-bottom: none; }
+  .tracking-status {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .status-interested { background: var(--amber); }
+  .status-applied { background: var(--accent); }
+  .status-review { background: var(--purple); }
+  .status-shortlisted { background: var(--green); }
+  .tracking-info { flex: 1; }
+  .tracking-name { font-size: 13px; font-weight: 600; }
+  .tracking-date { font-size: 11px; color: var(--text-muted); }
+  .upload-area {
+    border: 2px dashed var(--border); border-radius: var(--radius);
+    padding: 32px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .upload-area:hover { border-color: var(--accent); background: var(--accent-light); }
+  .upload-area p { color: var(--text-muted); font-size: 13px; margin-top: 8px; }
+
+  /* ── Concierge Page ── */
+  .concierge-hero {
+    text-align: center; padding: 32px 0 20px;
+  }
+  .concierge-hero h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .concierge-hero .hero-sub { font-size: 14px; color: var(--text-secondary); max-width: 600px; margin: 0 auto; }
+  .concierge-hero .hero-tagline {
+    display: inline-block; margin-top: 16px; padding: 10px 20px;
+    background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+    border: 1px solid #93c5fd; border-radius: 10px;
+    font-size: 13px; color: #1e40af; line-height: 1.7;
+  }
+  .concierge-advantages {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin: 24px 0;
+  }
+  .concierge-adv-card {
+    background: var(--surface); border-radius: var(--radius);
+    padding: 22px; border: 1px solid var(--border);
+    text-align: center;
+  }
+  .concierge-adv-card .adv-icon { font-size: 32px; margin-bottom: 10px; }
+  .concierge-adv-card h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .concierge-adv-card p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; }
+  .concierge-adv-card .highlight-text { color: #059669; font-weight: 600; }
+  .concierge-how {
+    margin: 24px 0; padding: 24px; background: var(--surface);
+    border-radius: var(--radius); border: 1px solid var(--border);
+  }
+  .concierge-how h3 { font-size: 17px; font-weight: 700; margin-bottom: 18px; text-align: center; }
+  .concierge-how-steps { display: flex; gap: 0; }
+  .concierge-how-step {
+    flex: 1; text-align: center; position: relative; padding: 0 12px;
+  }
+  .concierge-how-step:not(:last-child)::after {
+    content: '→'; position: absolute; right: -8px; top: 14px;
+    font-size: 18px; color: var(--accent); font-weight: 700;
+  }
+  .concierge-how-step .step-circle {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 17px; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .concierge-how-step h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .concierge-how-step p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+  .concierge-cta {
+    text-align: center; padding: 20px 0;
+  }
+  .concierge-cta .btn-primary { padding: 14px 40px; font-size: 15px; }
+  .concierge-cost-table {
+    width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 16px 0;
+  }
+  .concierge-cost-table th {
+    text-align: left; padding: 10px 14px; background: #f9fafb;
+    font-weight: 600; border-bottom: 2px solid var(--border);
+  }
+  .concierge-cost-table td {
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+  }
+  .concierge-cost-table .free { color: #059669; font-weight: 600; }
+
+  /* ── Organizer Disclaimer ── */
+  .org-disclaimer {
+    margin-top: 16px; padding: 14px 18px;
+    background: #fefce8; border: 1px solid #fde68a; border-radius: 8px;
+    font-size: 12px; color: #92400e; line-height: 1.7;
+  }
+  .org-disclaimer strong { color: #78350f; }
+
+  /* ── How It Works ── */
+  .how-section { padding: 24px 0; }
+  .how-section h2 { font-size: 22px; font-weight: 700; margin-bottom: 24px; text-align: center; }
+  .how-steps {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+    gap: 16px;
+  }
+  .how-step {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
+    padding: 24px; text-align: center;
+  }
+  .how-step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--accent-light); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; margin: 0 auto 12px;
+  }
+  .how-step h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .how-step p { font-size: 13px; color: var(--text-secondary); }
+
+  /* ═══════════ CITIES PAGE ═══════════ */
+  .cities-hero {
+    text-align: center; padding: 40px 20px 32px;
+  }
+  .cities-hero h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .cities-hero p { color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 14px; }
+  .cities-map-bar {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    margin-bottom: 28px; padding: 0 12px;
+  }
+  .cities-map-chip {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s;
+    background: var(--surface); color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .cities-map-chip:hover, .cities-map-chip.active {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+  .city-region-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 10px;
+    font-weight: 600; letter-spacing: 0.3px;
+  }
+  .region-north { background: #dbeafe; color: #1d4ed8; }
+  .region-east { background: #fce7f3; color: #be185d; }
+  .region-south { background: #d1fae5; color: #047857; }
+  .region-southwest { background: #fef3c7; color: #b45309; }
+  .region-central { background: #e0e7ff; color: #4338ca; }
+  .region-northwest { background: #f0fdf4; color: #15803d; }
+  .city-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid var(--border-light);
+    padding: 24px; display: none;
+  }
+  .city-card.active { display: block; }
+  .city-card-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .city-card-flag {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .city-card-name { font-size: 20px; font-weight: 700; }
+  .city-card-subtitle { font-size: 13px; color: var(--text-secondary); }
+  .city-stats-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr));
+    gap: 10px; margin-bottom: 16px;
+  }
+  .city-stat {
+    background: var(--surface-alt); border-radius: var(--radius-sm);
+    padding: 12px; text-align: center;
+  }
+  .city-stat-num { font-size: 16px; font-weight: 700; color: var(--accent); }
+  .city-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .city-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .city-detail-col h4 { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .city-industry-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .city-why-list { list-style: none; }
+  .city-why-list li { font-size: 13px; color: var(--text); padding: 4px 0; display: flex; align-items: flex-start; gap: 6px; }
+  .city-why-list li::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+  .cost-bar {
+    display: flex; align-items: center; gap: 8px; margin-top: 8px;
+    font-size: 12px;
+  }
+  .cost-bar-fill {
+    height: 6px; border-radius: 3px; background: var(--accent);
+    transition: width 0.3s;
+  }
+  .cost-bar-bg { flex: 1; height: 6px; border-radius: 3px; background: var(--border); }
+
+  /* ═══════════ SIGN UP MODAL ═══════════ */
+  .signup-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,23,42,0.6); z-index: 300;
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .signup-overlay.open { display: flex; }
+  .signup-modal {
+    background: var(--surface); border-radius: 16px;
+    max-width: 480px; width: 100%; max-height: 90vh;
+    overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    padding: 36px 32px 28px;
+  }
+  .signup-modal h2 {
+    font-size: 20px; font-weight: 700; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .signup-modal .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-secondary); margin-bottom: 4px;
+  }
+  .form-group input, .form-group select {
+    width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 14px; color: var(--text);
+    background: var(--surface); transition: border 0.15s;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .form-group input::placeholder { color: var(--text-muted); }
+  .auth-section { margin: 20px 0 8px; }
+  .auth-section h4 {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .auth-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid var(--border-light);
+  }
+  .auth-item:last-child { border-bottom: none; }
+  .auth-item input[type="checkbox"] {
+    margin-top: 2px; width: 16px; height: 16px; accent-color: var(--accent);
+    flex-shrink: 0; cursor: pointer;
+  }
+  .auth-item label {
+    font-size: 12.5px; color: var(--text); cursor: pointer;
+    line-height: 1.5;
+  }
+  .auth-item label a { color: var(--accent); text-decoration: underline; }
+  .signup-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .signup-actions .btn-primary { flex: 1; justify-content: center; }
+  .signup-actions .btn-secondary { flex: 1; justify-content: center; }
+  .signup-error {
+    background: var(--red-light); color: var(--red);
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    font-size: 12px; margin-bottom: 12px; display: none;
+  }
+  .signup-error.show { display: block; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center; padding: 32px 20px; margin-top: 48px;
+    border-top: 1px solid var(--border); color: var(--text-muted);
+    font-size: 12px;
+  }
+  .footer a { color: var(--accent); }
+
+  /* ── LinkedIn Newsletter Button ── */
+  .libutton {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px;
+    padding: 7px 18px;
+    text-align: center; text-decoration: none !important;
+    color: #ffffff !important;
+    width: 220px; height: 36px;
+    border-radius: 18px;
+    background-color: #0A66C2;
+    font-family: "SF Pro Text", Helvetica, sans-serif;
+    font-size: 13px; font-weight: 600;
+    border: none; cursor: pointer; transition: background 0.15s;
+  }
+  .libutton:hover { background-color: #004182; text-decoration: none !important; color: #fff !important; }
+  .libutton svg { width: 16px; height: 16px; fill: #fff; flex-shrink: 0; }
+
+  /* ── Hero Carousel ── */
+  .hero-carousel-wrap {
+    max-width: 1100px; margin: 0 auto 32px; position: relative;
+  }
+  .hero-carousel {
+    display: flex; gap: 16px; overflow: hidden; position: relative;
+    border-radius: var(--radius); min-height: 180px;
+  }
+  .hero-carousel-track {
+    display: flex; gap: 16px; transition: transform 0.4s ease;
+    width: 100%;
+  }
+  .hero-carousel-card {
+    min-width: calc(33.333% - 11px); background: var(--surface);
+    border-radius: var(--radius); border: 1px solid var(--border);
+    box-shadow: var(--shadow); padding: 20px; display: flex; flex-direction: column;
+    justify-content: space-between; position: relative; overflow: hidden;
+  }
+  .hero-carousel-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+  }
+  .hero-carousel-card .card-badge {
+    display: inline-block; background: var(--amber-light); color: #b45309;
+    font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 10px;
+    margin-bottom: 8px; align-self: flex-start;
+  }
+  .hero-carousel-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
+  .hero-carousel-card .card-meta {
+    font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;
+    display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .hero-carousel-card .card-meta span { display: inline-flex; align-items: center; gap: 3px; }
+  .hero-carousel-card .card-prize {
+    font-size: 14px; font-weight: 700; color: var(--amber); margin-top: auto;
+  }
+  .hero-carousel-card .card-btn {
+    display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600;
+    color: var(--accent); text-decoration: none;
+  }
+  .hero-carousel-nav {
+    display: flex; justify-content: center; gap: 8px; margin-top: 14px;
+  }
+  .hero-carousel-dot {
+    width: 8px; height: 8px; border-radius: 50%; border: none;
+    background: var(--border); cursor: pointer; padding: 0; transition: background 0.15s;
+  }
+  .hero-carousel-dot.active { background: var(--accent); width: 20px; border-radius: 4px; }
+  .hero-carousel-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 50%;
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px; color: var(--text-secondary);
+    box-shadow: var(--shadow-sm); z-index: 2; transition: all 0.15s;
+  }
+  .hero-carousel-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .hero-carousel-btn.prev { left: -16px; }
+  .hero-carousel-btn.next { right: -16px; }
+  @media (max-width: 900px) {
+    .hero-carousel-card { min-width: calc(50% - 8px); }
+  }
+  @media (max-width: 600px) {
+    .hero-carousel-card { min-width: 100%; }
+    .hero-carousel-btn.prev { left: 4px; }
+    .hero-carousel-btn.next { right: 4px; }
+  }
+
+  /* ── Page Background Decoration ── */
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(37,99,235,0.04) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(16,185,129,0.04) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+  .app { position: relative; z-index: 1; }
+  .hero {
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .concierge-hero {
+    position: relative; overflow: hidden;
+    text-align: center; padding: 40px 20px 32px;
+    background: linear-gradient(135deg, var(--accent-light) 0%, #f0fdf4 100%);
+    border-radius: var(--radius); margin-bottom: 28px;
+  }
+  .concierge-hero::after {
+    content: ''; position: absolute; bottom: -30px; left: -30px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(16,185,129,0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .how-section { position: relative; }
+  .how-section::before {
+    content: ''; position: absolute; top: -20px; right: 10%;
+    width: 120px; height: 120px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='40' fill='none' stroke='%232563eb' stroke-width='1' opacity='0.08'/%3E%3Ccircle cx='60' cy='60' r='20' fill='none' stroke='%232563eb' stroke-width='1' opacity='0.12'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  /* ── Concierge CTA with LinkedIn ── */
+  .concierge-newsletter-cta {
+    text-align: center; margin: 28px 0 8px; padding: 24px;
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border-radius: var(--radius); border: 1px solid #bfdbfe;
+  }
+  .concierge-newsletter-cta p { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+  .concierge-newsletter-cta .li-wrap { display: flex; justify-content: center; }
+
+  /* ── Footer LinkedIn ── */
+  .footer-newsletter {
+    margin-top: 12px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .footer-newsletter span { font-size: 12px; color: var(--text-muted); }
+
+  /* ── Empty State ── */
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+  .empty-state h3 { font-size: 16px; margin-bottom: 8px; color: var(--text-secondary); }
+
+  /* ── Tooltip ── */
+  .info-tip {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--border); color: var(--text-muted);
+    font-size: 10px; font-weight: 700; cursor: help;
+    position: relative;
+  }
+  .info-tip:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    background: var(--text); color: #fff; font-size: 11px;
+    padding: 6px 10px; border-radius: 6px; white-space: nowrap;
+    pointer-events: none; z-index: 10; font-weight: 400;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .comp-grid { grid-template-columns: 1fr; }
+    .filter-bar { flex-direction: column; }
+    .hero { padding: 32px 16px; }
+    .hero h1 { font-size: 22px; }
+    .hero-stats { gap: 16px; }
+    .modal { padding: 20px; }
+    .modal-meta-grid { grid-template-columns: 1fr; }
+    .city-detail-grid { grid-template-columns: 1fr; }
+    .nav-links { gap: 8px; }
+    .nav-link { font-size: 12px; }
+    .signup-modal { padding: 24px 20px; }
+    .city-stats-row { grid-template-columns: repeat(2,1fr); }
+    .org-stats-row { grid-template-columns: 1fr; }
+    .concierge-advantages { grid-template-columns: 1fr; }
+    .org-benefits { grid-template-columns: 1fr; }
+    .org-process { grid-template-columns: 1fr; }
+  }
+
+  /* ═══════════ ORGANIZER PAGE ═══════════ */
+  .org-hero {
+    text-align: center; padding: 48px 20px 40px;
+    background: linear-gradient(180deg, #fef3c7 0%, transparent 100%);
+    border-radius: var(--radius); margin-bottom: 32px;
+  }
+  .org-hero h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .org-hero p { font-size: 15px; color: var(--text-secondary); max-width: 600px; margin: 0 auto 20px; }
+  .org-hero .badge-free {
+    display: inline-block; background: var(--green-light); color: var(--green);
+    font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .org-stats-row {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 16px;
+    margin-bottom: 32px;
+  }
+  .org-stat-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
+    padding: 20px; text-align: center;
+  }
+  .org-stat-card .num { font-size: 28px; font-weight: 700; color: var(--amber); }
+  .org-stat-card .label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .org-benefits {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-bottom: 32px;
+  }
+  .org-benefit {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
+    padding: 24px;
+  }
+  .org-benefit .benefit-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px; font-size: 20px;
+  }
+  .org-benefit h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .org-benefit p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .org-process {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+    margin-bottom: 32px;
+  }
+  .org-step {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border-light);
+    padding: 24px; text-align: center; position: relative;
+  }
+  .org-step-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--amber-light); color: var(--amber);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; margin: 0 auto 12px;
+  }
+  .org-step h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .org-step p { font-size: 12.5px; color: var(--text-secondary); }
+  .org-cta-row {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .org-form-card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid var(--border-light);
+    padding: 28px; max-width: 640px; margin: 0 auto 32px;
+  }
+  .org-form-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; text-align: center; }
+  .org-form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .org-form-row input, .org-form-row select, .org-form-row textarea {
+    flex: 1; padding: 10px 14px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 13px; font-family: inherit;
+    background: var(--surface);
+  }
+  .org-form-row textarea { min-height: 80px; resize: vertical; }
+  .org-form-row input:focus, .org-form-row select:focus, .org-form-row textarea:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .org-form-submit {
+    width: 100%; margin-top: 4px;
+  }
+
+  /* ═══════════ AI CHAT WIDGET ═══════════ */
+  .chat-widget { position: fixed; bottom: 24px; right: 24px; z-index: 300; }
+  .chat-bubble {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--accent); color: #fff; border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 22px; box-shadow: 0 4px 16px rgba(37,99,235,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .chat-bubble:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(37,99,235,0.45); }
+  .chat-panel {
+    display: none; position: absolute; bottom: 64px; right: 0;
+    width: 340px; max-height: 480px; background: var(--surface);
+    border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    border: 1px solid var(--border); overflow: hidden;
+  }
+  .chat-panel.open { display: flex; flex-direction: column; }
+  .chat-header {
+    background: var(--accent); color: #fff; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .chat-header-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .chat-header-info { flex: 1; }
+  .chat-header-name { font-size: 13px; font-weight: 600; }
+  .chat-header-status { font-size: 11px; opacity: 0.8; }
+  .chat-header-close {
+    background: none; border: none; color: #fff; font-size: 18px;
+    cursor: pointer; opacity: 0.7;
+  }
+  .chat-header-close:hover { opacity: 1; }
+  .chat-body {
+    flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px;
+    max-height: 260px;
+  }
+  .chat-msg {
+    font-size: 12.5px; line-height: 1.5; max-width: 85%;
+    padding: 10px 14px; border-radius: 14px; animation: msgIn 0.2s ease;
+  }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .chat-msg.bot {
+    background: var(--surface-alt); color: var(--text); align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .chat-msg.user {
+    background: var(--accent); color: #fff; align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .chat-faq {
+    display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px;
+  }
+  .chat-faq-btn {
+    font-size: 11px; padding: 6px 12px; border-radius: 14px;
+    background: var(--surface-alt); border: 1px solid var(--border);
+    color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+  }
+  .chat-faq-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+  .chat-input-row {
+    display: flex; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--border-light);
+  }
+  .chat-input-row input {
+    flex: 1; padding: 10px 14px; border: 1px solid var(--border);
+    border-radius: 20px; font-size: 12.5px; outline: none;
+  }
+  .chat-input-row input:focus { border-color: var(--accent); }
+  .chat-input-row button {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: var(--accent); color: #fff; cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-input-row button:hover { background: var(--accent-hover); }
+
+  /* ═══════════ SOCIAL ICONS ═══════════ */
+  .social-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--text-secondary); font-size: 12px; cursor: pointer;
+    transition: color 0.15s; text-decoration: none;
+  }
+  .social-link:hover { color: var(--accent); text-decoration: none; }
+  .social-link svg { width: 18px; height: 18px; }
+  .lang-toggle {
+    background: var(--surface-alt); border: 1px solid var(--border);
+    color: var(--text-secondary); font-size: 12px; font-weight: 600;
+    padding: 4px 10px; border-radius: 14px; cursor: pointer;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .lang-toggle:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+  /* ═══════════ WHATSAPP FLOATING BUTTON ═══════════ */
+  .wa-float {
+    position: fixed; bottom: 24px; right: 92px; z-index: 300;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  }
+  .wa-tooltip {
+    background: var(--surface); box-shadow: var(--shadow-md); border-radius: var(--radius-sm);
+    padding: 10px 14px; font-size: 12px; color: var(--text); display: none;
+    max-width: 200px; line-height: 1.5; white-space: nowrap;
+  }
+  .wa-tooltip.show { display: block; }
+  .wa-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #25d366; color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; box-shadow: 0 4px 14px rgba(37,211,102,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .wa-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(37,211,102,0.5); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="nav">
+  <div class="nav-logo" onclick="showPage('browse')">
+    <div class="nav-logo-icon">C</div>
+    Compete in China
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" data-page="browse" data-i18n="nav_comp" onclick="showPage('browse')">Competitions</a>
+    <a class="nav-link" data-page="cities" data-i18n="nav_cities" onclick="showPage('cities')">Explore Cities</a>
+    <a class="nav-link" data-page="organizers" data-i18n="nav_org" onclick="showPage('organizers')">For Organizers</a>
+    <a class="nav-link" data-page="how" data-i18n="nav_how" onclick="showPage('how')">How It Works</a>
+    <a class="nav-link" data-page="dashboard" data-i18n="nav_dash" onclick="showPage('dashboard')">Dashboard</a>
+    <a class="social-link" href="https://www.linkedin.com/company/techinbridge" target="_blank" title="Techinbridge on LinkedIn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+    <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()" title="Switch Language / 切换语言">中文</button>
+    <button class="nav-cta" data-i18n="nav_signup" onclick="openSignup()">Sign Up Free</button>
+  </div>
+</nav>
+
+<div class="app">
+
+<!-- ═══════════ PAGE: Browse ═══════════ -->
+<div class="page active" id="page-browse">
+
+  <div class="hero">
+    <h1 data-i18n="hero_title">China Innovation Competitions — All in One Place</h1>
+    <p data-i18n="hero_sub">200+ competitions across 20+ Chinese cities. Filter by city, industry, prize, and deadline. Find the right stage for your startup.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num" id="stat-total">9</div><div class="hero-stat-label" data-i18n="hero_stat1">Active Competitions</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">20+</div><div class="hero-stat-label" data-i18n="hero_stat2">Cities Covered</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">¥100M+</div><div class="hero-stat-label" data-i18n="hero_stat3">Total Prize Pool</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">12</div><div class="hero-stat-label" data-i18n="hero_stat4">Industry Tracks</div></div>
+    </div>
+  </div>
+
+  <!-- Featured Competitions Carousel -->
+  <div class="hero-carousel-wrap" id="carouselWrap">
+    <h2 style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:14px;display:flex;align-items:center;gap:6px;">
+      <span>⭐</span> <span data-i18n="carousel_title">Featured Competitions</span>
+    </h2>
+    <div style="position:relative;">
+      <button class="hero-carousel-btn prev" onclick="carouselMove(-1)">‹</button>
+      <div class="hero-carousel" id="heroCarousel">
+        <div class="hero-carousel-track" id="carouselTrack"></div>
+      </div>
+      <button class="hero-carousel-btn next" onclick="carouselMove(1)">›</button>
+    </div>
+    <div class="hero-carousel-nav" id="carouselNav"></div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar" id="filterBar">
+    <div>
+      <label data-i18n="filter_city">City</label>
+      <select id="filterCity" onchange="applyFilters()">
+        <option value="" data-i18n="filter_all_cities">All Cities</option>
+        <option>Beijing</option><option>Shanghai</option><option>Shenzhen</option>
+        <option>Guangzhou</option><option>Hangzhou</option><option>Suzhou</option>
+        <option>Hefei</option><option>Nanjing</option><option>Xiamen</option>
+        <option>Chengdu</option><option>Xi'an</option><option>Wuhan</option>
+        <option>Kunming</option><option>Jinan</option>
+        <option>Multi-city</option>
+      </select>
+    </div>
+    <div>
+      <label data-i18n="filter_ind">Industry</label>
+      <select id="filterIndustry" onchange="applyFilters()">
+        <option value="" data-i18n="filter_all_ind">All Industries</option>
+        <option>AI</option><option>Biotech & Pharma</option><option>Semiconductors</option>
+        <option>New Energy</option><option>Advanced Manufacturing</option>
+        <option>New Materials</option><option>Aerospace</option>
+        <option>Robotics</option><option>Digital Economy</option>
+        <option>Medical Devices</option><option>General</option>
+      </select>
+    </div>
+    <div>
+      <label data-i18n="filter_prize">Prize Range</label>
+      <select id="filterPrize" onchange="applyFilters()">
+        <option value="" data-i18n="filter_all">All</option>
+        <option value="small">&lt; ¥500K</option>
+        <option value="medium">¥500K – ¥2M</option>
+        <option value="large">¥2M – ¥10M</option>
+        <option value="huge">&gt; ¥10M</option>
+      </select>
+    </div>
+    <div>
+      <label data-i18n="filter_deadline">Deadline</label>
+      <select id="filterDeadline" onchange="applyFilters()">
+        <option value="" data-i18n="filter_all2">All</option>
+        <option value="urgent" data-i18n="filter_urgent">This Month</option>
+        <option value="soon" data-i18n="filter_soon">Next 2 Months</option>
+        <option value="open" data-i18n="filter_open">Open / TBA</option>
+      </select>
+    </div>
+    <div class="filter-count"><span id="resultCount">9</span> <span data-i18n="filter_results">results</span></div>
+    <button class="filter-reset" onclick="resetFilters()" data-i18n="filter_reset">Reset</button>
+  </div>
+
+  <!-- Competition Grid -->
+  <div class="comp-grid" id="compGrid"></div>
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <h3 data-i18n="empty_title">No competitions match your filters</h3>
+    <p data-i18n="empty_sub">Try adjusting your criteria or reset filters.</p>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE: Explore Cities ═══════════ -->
+<div class="page" id="page-cities">
+  <div class="cities-hero">
+    <h2>Not Just Beijing & Shanghai</h2>
+    <p>China has 20+ cities with thriving innovation ecosystems, each with unique industries, incentives, and advantages. Most overseas founders only know the top 3 — you're missing 85% of the opportunity.</p>
+  </div>
+
+  <!-- City Quick Select Chips -->
+  <div class="cities-map-bar" id="citiesChips"></div>
+
+  <!-- City Detail Card -->
+  <div id="cityDetail"></div>
+</div>
+
+<!-- ═══════════ PAGE: How It Works (DIY + Concierge Merged) ═══════════ -->
+<div class="page" id="page-how">
+
+  <!-- Section 1: Two Paths Overview -->
+  <div class="how-section">
+    <h2 data-i18n="how_title">Two Ways to Compete</h2>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num" style="background:var(--green);">🆓</div>
+        <h3 data-i18n="how_s1t">DIY — Apply Yourself</h3>
+        <p data-i18n="how_s1d">Browse 200+ competitions, click "Apply Now" to jump to the official page. <strong>100% free, forever.</strong> You fill the forms, you track progress, you keep all prizes.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num" style="background:var(--accent);">🤝</div>
+        <h3 data-i18n="how_s2t">Concierge — We Handle Everything</h3>
+        <p data-i18n="how_s2d">Fill one form, upload your deck. <strong>We submit to multiple competitions for you.</strong> Zero upfront cost. 50% success fee only if you win through us.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Why Concierge -->
+  <div class="concierge-hero">
+    <h2 data-i18n="conc_title">One Submission. Multiple Competitions. Zero Upfront Cost.</h2>
+    <p class="hero-sub" data-i18n="conc_sub">We handle the Chinese paperwork. You focus on your product. Apply to 200+ innovation competitions across China — all from a single submission.</p>
+    <div class="hero-tagline">
+      <strong data-i18n="conc_tagline1">More than just competitions — it's the lowest-cost way to expand your influence in China.</strong><br>
+      <span data-i18n="conc_tagline2">Your project gets seen by investors, industrial parks, and government talent programs across multiple cities. Build your China presence gradually — one competition at a time.</span>
+    </div>
+  </div>
+
+  <!-- Section 3: Advantages -->
+  <h3 style="font-size:18px;font-weight:700;text-align:center;margin-bottom:4px;" data-i18n="conc_why_title">Why Use Our Concierge Service?</h3>
+  <p style="text-align:center;font-size:12.5px;color:var(--text-secondary);margin-bottom:16px;" data-i18n="conc_why_sub">Applying to Chinese competitions is hard. We make it easy.</p>
+  <div class="concierge-advantages">
+    <div class="concierge-adv-card">
+      <div class="adv-icon">⏱️</div>
+      <h4 data-i18n="conc_adv1t">Save 40+ Hours</h4>
+      <p data-i18n="conc_adv1d">Each Chinese competition application takes 2-3 hours — filling forms, translating materials, understanding requirements. We do it for <strong>multiple competitions at once</strong>. You upload once, we apply everywhere.</p>
+    </div>
+    <div class="concierge-adv-card">
+      <div class="adv-icon">💰</div>
+      <h4 data-i18n="conc_adv2t">Zero Upfront Cost</h4>
+      <p data-i18n="conc_adv2d"><span class="highlight-text">Completely free to use.</span> No submission fees, no retainer, no hidden charges. We only charge <strong>50% of prize money</strong> — and only if you actually win through competitions we submit on your behalf.</p>
+    </div>
+    <div class="concierge-adv-card">
+      <div class="adv-icon">🌏</div>
+      <h4 data-i18n="conc_adv3t">Build China Presence</h4>
+      <p data-i18n="conc_adv3d">Every competition submission is a touchpoint — with city governments, industrial parks, and investors. Even if you don't win, your project gets on their radar. <strong>Low-cost brand building in China.</strong></p>
+    </div>
+    <div class="concierge-adv-card">
+      <div class="adv-icon">🎯</div>
+      <h4 data-i18n="conc_adv4t">Smart Matching</h4>
+      <p data-i18n="conc_adv4d">We match your project to the <strong>right competitions</strong> — by industry, stage, and city. No more guessing which competition fits. We know the landscape and pick the best opportunities for you.</p>
+    </div>
+    <div class="concierge-adv-card">
+      <div class="adv-icon">🤝</div>
+      <h4 data-i18n="conc_adv5t">Your Competition Assistant</h4>
+      <p data-i18n="conc_adv5d">We handle <strong>all communication with organizers</strong> — eligibility questions, material updates, schedule changes, result notifications. You focus on your product; we handle the paperwork and back-and-forth.</p>
+    </div>
+    <div class="concierge-adv-card">
+      <div class="adv-icon">🏢</div>
+      <h4 data-i18n="conc_adv6t">China Landing Support</h4>
+      <p data-i18n="conc_adv6d">Planning to set up in China? We guide you through <strong>entity registration, talent policies, and local incentives</strong>. Full end-to-end support available after you win — transparent service pricing provided upfront.</p>
+    </div>
+  </div>
+
+  <!-- LinkedIn Newsletter CTA -->
+  <div class="concierge-newsletter-cta">
+    <h4 style="font-size:15px;font-weight:700;margin-bottom:4px;" data-i18n="conc_newsletter_title">Follow Our LinkedIn Newsletter</h4>
+    <p data-i18n="conc_newsletter_sub">Get weekly updates on China innovation competitions, talent programs, and landing policies — delivered straight to your LinkedIn feed.</p>
+    <div class="li-wrap">
+      <a class="libutton" href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7402612108833832960" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        <span data-i18n="conc_newsletter_btn">Follow on LinkedIn</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Section 4: Cost Comparison -->
+  <div class="concierge-how">
+    <h3 data-i18n="conc_cost_title">Cost Comparison: DIY vs. Concierge</h3>
+    <table class="concierge-cost-table">
+      <tr><th data-i18n="conc_cost_h1"></th><th data-i18n="conc_cost_h2">Applying Yourself (DIY)</th><th data-i18n="conc_cost_h3">Concierge Service</th></tr>
+      <tr>
+        <td data-i18n="conc_cost_r1l">Upfront Cost</td>
+        <td>Usually free (but time = money)</td>
+        <td class="free" data-i18n="conc_cost_r1c">Free — no upfront cost</td>
+      </tr>
+      <tr>
+        <td data-i18n="conc_cost_r2l">Time Per Competition</td>
+        <td>2-3 hours (form filling + translation)</td>
+        <td class="free" data-i18n="conc_cost_r2c">0 — we handle everything</td>
+      </tr>
+      <tr>
+        <td data-i18n="conc_cost_r3l">Language Barrier</td>
+        <td>High — most forms are Chinese-only</td>
+        <td class="free" data-i18n="conc_cost_r3c">Solved — we translate & submit</td>
+      </tr>
+      <tr>
+        <td data-i18n="conc_cost_r4l">Success Fee</td>
+        <td>You keep 100% of prizes</td>
+        <td class="free" data-i18n="conc_cost_r4c">50% of prize — only if you win</td>
+      </tr>
+      <tr>
+        <td data-i18n="conc_cost_r5l">Multi-Competition Strategy</td>
+        <td>Hard — each requires separate effort</td>
+        <td class="free" data-i18n="conc_cost_r5c">Easy — one upload, apply to many</td>
+      </tr>
+    </table>
+    <p style="font-size:11px;color:var(--text-secondary);text-align:center;margin-top:10px;" data-i18n="conc_cost_note">* Direct applications (you click "Apply Now" yourself) never incur any fee.</p>
+  </div>
+
+  <!-- Section 5: Concierge Workflow -->
+  <div class="concierge-how">
+    <h3 data-i18n="conc_steps_title">How Concierge Works — 4 Simple Steps</h3>
+    <div class="concierge-how-steps">
+      <div class="concierge-how-step">
+        <div class="step-circle">1</div>
+        <h4 data-i18n="conc_s1t">Create Account</h4>
+        <p data-i18n="conc_s1d">Quick sign up — name, email, password. Takes 10 seconds.</p>
+      </div>
+      <div class="concierge-how-step">
+        <div class="step-circle">2</div>
+        <h4 data-i18n="conc_s2t">Fill One Form</h4>
+        <p data-i18n="conc_s2d">Tell us about your team, project, IP, and China plans. Upload your pitch deck.</p>
+      </div>
+      <div class="concierge-how-step">
+        <div class="step-circle">3</div>
+        <h4 data-i18n="conc_s3t">We Match & Submit</h4>
+        <p data-i18n="conc_s3d">We match you to the best competitions and handle all Chinese applications — <strong>including all organizer communication</strong>. You'll see every submission and status update on your Dashboard.</p>
+      </div>
+      <div class="concierge-how-step">
+        <div class="step-circle">4</div>
+        <h4 data-i18n="conc_s4t">Track & Win</h4>
+        <p data-i18n="conc_s4d">Track all submissions on your dashboard. We update the status at each stage — Submitted → Review → Shortlisted → Result. <strong>If you win and plan to land in China, we can support your next steps.</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 6: FAQ -->
+  <div class="concierge-how">
+    <h3 data-i18n="conc_faq_title">Common Questions</h3>
+    <p style="font-size:13px;line-height:2;color:var(--text);">
+      <strong data-i18n="conc_faq_q1">Q: Is there really no upfront cost?</strong><br>
+      <span data-i18n="conc_faq_a1">A: Zero. We don't charge to submit. You only pay if you win — 50% of the prize money, and only for competitions we actively manage.</span><br><br>
+      <strong data-i18n="conc_faq_q2">Q: Can I still apply directly to some competitions?</strong><br>
+      <span data-i18n="conc_faq_a2">A: Of course. Direct applications (you click "Apply Now" yourself) are always free and never incur our service fee. Concierge is optional.</span><br><br>
+      <strong data-i18n="conc_faq_q3">Q: What materials do I need to prepare?</strong><br>
+      <span data-i18n="conc_faq_a3">A: Just your pitch deck (PDF/PPTX) and basic team/project info. Our form covers everything competition organizers typically ask for.</span><br><br>
+      <strong data-i18n="conc_faq_q4">Q: How long before I hear back?</strong><br>
+      <span data-i18n="conc_faq_a4">A: We submit within 48 hours of receiving your materials. Competition results depend on each event's review timeline — typically 4-12 weeks.</span><br><br>
+      <strong data-i18n="conc_faq_q5">Q: I plan to set up a company in China after winning — can you help?</strong><br>
+      <span data-i18n="conc_faq_a5">A: Absolutely. We provide end-to-end support for China entity registration, talent program applications, and local incentive applications. We'll share a transparent service pricing plan before any engagement — no hidden fees.</span><br><br>
+      <strong data-i18n="conc_faq_q6">Q: Who handles communication with competition organizers?</strong><br>
+      <span data-i18n="conc_faq_a6">A: We do. As your concierge, we handle all organizer communication — eligibility questions, material updates, schedule changes, and result notifications. You focus on your product; we handle the back-and-forth.</span>
+    </p>
+  </div>
+
+  <!-- CTA -->
+  <div class="concierge-cta">
+    <button class="btn-primary" onclick="startConcierge()" data-i18n="conc_cta">
+      Start Now — It's Free
+    </button>
+    <p style="font-size:12px;color:var(--text-secondary);margin-top:10px;" data-i18n="conc_cta_sub">No credit card. No commitment. Cancel anytime.</p>
+  </div>
+
+  <!-- WhatsApp Quick Contact -->
+  <div style="text-align:center;padding:20px 0 0;">
+    <p style="font-size:13px;color:var(--text-secondary);">
+      Questions? <a href="https://wa.me/85252072721" target="_blank" style="color:#25d366;font-weight:600;">Chat with us on WhatsApp →</a>
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE: Dashboard ═══════════ -->
+<div class="page" id="page-dashboard">
+  <div class="dash-header">
+    <h2 data-i18n="dash_title">My Concierge Applications</h2>
+  </div>
+
+  <!-- Important Notice -->
+  <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;font-size:13px;color:#92400e;line-height:1.7;">
+    <strong>This dashboard only shows competitions submitted on your behalf by TechinBridge (Concierge Service).</strong><br>
+    If you applied directly by clicking "Apply Now" on a competition, you must <strong>contact the competition organizer directly</strong> to track your application status. We cannot track self-applied entries.
+  </div>
+
+  <!-- No applications state -->
+  <div id="dashEmpty" style="background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:48px 32px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">📋</div>
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">No Concierge Applications Yet</h3>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">You haven't submitted any competitions through our Concierge Service. Fill one form and we'll handle the rest.</p>
+    <button class="btn-primary" onclick="showPage('how')" style="font-size:14px;padding:10px 24px;">Start Concierge →</button>
+  </div>
+
+  <!-- Active Applications -->
+  <div id="dashActive" style="display:none;">
+    <div class="dash-cards">
+      <div class="dash-card">
+        <h3><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg> <span>Active Submissions</span></h3>
+        <div class="dash-stat" id="dashCount">0</div>
+        <div class="dash-stat-label" id="dashCountSub">concierge applications in progress</div>
+      </div>
+      <div class="dash-card">
+        <h3><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span>Next Deadline</span></h3>
+        <div class="dash-stat" id="dashNextDeadline">—</div>
+        <div class="dash-stat-label" id="dashDeadlineSub">No upcoming deadlines</div>
+      </div>
+    </div>
+
+    <div class="dash-card" style="margin-bottom:16px;">
+      <h3><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> <span>Submission Progress</span></h3>
+      <div id="dashTracking"></div>
+    </div>
+
+    <div class="dash-card">
+      <h3><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> <span>Your Materials</span></h3>
+      <div class="upload-area" onclick="startConcierge()" style="cursor:pointer;">
+        <div style="font-size:32px;margin-bottom:8px;">📄</div>
+        <div style="font-weight:600;font-size:14px;">Update Registration Form</div>
+        <p>Re-submit or update your team info, pitch deck, and preferences. We'll use the latest version for all future submissions.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE: For Organizers ═══════════ -->
+<div class="page" id="page-organizers">
+  <div class="org-hero">
+    <span class="badge-free" data-i18n="org_badge">Free for Competition Organizers</span>
+    <h2 data-i18n="org_hero_title">Reach Global Innovators. Attract World-Class Projects.</h2>
+    <p data-i18n="org_hero_sub">Your competition deserves to be seen by the best overseas startups. We bridge the language gap and put your event in front of 10,000+ global founders actively looking for China opportunities.</p>
+  </div>
+
+  <!-- Why List With Us -->
+  <div class="org-stats-row">
+    <div class="org-stat-card">
+      <div class="num">10K+</div>
+      <div class="label" data-i18n="org_stat1">Overseas Startups in Network</div>
+    </div>
+    <div class="org-stat-card">
+      <div class="num">50+</div>
+      <div class="label" data-i18n="org_stat2">Countries Represented</div>
+    </div>
+    <div class="org-stat-card">
+      <div class="num">8</div>
+      <div class="label" data-i18n="org_stat3">Languages for Promotion</div>
+    </div>
+    <div class="org-stat-card">
+      <div class="num">Free</div>
+      <div class="label" data-i18n="org_stat4">Basic Listing — Forever</div>
+    </div>
+  </div>
+
+  <!-- Benefits -->
+  <h3 style="font-size:18px;font-weight:700;text-align:center;margin-bottom:16px;" data-i18n="org_benefits_title">What You Get</h3>
+  <div class="org-benefits">
+    <div class="org-benefit">
+      <div class="benefit-icon" style="background:#eff6ff;">🌐</div>
+      <h3 data-i18n="org_b1t">Global Visibility</h3>
+      <p data-i18n="org_b1d">Your competition appears in our searchable database alongside China's top innovation contests. We promote featured events across LinkedIn, email newsletters, and partner networks — reaching founders in Boston, Berlin, Bangalore, and beyond.</p>
+    </div>
+    <div class="org-benefit">
+      <div class="benefit-icon" style="background:#f0fdfa;">📝</div>
+      <h3 data-i18n="org_b2t">English-Language Promotion</h3>
+      <p data-i18n="org_b2d">We translate your competition details into professional English — eligibility, submission requirements, prize structure, and timelines. No more lost-in-translation. Your event reads like a native English opportunity.</p>
+    </div>
+    <div class="org-benefit">
+      <div class="benefit-icon" style="background:#fffbeb;">🎯</div>
+      <h3 data-i18n="org_b3t">Quality Applicant Screening</h3>
+      <p data-i18n="org_b3d">Our platform attracts serious overseas teams actively seeking China market entry. We pre-screen for industry fit, stage, and international eligibility — so your review panel spends time on qualified candidates, not noise.</p>
+    </div>
+    <div class="org-benefit">
+      <div class="benefit-icon" style="background:#f5f3ff;">📊</div>
+      <h3 data-i18n="org_b4t">Applicant Analytics</h3>
+      <p data-i18n="org_b4d">Get monthly reports on page views, click-throughs, and applicant demographics. Understand which regions and industries are most interested in your competition — data to shape your next outreach strategy.</p>
+    </div>
+    <div class="org-benefit">
+      <div class="benefit-icon" style="background:#fef2f2;">🤝</div>
+      <h3 data-i18n="org_b5t">Investment Matchmaking</h3>
+      <p data-i18n="org_b5d">Beyond the competition — winning teams become candidates for local investment funds, industrial parks, and government talent programs. Your competition is the first touchpoint in a full innovation pipeline.</p>
+    </div>
+    <div class="org-benefit">
+      <div class="benefit-icon" style="background:#ecfdf5;">⚡</div>
+      <h3 data-i18n="org_b6t">Zero Cost, Zero Risk</h3>
+      <p data-i18n="org_b6d">Basic listing is completely free — no setup fees, no subscription, no hidden charges. We only offer optional premium promotion if you want extra visibility. You control everything.</p>
+    </div>
+  </div>
+
+  <!-- How It Works for Organizers -->
+  <h3 style="font-size:18px;font-weight:700;text-align:center;margin-bottom:16px;" data-i18n="org_steps_title">Getting Started — 3 Simple Steps</h3>
+  <div class="org-process">
+    <div class="org-step">
+      <div class="org-step-num">1</div>
+      <h4 data-i18n="org_s1t">Submit Your Competition</h4>
+      <p data-i18n="org_s1d">Fill out the quick form below with your competition name, dates, prizes, and eligibility. Takes 3 minutes.</p>
+    </div>
+    <div class="org-step">
+      <div class="org-step-num">2</div>
+      <h4 data-i18n="org_s2t">We Review & Translate</h4>
+      <p data-i18n="org_s2d">Our team verifies the details, translates into professional English, and formats for global audiences. Usually within 48 hours.</p>
+    </div>
+    <div class="org-step">
+      <div class="org-step-num">3</div>
+      <h4 data-i18n="org_s3t">Go Live & Get Applicants</h4>
+      <p data-i18n="org_s3d">Your competition goes live on Compete in China. We promote it across our channels. You start receiving qualified international applicants.</p>
+    </div>
+  </div>
+
+  <!-- CTA Buttons -->
+  <div class="org-cta-row">
+    <button class="btn-primary" onclick="document.getElementById('orgFormCard').scrollIntoView({behavior:'smooth'})" data-i18n="org_cta1">
+      List Your Competition Free &rarr;
+    </button>
+    <button class="btn-secondary" onclick="openChat()" data-i18n="org_cta2">
+      Chat with Us
+    </button>
+  </div>
+
+  <!-- Submission Form -->
+  <div class="org-form-card" id="orgFormCard">
+    <h3 data-i18n="org_form_title">List Your Competition</h3>
+    <p style="text-align:center;font-size:13px;color:var(--text-secondary);margin-bottom:16px;" data-i18n="org_form_sub">Free basic listing. We'll review and publish within 48 hours.</p>
+
+    <div class="org-form-row">
+      <input type="text" id="orgCompName" data-i18n-ph="org_name_ph" placeholder="Competition Name *" style="flex:2;">
+      <select id="orgCity" style="flex:1;" data-i18n-first="org_city_first">
+        <option value="">City *</option>
+        <option>Beijing</option><option>Shanghai</option><option>Shenzhen</option>
+        <option>Guangzhou</option><option>Hangzhou</option><option>Suzhou</option>
+        <option>Hefei</option><option>Nanjing</option><option>Xiamen</option>
+        <option>Chengdu</option><option>Xi'an</option><option>Wuhan</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="org-form-row">
+      <input type="text" id="orgPrize" data-i18n-ph="org_prize_ph" placeholder="Prize Pool (e.g. ¥5M total)" style="flex:1;">
+      <input type="text" id="orgDeadline" data-i18n-ph="org_deadline_ph" placeholder="Application Deadline" style="flex:1;" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
+    </div>
+    <div class="org-form-row">
+      <input type="text" id="orgIndustry" data-i18n-ph="org_ind_ph" placeholder="Industry Focus (e.g. AI, Biotech)">
+    </div>
+    <div class="org-form-row">
+      <input type="text" id="orgWebsite" data-i18n-ph="org_web_ph" placeholder="Official Website / Registration Link *">
+    </div>
+    <div class="org-form-row">
+      <textarea id="orgDesc" data-i18n-ph="org_desc_ph" placeholder="Brief description of your competition..."></textarea>
+    </div>
+    <div class="org-form-row">
+      <input type="text" id="orgContact" data-i18n-ph="org_contact_ph" placeholder="Your Name / Organization *">
+    </div>
+    <div class="org-form-row">
+      <input type="email" id="orgEmail" data-i18n-ph="org_email_ph" placeholder="Contact Email *">
+    </div>
+    <button class="btn-primary org-form-submit" onclick="submitOrganizerForm()" data-i18n="org_submit">Submit for Review &rarr;</button>
+    <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:10px;" data-i18n="org_footer">By submitting, you confirm you are authorized to represent this competition. We'll email you within 48 hours.</p>
+
+    <!-- Disclaimer -->
+    <div class="org-disclaimer">
+      <strong data-i18n="org_disc_title">⚠️ 入驻须知与免责声明 / Listing Disclaimer</strong><br>
+      <span data-i18n="org_disc_1">1. <strong>信息真实性：</strong>提交方须确保所有赛事信息真实、准确、完整。如因信息不实导致的任何后果，由提交方承担。</span><br>
+      <span data-i18n="org_disc_2">2. <strong>非虚假宣传：</strong>提交方承诺赛事宣传内容不含虚假、夸大或误导性信息。所有奖金金额、参赛条件、评审标准均以实际情况为准。</span><br>
+      <span data-i18n="org_disc_3">3. <strong>人工审核发布：</strong>所有赛事资料提交后需经 Compete in China 团队人工审核。审核通过后方可展示发布。我们保留拒绝或要求修改不符合规范内容的权利。</span><br>
+      <span data-i18n="org_disc_4">4. <strong>审核时效：</strong>通常在 48 小时内完成审核并上线。如需加急，请联系 competitions@techinbridge.com。</span>
+    </div>
+  </div>
+
+  <!-- Direct Contact -->
+  <div style="text-align:center;padding:20px 0;">
+    <p style="font-size:14px;color:var(--text-secondary);" data-i18n="org_contact">
+      Prefer to talk directly? Reach us at
+      <strong><a href="mailto:competitions@techinbridge.com">competitions@techinbridge.com</a></strong>
+      or connect on
+      <a href="https://www.linkedin.com/company/techinbridge" target="_blank" class="social-link" style="display:inline-flex;">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+    </p>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- ═══════════ COMPETITION DETAIL MODAL ═══════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent" onclick="event.stopPropagation()"></div>
+</div>
+
+<!-- ═══════════ SIGN UP MODAL ═══════════ -->
+<div class="signup-overlay" id="signupOverlay" onclick="closeSignup(event)">
+  <div class="signup-modal" id="signupModal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeSignup()">&times;</button>
+    <h2 data-i18n="signup_title">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+      Create Your Free Account
+    </h2>
+    <p class="subtitle" data-i18n="signup_sub">Just 3 fields. Takes 10 seconds. No credit card required.</p>
+
+    <div class="signup-error" id="signupError"></div>
+
+    <div class="form-group">
+      <label data-i18n="signup_name">Full Name</label>
+      <input type="text" id="signupName" data-i18n-ph="signup_name_ph" placeholder="e.g. Sarah Chen">
+    </div>
+    <div class="form-group">
+      <label data-i18n="signup_email">Email</label>
+      <input type="email" id="signupEmail" data-i18n-ph="signup_email_ph" placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label data-i18n="signup_pw">Password</label>
+      <input type="password" id="signupPassword" data-i18n-ph="signup_pw_ph" placeholder="Min. 8 characters">
+    </div>
+
+    <div class="auth-section" style="margin:16px 0;">
+      <div class="auth-item" style="padding:10px 0;">
+        <input type="checkbox" id="authTerms" onchange="checkSignupForm()">
+        <label for="authTerms" data-i18n="signup_auth_simple">
+          I agree to the <a href="#" onclick="event.preventDefault();alert('Terms of Service — Full document will be available at launch.')">Terms of Service</a> and <a href="#" onclick="event.preventDefault();alert('Privacy Policy — Full document will be available at launch.')">Privacy Policy</a>.
+        </label>
+      </div>
+    </div>
+
+    <div class="signup-actions">
+      <button class="btn-secondary" onclick="closeSignup()" data-i18n="signup_cancel">Cancel</button>
+      <button class="btn-primary" id="signupSubmit" onclick="submitSignup()" disabled data-i18n="signup_submit">
+        Create Account &rarr;
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ WHATSAPP FLOATING BUTTON ═══════════ -->
+<div class="wa-float">
+  <div class="wa-tooltip" id="waTooltip">Chat on WhatsApp →</div>
+  <button class="wa-btn" onclick="window.open('https://wa.me/85252072721','_blank')" onmouseenter="document.getElementById('waTooltip').classList.add('show')" onmouseleave="document.getElementById('waTooltip').classList.remove('show')" title="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </button>
+</div>
+
+<!-- ═══════════ AI CHAT WIDGET ═══════════ -->
+<div class="chat-widget" id="chatWidget">
+  <button class="chat-bubble" id="chatBubble" onclick="toggleChat()" title="Chat with us">💬</button>
+  <div class="chat-panel" id="chatPanel">
+    <div class="chat-header">
+      <div class="chat-header-avatar">🤖</div>
+      <div class="chat-header-info">
+        <div class="chat-header-name" data-i18n="chat_name">Compete in China Assistant</div>
+        <div class="chat-header-status" data-i18n="chat_status">Typically replies instantly</div>
+      </div>
+      <button class="chat-header-close" onclick="toggleChat()">&times;</button>
+    </div>
+    <div class="chat-body" id="chatBody">
+      <div class="chat-msg bot" id="chatGreeting">
+        <span data-i18n="chat_hi">Hi there! I'm the Compete in China assistant. How can I help you today?</span><br><br>
+        <span data-i18n="chat_menu">You can ask me about:</span>
+        <br><span data-i18n="chat_m1">· How to find competitions</span>
+        <br><span data-i18n="chat_m2">· How concierge submission works</span>
+        <br><span data-i18n="chat_m3">· Listing your competition</span>
+        <br><span data-i18n="chat_m4">· Account and materials</span>
+      </div>
+    </div>
+    <div class="chat-faq" id="chatFaq">
+      <button class="chat-faq-btn" data-i18n="chat_faq1" onclick="sendFaq('How do I find competitions for my industry?')">Find competitions</button>
+      <button class="chat-faq-btn" data-i18n="chat_faq2" onclick="sendFaq('How does the concierge submission work?')">Concierge service</button>
+      <button class="chat-faq-btn" data-i18n="chat_faq3" onclick="sendFaq('How can I list my competition?')">List competition</button>
+      <button class="chat-faq-btn" data-i18n="chat_faq4" onclick="sendFaq('I need to talk to a real person')">Contact human</button>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" data-i18n-ph="chat_ph" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<div class="footer">
+  <span data-i18n="footer_1">Compete in China is a public service platform powered by</span> <a href="https://www.techinbridge.com" target="_blank">Techinbridge</a>
+  &nbsp;·&nbsp;
+  <a href="https://www.linkedin.com/company/techinbridge" target="_blank" style="display:inline-flex;align-items:center;gap:3px;vertical-align:middle;">
+    <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    LinkedIn
+  </a><br>
+  <div class="footer-newsletter">
+    <span data-i18n="footer_newsletter">Subscribe to our LinkedIn Newsletter for weekly updates:</span><br>
+    <a class="libutton" href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7402612108833832960" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      <span data-i18n="footer_newsletter_btn">Follow on LinkedIn</span>
+    </a>
+  </div>
+  <span data-i18n="footer_2">All competition information is sourced from official channels. We do not guarantee results. Registration links go to official pages.</span><br>
+  &copy; 2026 Compete in China. <span data-i18n="footer_3">All rights reserved.</span>
+</div>
+
+<script>
+// ═══════════ SVG ICONS (inline utility) ═══════════
+const ICONS = {
+  mapPin: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  trophy: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C6 4 6 9 6 9z"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5C18 4 18 9 18 9z"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>',
+  clock: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  tag: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>',
+  dollar: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  cpu: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
+  flask: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2v6a2 2 0 0 0 .5 1.3l6 8.4A2 2 0 0 1 19 21H5a2 2 0 0 1-1.5-3.3l6-8.4A2 2 0 0 0 10 8V2"/><path d="M10 2h4"/></svg>',
+  gear: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
+  building: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 18h6v4H9z"/></svg>',
+  users: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  home: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  train: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="6" y1="8" x2="6" y2="8.01"/><line x1="10" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="6" y2="12.01"/><line x1="10" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="6" y2="16.01"/><line x1="10" y1="16" x2="18" y2="16"/></svg>',
+  globe: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+  target: '<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  star: '<svg class="icon-sm" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'
+};
+
+// ═══════════ CITY COLOR MAP ═══════════
+const cityColors = {
+  'Beijing': '#dc2626', 'Shanghai': '#2563eb', 'Shenzhen': '#059669',
+  'Guangzhou': '#d97706', 'Hangzhou': '#7c3aed', 'Suzhou': '#0891b2',
+  'Hefei': '#4f46e5', 'Nanjing': '#be185d', 'Xiamen': '#0d9488',
+  'Chengdu': '#ea580c', 'Xi\'an': '#9333ea', 'Wuhan': '#0284c7',
+  'Kunming': '#15803d', 'Jinan': '#b45309', 'Multi-city': '#64748b'
+};
+
+// ═══════════ COMPETITION DATA ═══════════
+// Runtime array — loaded from competitions.json (or fallback to built-in)
+let competitions = [];
+
+// Built-in fallback in case JSON file can't be loaded (file:// CORS, etc.)
+const DEFAULT_COMPETITIONS = [
+  {
+    id: 1,
+    title: "ITEC 2026 — Beijing Chaoyang International Talent Entrepreneurship Conference",
+    city: "Beijing",
+    deadline: "2026-08-31",
+    prize: "¥54.5M total (86 slots, max ¥5M Special Prize)",
+    prizeCategory: "huge",
+    industries: ["AI", "Robotics", "Aerospace", "Digital Economy", "Biotech & Pharma", "General"],
+    level: "District",
+    desc: "14th edition. Prize + Investment + Loan triple engine. Three tracks: Talent, Industry, Special.",
+    highlights: [
+      "¥54.5M total prize pool with 86 award slots",
+      "CICC Capital, Hillhouse, Plum Ventures investment consortium",
+      "Policy matching, landing services, office space included",
+      "Special track for robotics, photonics, and disruptive tech"
+    ],
+    applyUrl: "https://www.chytalents.gov.cn/",
+    englishUrl: "https://exploreitec.com/",
+    stage: "Preliminary"
+  },
+  {
+    id: 2,
+    title: "Shenzhen International Innovation Competition (10th Edition)",
+    city: "Shenzhen",
+    deadline: "2026-08-31",
+    prize: "¥9.42M pool (Grand: ¥1.5M; ¥5B VC fund)",
+    prizeCategory: "large",
+    industries: ["AI", "Biotech & Pharma", "New Energy", "Advanced Manufacturing", "Semiconductors", "Digital Economy", "General"],
+    level: "City",
+    desc: "12 overseas branch stations. One of China's largest and most rewarding competitions for global innovators.",
+    highlights: [
+      "12 overseas stations: Boston, London, Paris, Toronto, Sydney + 7 more",
+      "Grand Prize: ¥1.5M (¥500K immediate + ¥1M landing fund)",
+      "¥5B venture capital pool from 20+ leading VCs",
+      "Up to 24 months free workspace across 434 startup spaces"
+    ],
+    applyUrl: "http://cn.itcsz.cn/",
+    stage: "Registration"
+  },
+  {
+    id: 3,
+    title: "Jiangsu Talent Innovation & Entrepreneurship Competition 2026",
+    city: "Nanjing",
+    deadline: "2026-07-31",
+    prize: "¥20K (1st) / ¥10K (2nd) / ¥8K (3rd) + Policy Fast-Track",
+    prizeCategory: "small",
+    industries: ["AI", "Semiconductors", "Advanced Manufacturing", "Biotech & Pharma", "New Materials", "New Energy", "General"],
+    level: "Provincial",
+    desc: "5 overseas divisions. Winners get direct access to Jiangsu's Dual Innovation Plan interview.",
+    highlights: [
+      "5 overseas divisions: Munich, Boston, LA, Melbourne, Seoul",
+      "Two categories: Innovation (pre-registration) & Entrepreneurship (registered)",
+      "Direct access to provincial talent program interviews",
+      "Priority recommendation for national-level programs"
+    ],
+    applyUrl: "http://jssrcfwypt.org.cn/",
+    englishUrl: "",
+    stage: "Regional Selection"
+  },
+  {
+    id: 4,
+    title: "12th China Returnee Entrepreneurship Competition & International Sci-Tech Contest",
+    city: "Suzhou",
+    deadline: "2026-06-22",
+    prize: "Cash prizes + comprehensive support services",
+    prizeCategory: "small",
+    industries: ["Biotech & Pharma", "Semiconductors", "Medical Devices", "Advanced Manufacturing", "General"],
+    level: "National",
+    desc: "Upgraded with new International Talent Sci-Tech Contest track. 5,500+ returnee projects since 2015.",
+    highlights: [
+      "New International Talent Sci-Tech Contest track",
+      "Full-chain: competition, mentoring, landing, industrialization",
+      "International Sci-Tech Talent China Tour program",
+      "Suzhou biotech and semiconductor ecosystem matchmaking"
+    ],
+    applyUrl: "http://oseccn.com/",
+    stage: "Registration"
+  },
+  {
+    id: 5,
+    title: "Hefei Global 'Kepiao' Innovation Competition 2026",
+    city: "Hefei",
+    deadline: "",
+    prize: "Free housing + rent subsidy + funding matching",
+    prizeCategory: "small",
+    industries: ["AI", "Advanced Manufacturing", "New Energy", "Semiconductors", "Digital Economy", "General"],
+    level: "City",
+    desc: "15 days free accommodation for all qualifying teams. No overseas vs. domestic split.",
+    highlights: [
+      "15 days free accommodation for all qualifying teams",
+      "Up to 6 months rent subsidy + free coworking desk",
+      "Single track for all teams — online pitch via Tencent Meeting",
+      "Entry into USTC Silicon Valley Project Library for ongoing matchmaking"
+    ],
+    applyUrl: "https://www.ustc-si.com/",
+    stage: "Open"
+  },
+  {
+    id: 6,
+    title: "Huachuang Star 2026 — National Innovation & Entrepreneurship Competition (3rd Edition)",
+    city: "Multi-city",
+    deadline: "",
+    prize: "Multi-city prizes + landing support per city",
+    prizeCategory: "medium",
+    industries: ["AI", "Biotech & Pharma", "New Materials", "New Energy", "Advanced Manufacturing", "Digital Economy", "General"],
+    level: "National",
+    desc: "One application, 14 Chinese cities + overseas tracks. 10 industry tracks.",
+    highlights: [
+      "14 hub cities: Shanghai, Beijing, Shenzhen, Wuhan, Hangzhou, Hefei, Chengdu + more",
+      "10 industry tracks covering AI, biotech, new materials, traditional industries",
+      "Two pathways: Team Group (pre-registration) / Enterprise Group (registered)",
+      "Test multiple ecosystems with one application"
+    ],
+    applyUrl: "https://weixin.qq.com/",
+    stage: "Open"
+  },
+  {
+    id: 7,
+    title: "Win in Guangzhou + Jingu Cup — GBA Innovation Competition",
+    city: "Guangzhou",
+    deadline: "2026-06-30",
+    prize: "Investment-as-award + cash up to ¥50K",
+    prizeCategory: "small",
+    industries: ["AI", "Biotech & Pharma", "Digital Economy", "Advanced Manufacturing", "General"],
+    level: "City",
+    desc: "Investment-as-award model. Three tracks: Seed, Startup, Growth.",
+    highlights: [
+      "Investment-as-award model + cash prizes up to ¥50K",
+      "Three categories: Seed (0-3yr), Startup (3-5yr), Growth (5yr+)",
+      "Greater Bay Area ecosystem access",
+      "Government support for landing in Guangzhou"
+    ],
+    applyUrl: "https://www.gz.gov.cn/",
+    stage: "Registration"
+  },
+  {
+    id: 8,
+    title: "Xiamen 'Talents Gather in Fujian' Global Innovation Competition",
+    city: "Xiamen",
+    deadline: "2026-06-30",
+    prize: "~¥4M pool + ¥100K settlement bonus (30% extra for foreign nationals)",
+    prizeCategory: "large",
+    industries: ["Semiconductors", "Biotech & Pharma", "Advanced Manufacturing", "New Materials", "General"],
+    level: "Provincial",
+    desc: "Provincial B-level talent recognition. 30% bonus for foreign nationals.",
+    highlights: [
+      "Provincial B-level talent recognition (¥100K settlement bonus)",
+      "30% additional bonus for foreign national winners",
+      "Focus on Electronics & IT, Biotech, Advanced Manufacturing",
+      "Fujian provincial government backing"
+    ],
+    applyUrl: "https://www.fujiantalent.com/",
+    stage: "Registration"
+  },
+  {
+    id: 9,
+    title: "Startup in Shanghai 2026",
+    city: "Shanghai",
+    deadline: "2026-05-31",
+    prize: "Free office space + innovation fund (¥5M+ angel required)",
+    prizeCategory: "medium",
+    industries: ["AI", "Biotech & Pharma", "Semiconductors", "New Energy", "Advanced Manufacturing", "New Materials", "General"],
+    level: "City",
+    desc: "14th edition. Nearly 70,000 tech companies since 2012 — 94 have gone public. CLOSED for 2026.",
+    highlights: [
+      "14 editions, nearly 70,000 participants, 94 IPOs since 2012",
+      "6 months free office space for finalists",
+      "Priority access to tech-finance loans and VC matchmaking",
+      "Core team members prioritized for talent program recommendations"
+    ],
+    applyUrl: "https://www.startup-sh.cn/cyds/en",
+    stage: "Closed"
+  }
+];
+
+// Async loader: try API first, then competitions.json, then built-in defaults
+async function loadCompetitions() {
+  // Try API server first
+  try {
+    const resp = await fetch('/api/competitions');
+    if (resp.ok) {
+      competitions = await resp.json();
+      console.log(`Loaded ${competitions.length} competitions from API`);
+      window.competitions = competitions;
+      renderCards(competitions);
+      renderCarousel();
+      return;
+    }
+  } catch(e) {}
+  // Fallback to JSON file
+  try {
+    const resp = await fetch('competitions.json');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    competitions = await resp.json();
+    console.log(`Loaded ${competitions.length} competitions from competitions.json`);
+  } catch (e) {
+    console.warn('Could not load competitions, using built-in data:', e.message);
+    competitions = DEFAULT_COMPETITIONS;
+  }
+  window.competitions = competitions;
+  renderCards(competitions);
+  renderCarousel();
+}
+
+// ═══════════ CAROUSEL ═══════════
+let carouselIndex = 0;
+let carouselTimer = null;
+const CAROUSEL_AUTOPLAY_MS = 4000;
+
+function renderCarousel() {
+  const track = document.getElementById('carouselTrack');
+  const nav = document.getElementById('carouselNav');
+  const wrap = document.getElementById('carouselWrap');
+  if (!track) return;
+
+  const featured = (window.competitions || []).slice(0, 5);
+  if (featured.length === 0) {
+    if (wrap) wrap.style.display = 'none';
+    return;
+  }
+
+  const isZh = document.documentElement.lang === 'zh';
+  track.innerHTML = featured.map((c, i) => {
+    const title = isZh ? (c.titleCN || c.title) : c.title;
+    const prizeShort = (c.prize || '').split('(')[0].trim();
+    return `
+    <div class="hero-carousel-card">
+      <span class="card-badge">FEATURED</span>
+      <h3>${title}</h3>
+      <div class="card-meta">
+        <span>📍 ${c.city}</span>
+        <span>🏆 ${prizeShort}</span>
+      </div>
+      <div class="card-prize">${c.prize || ''}</div>
+      <a class="card-btn" href="#" onclick="event.preventDefault();openDetail(${c.id});">${isZh ? '查看详情 →' : 'View Details →'}</a>
+    </div>`;
+  }).join('');
+
+  if (nav) {
+    nav.innerHTML = featured.map((_, i) =>
+      `<button class="hero-carousel-dot${i === 0 ? ' active' : ''}" onclick="carouselGoTo(${i})"></button>`
+    ).join('');
+  }
+
+  carouselIndex = 0;
+  startCarouselAutoplay();
+}
+
+function startCarouselAutoplay() {
+  stopCarouselAutoplay();
+  carouselTimer = setInterval(() => {
+    const featured = (window.competitions || []).slice(0, 5);
+    if (featured.length <= 1) return;
+    carouselMove(1);
+  }, CAROUSEL_AUTOPLAY_MS);
+}
+
+function stopCarouselAutoplay() {
+  if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+}
+
+function carouselMove(dir) {
+  const featured = (window.competitions || []).slice(0, 5);
+  if (featured.length === 0) return;
+  carouselIndex = (carouselIndex + dir + featured.length) % featured.length;
+  carouselGoTo(carouselIndex);
+}
+
+function carouselGoTo(idx) {
+  const track = document.getElementById('carouselTrack');
+  if (!track) return;
+  const cards = track.querySelectorAll('.hero-carousel-card');
+  if (!cards.length) return;
+
+  const card = cards[0];
+  const cardW = card.offsetWidth + 16;
+  track.style.transform = `translateX(-${idx * cardW}px)`;
+  carouselIndex = idx;
+
+  document.querySelectorAll('.hero-carousel-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  startCarouselAutoplay();
+}
+
+// Pause on hover
+document.addEventListener('DOMContentLoaded', () => {
+  const wrap = document.getElementById('carouselWrap');
+  if (wrap) {
+    wrap.addEventListener('mouseenter', stopCarouselAutoplay);
+    wrap.addEventListener('mouseleave', startCarouselAutoplay);
+  }
+});
+
+// ═══════════ CITY DATA ═══════════
+const cities = [
+  {
+    id: 'beijing',
+    name: 'Beijing',
+    nameCN: '北京',
+    region: 'North',
+    regionClass: 'region-north',
+    emoji: '🏛️',
+    population: '21.5M',
+    universities: '34 (Project 211)',
+    gdpRank: '#2 nationally',
+    costIndex: 100,
+    description: 'China\'s political and cultural capital. Home to the largest concentration of top universities, national labs, and government-backed VC funds. The go-to city for deep tech and policy-linked innovation.',
+    industries: ['AI', 'Aerospace', 'Robotics', 'Digital Economy', 'Semiconductors'],
+    whyOverseas: [
+      'Zhongguancun (China\'s Silicon Valley) has 20,000+ tech companies',
+      'ITEC competition alone offers ¥54.5M in prizes with 86 slots',
+      'Direct access to national-level policy makers and ministries',
+      'Tsinghua/Peking University talent pipeline unmatched in China'
+    ],
+    costNote: 'Most expensive city in China — roughly 70% of San Francisco costs'
+  },
+  {
+    id: 'shanghai',
+    name: 'Shanghai',
+    nameCN: '上海',
+    region: 'East',
+    regionClass: 'region-east',
+    emoji: '🏙️',
+    population: '24.9M',
+    universities: '15 (Project 211)',
+    gdpRank: '#1 nationally',
+    costIndex: 95,
+    description: 'China\'s financial hub and largest city by GDP. The most international city — 70,000+ foreign residents. Strong in biotech, semiconductors, and fintech. Startup in Shanghai competition has produced 94 IPOs since 2012.',
+    industries: ['Biotech & Pharma', 'Semiconductors', 'AI', 'New Energy', 'Advanced Manufacturing'],
+    whyOverseas: [
+      '94 companies went public through the city\'s entrepreneurship program',
+      'Shanghai Free Trade Zone offers unique regulatory advantages',
+      'Largest expat community in mainland China — easiest cultural transition',
+      'Zhangjiang Hi-Tech Park is China\'s top biotech cluster'
+    ],
+    costNote: 'Comparable to Singapore in living costs; slightly below Beijing'
+  },
+  {
+    id: 'shenzhen',
+    name: 'Shenzhen',
+    nameCN: '深圳',
+    region: 'South',
+    regionClass: 'region-south',
+    emoji: '🚀',
+    population: '17.6M',
+    universities: '2 (but 130+ research institutes)',
+    gdpRank: '#3 nationally',
+    costIndex: 90,
+    description: 'The hardware capital of the world. From a fishing village to a global tech hub in 40 years. Huawei, Tencent, DJI, and BYD are headquartered here. Unmatched prototyping and manufacturing ecosystem.',
+    industries: ['AI', 'Robotics', 'Semiconductors', 'Advanced Manufacturing', 'New Energy'],
+    whyOverseas: [
+      'World\'s fastest hardware prototyping cycle — 48hr PCB turnaround',
+      'Shenzhen Int\'l Innovation Competition: ¥1.5M grand prize + ¥5B VC pool',
+      'Greater Bay Area: 86M population economic zone with Hong Kong',
+      'Average founder age is 32 — youngest tech ecosystem in China'
+    ],
+    costNote: 'Slightly below Shanghai; housing is the main cost driver'
+  },
+  {
+    id: 'guangzhou',
+    name: 'Guangzhou',
+    nameCN: '广州',
+    region: 'South',
+    regionClass: 'region-south',
+    emoji: '⚓',
+    population: '18.8M',
+    universities: '5 (Project 211)',
+    gdpRank: '#4 nationally',
+    costIndex: 70,
+    description: 'The historic southern gateway and manufacturing powerhouse. More affordable than Shenzhen but part of the same Greater Bay Area. Strong automotive, biomedicine, and trade sectors.',
+    industries: ['Biotech & Pharma', 'AI', 'Digital Economy', 'Advanced Manufacturing', 'New Materials'],
+    whyOverseas: [
+      'Win in Guangzhou competition uses investment-as-award model',
+      'Greater Bay Area access at 30% lower costs than Shenzhen',
+      'China\'s largest biomedical industry cluster by number of companies',
+      'Canton Fair legacy — strong international trade infrastructure'
+    ],
+    costNote: '~30% cheaper than Shenzhen; best value in the GBA region'
+  },
+  {
+    id: 'hangzhou',
+    name: 'Hangzhou',
+    nameCN: '杭州',
+    region: 'East',
+    regionClass: 'region-east',
+    emoji: '🌿',
+    population: '12.2M',
+    universities: '1 (Zhejiang University — Top 5)',
+    gdpRank: '#9 nationally',
+    costIndex: 65,
+    description: 'Alibaba\'s hometown. China\'s undisputed e-commerce and digital economy capital. Now emerging as a major AI hub with DeepSeek headquartered here. More livable than tier-1 cities with comparable tech density.',
+    industries: ['AI', 'Digital Economy', 'Robotics', 'New Energy', 'Advanced Manufacturing'],
+    whyOverseas: [
+      'Alibaba ecosystem alone has spawned 1,000+ startups',
+      'DeepSeek\'s HQ — one of China\'s most-watched AI companies',
+      'West Lake + tech scene: unique quality-of-life for talent',
+      'Zhejiang University is China\'s #3 university by research output'
+    ],
+    costNote: '~35% cheaper than Shanghai; 1hr by high-speed rail'
+  },
+  {
+    id: 'suzhou',
+    name: 'Suzhou',
+    nameCN: '苏州',
+    region: 'East',
+    regionClass: 'region-east',
+    emoji: '🏭',
+    population: '12.9M',
+    universities: '1 (Soochow University)',
+    gdpRank: '#6 nationally',
+    costIndex: 55,
+    description: 'China\'s strongest industrial city per capita. Home to Suzhou Industrial Park (SIP) — the most successful China-Singapore collaboration. Dominant in biotech, semiconductors, and advanced manufacturing. Returnee competition hub.',
+    industries: ['Biotech & Pharma', 'Semiconductors', 'Medical Devices', 'Advanced Manufacturing', 'New Materials'],
+    whyOverseas: [
+      'SIP alone hosts 5,500+ foreign-invested companies',
+      'China Returnee Entrepreneurship Competition based here',
+      'BioBay is one of China\'s top 3 biotech parks',
+      '20 minutes to Shanghai by high-speed rail'
+    ],
+    costNote: '~45% cheaper than Shanghai; excellent infrastructure'
+  },
+  {
+    id: 'hefei',
+    name: 'Hefei',
+    nameCN: '合肥',
+    region: 'East',
+    regionClass: 'region-east',
+    emoji: '🔬',
+    population: '9.6M',
+    universities: '3 (USTC — Top 7, CAS-affiliated)',
+    gdpRank: '#21 nationally',
+    costIndex: 35,
+    description: 'China\'s most underrated science city. Home to USTC (C9 league), Hefei National Lab, and EAST fusion reactor. Government is famously good at "venture capital-style" industrial investment — they bet on BOE, NIO, and CXMT and won.',
+    industries: ['AI', 'Semiconductors', 'New Energy', 'Advanced Manufacturing', 'Digital Economy'],
+    whyOverseas: [
+      'USTC is China\'s top science university (Nature Index #2 in Asia-Pacific)',
+      'Hefei "Kepiao" Competition offers free housing + rent subsidies',
+      'City government known as "China\'s best VC" for tech investments',
+      'CXMT (China\'s top DRAM maker) HQ — semiconductor ecosystem growing fast'
+    ],
+    costNote: '~65% cheaper than Beijing; graduate-level talent pool rivaling tier-1 cities'
+  },
+  {
+    id: 'nanjing',
+    name: 'Nanjing',
+    nameCN: '南京',
+    region: 'East',
+    regionClass: 'region-east',
+    emoji: '📚',
+    population: '9.5M',
+    universities: '8 (Project 211)',
+    gdpRank: '#10 nationally',
+    costIndex: 50,
+    description: 'Ancient capital with deep academic heritage. #1 city in China for university density per capita. Jiangsu province is China\'s #2 economy — and Nanjing is its capital. Strong in semiconductors, new materials, and biotech.',
+    industries: ['Semiconductors', 'Advanced Manufacturing', 'Biotech & Pharma', 'New Materials', 'AI'],
+    whyOverseas: [
+      'Jiangsu talent competition offers direct access to provincial programs',
+      '8 Project 211 universities — highest density of any Chinese city',
+      'TSMC\'s largest mainland fab is in Nanjing',
+      'Jiangsu\'s economy alone would rank #12 globally if it were a country'
+    ],
+    costNote: '~50% cheaper than Shanghai; 1.5hr by high-speed rail'
+  },
+  {
+    id: 'xiamen',
+    name: 'Xiamen',
+    nameCN: '厦门',
+    region: 'South',
+    regionClass: 'region-south',
+    emoji: '🏝️',
+    population: '5.3M',
+    universities: '1 (Xiamen University — Top 20)',
+    gdpRank: '#33 nationally',
+    costIndex: 55,
+    description: 'China\'s most livable coastal city. Island lifestyle meets semiconductor and biotech ambition. 30% bonus on prize money for foreign national winners — the only city to explicitly incentivize non-Chinese founders.',
+    industries: ['Semiconductors', 'Biotech & Pharma', 'Advanced Manufacturing', 'New Materials', 'Digital Economy'],
+    whyOverseas: [
+      '30% prize bonus for foreign nationals — unique in China',
+      'Provincial B-level talent recognition with ¥100K settlement bonus',
+      'Across the strait from Taiwan — strong semiconductor supply chain links',
+      'Island city with year-round subtropical climate'
+    ],
+    costNote: '~45% cheaper than Shanghai; highest quality-of-life ranking in China'
+  },
+  {
+    id: 'chengdu',
+    name: 'Chengdu',
+    nameCN: '成都',
+    region: 'Southwest',
+    regionClass: 'region-southwest',
+    emoji: '🐼',
+    population: '21.2M',
+    universities: '5 (Project 211)',
+    gdpRank: '#7 nationally',
+    costIndex: 40,
+    description: 'Western China\'s undisputed tech capital. Home to 300+ Fortune 500 companies. Chengdu Hi-Tech Zone is one of China\'s largest. Strong in aerospace, gaming, and biotech. Famous for work-life balance and spicy food.',
+    industries: ['Aerospace', 'AI', 'Biotech & Pharma', 'Digital Economy', 'New Energy'],
+    whyOverseas: [
+      'Western China\'s largest tech ecosystem — less competition than coastal cities',
+      'Chengdu Hi-Tech Zone: 300+ Fortune 500 R&D centers',
+      'China\'s #1 city for game development (Tencent, NetEase studios)',
+      'New "Tianfu" international airport — direct flights to 40+ countries'
+    ],
+    costNote: '~60% cheaper than Beijing; best work-life balance of any major tech city'
+  },
+  {
+    id: 'xian',
+    name: 'Xi\'an',
+    nameCN: '西安',
+    region: 'Northwest',
+    regionClass: 'region-northwest',
+    emoji: '🏯',
+    population: '13.0M',
+    universities: '7 (Project 211)',
+    gdpRank: '#22 nationally',
+    costIndex: 30,
+    description: 'Ancient Silk Road starting point, now a rising aerospace and semiconductor hub. Home to Xi\'an Jiaotong University (C9) and massive Samsung semiconductor fab. Belt & Road Initiative headquarters.',
+    industries: ['Aerospace', 'Semiconductors', 'AI', 'New Materials', 'Advanced Manufacturing'],
+    whyOverseas: [
+      'Samsung\'s largest overseas semiconductor fab is here ($17B investment)',
+      'Xi\'an Jiaotong University: C9 league, top engineering programs',
+      'China\'s aerospace R&D center — 50%+ of satellite components made here',
+      'Belt & Road Initiative hub — gateway to Central Asian markets'
+    ],
+    costNote: '~70% cheaper than Beijing; strong government subsidies for tech talent'
+  },
+  {
+    id: 'wuhan',
+    name: 'Wuhan',
+    nameCN: '武汉',
+    region: 'Central',
+    regionClass: 'region-central',
+    emoji: '🌉',
+    population: '13.7M',
+    universities: '7 (Project 211)',
+    gdpRank: '#8 nationally',
+    costIndex: 35,
+    description: 'Central China\'s largest city and a top-tier university town. Optics Valley (Guanggu) is China\'s largest optoelectronics base. 1.3M university students — one of the largest student populations in the world.',
+    industries: ['Semiconductors', 'New Energy', 'Biotech & Pharma', 'Advanced Manufacturing', 'AI'],
+    whyOverseas: [
+      'Optics Valley: world\'s largest fiber optic production base',
+      '1.3M students — enormous and affordable talent pool',
+      'Huawei, Xiaomi, Lenovo all have major R&D centers here',
+      'Central China location means lower competition for government grants'
+    ],
+    costNote: '~65% cheaper than Beijing; massive talent pool at competitive salaries'
+  },
+  {
+    id: 'kunming',
+    name: 'Kunming',
+    nameCN: '昆明',
+    region: 'Southwest',
+    regionClass: 'region-southwest',
+    emoji: '🌺',
+    population: '8.6M',
+    universities: '1 (Yunnan University – Project 211)',
+    gdpRank: '#47 nationally',
+    costIndex: 25,
+    description: '"City of Eternal Spring" — year-round mild climate. Gateway to Southeast Asia. Emerging biotech and new materials hub leveraging Yunnan\'s unique biodiversity. Lowest competition for government funding among innovation cities.',
+    industries: ['Biotech & Pharma', 'New Materials', 'New Energy', 'Digital Economy', 'Advanced Manufacturing'],
+    whyOverseas: [
+      'Unique biodiversity: 50%+ of China\'s plant species for bioprospecting',
+      'Direct rail links to Laos, Thailand, Vietnam — ASEAN market access',
+      'Lowest competition for provincial-level innovation funding',
+      'Year-round 15-25°C climate — zero heating/cooling costs for labs'
+    ],
+    costNote: '~75% cheaper than Beijing; lowest operating costs of any innovation hub'
+  },
+  {
+    id: 'jinan',
+    name: 'Jinan',
+    nameCN: '济南',
+    region: 'North',
+    regionClass: 'region-north',
+    emoji: '⛲',
+    population: '9.4M',
+    universities: '1 (Shandong University – Project 211)',
+    gdpRank: '#19 nationally',
+    costIndex: 30,
+    description: 'Capital of Shandong — China\'s #3 provincial economy. "City of Springs" with 72 natural artesian springs. Strong in quantum technology, advanced manufacturing, and new materials. Jinan is aggressively courting international talent.',
+    industries: ['AI', 'Semiconductors', 'Advanced Manufacturing', 'New Materials', 'Biotech & Pharma'],
+    whyOverseas: [
+      'China\'s quantum computing research center — national lab based here',
+      'Shandong economy is larger than Mexico\'s entire GDP',
+      'Jinan Innovation Zone offers 3-year rent-free office space',
+      '2hr to Beijing by high-speed rail; 4hr to Shanghai'
+    ],
+    costNote: '~70% cheaper than Beijing; aggressive talent subsidies available'
+  }
+];
+
+// ═══════════ COMPETITION RENDER ═══════════
+function getBadgeClass(stage) {
+  if (stage === 'Closed') return 'badge-soon';
+  if (stage === 'Registration') return 'badge-urgent';
+  return 'badge-open';
+}
+
+function getDeadlineClass(deadline) {
+  if (!deadline) return 'deadline-normal';
+  const d = new Date(deadline);
+  const now = new Date();
+  const diffDays = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+  if (diffDays <= 14) return 'deadline-soon';
+  if (diffDays <= 45) return 'deadline-urgent';
+  return 'deadline-normal';
+}
+
+function formatDeadline(deadline) {
+  if (!deadline) return 'Open / TBA';
+  const d = new Date(deadline + 'T00:00:00+08:00');
+  if (d < new Date()) return 'Closed: ' + d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  const diffDays = Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24));
+  if (diffDays <= 7) return diffDays + 'd left — ' + d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  return d.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+}
+
+function cityDot(color) {
+  return `<span class="city-dot" style="background:${color};"></span>`;
+}
+
+function renderCards(comps) {
+  const grid = document.getElementById('compGrid');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('resultCount').textContent = comps.length;
+  document.getElementById('stat-total').textContent = comps.length;
+
+  if (comps.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = comps.map(c => `
+    <div class="comp-card" onclick="openDetail(${c.id})">
+      <span class="comp-card-badge ${getBadgeClass(c.stage)}">${c.stage}</span>
+      <div class="comp-card-city">${cityDot(cityColors[c.city] || '#64748b')} ${c.city}</div>
+      <div class="comp-card-title">${c.title}</div>
+      <div class="comp-card-desc">${c.desc}</div>
+      <div class="comp-card-meta">
+        <span class="comp-card-prize">${ICONS.dollar} ${c.prize.split('(')[0].trim()}</span>
+        <span class="comp-card-tag">${ICONS.tag} ${c.industries.slice(0,3).join(' / ')}</span>
+        <span class="comp-card-deadline ${getDeadlineClass(c.deadline)}">
+          ${ICONS.clock} ${formatDeadline(c.deadline)}
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════ FILTER ═══════════
+function applyFilters() {
+  const city = document.getElementById('filterCity').value;
+  const industry = document.getElementById('filterIndustry').value;
+  const prize = document.getElementById('filterPrize').value;
+  const deadline = document.getElementById('filterDeadline').value;
+
+  let filtered = competitions;
+
+  if (city) filtered = filtered.filter(c => c.city === city);
+  if (industry) filtered = filtered.filter(c => c.industries.includes(industry));
+  if (prize) filtered = filtered.filter(c => c.prizeCategory === prize);
+
+  if (deadline) {
+    const now = new Date();
+    if (deadline === 'urgent') {
+      filtered = filtered.filter(c => {
+        if (!c.deadline) return false;
+        const d = new Date(c.deadline + 'T00:00:00+08:00');
+        const diff = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+        return diff >= 0 && diff <= 30;
+      });
+    } else if (deadline === 'soon') {
+      filtered = filtered.filter(c => {
+        if (!c.deadline) return false;
+        const d = new Date(c.deadline + 'T00:00:00+08:00');
+        const diff = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+        return diff >= 0 && diff <= 90;
+      });
+    } else if (deadline === 'open') {
+      filtered = filtered.filter(c => !c.deadline);
+    }
+  }
+
+  renderCards(filtered);
+}
+
+function resetFilters() {
+  document.getElementById('filterCity').value = '';
+  document.getElementById('filterIndustry').value = '';
+  document.getElementById('filterPrize').value = '';
+  document.getElementById('filterDeadline').value = '';
+  renderCards(competitions);
+}
+
+// ═══════════ COMPETITION MODAL ═══════════
+function openDetail(id) {
+  const c = competitions.find(x => x.id === id);
+  if (!c) return;
+
+  const highlightsHTML = c.highlights.map(h => `<li style="margin-bottom:6px;font-size:13px;">${h}</li>`).join('');
+
+  document.getElementById('modalContent').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-city">${c.city} · ${c.level} Level</div>
+    <div class="modal-title">${c.title}</div>
+    <span class="comp-card-badge ${getBadgeClass(c.stage)}" style="position:static;display:inline-block;margin-bottom:16px;">${c.stage}</span>
+
+    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">${c.desc}</p>
+
+    <div class="modal-section">
+      <h3>${ICONS.star} Key Information</h3>
+      <div class="modal-meta-grid">
+        <div class="modal-meta-item"><div class="label">Prize Pool</div><div class="value">${c.prize}</div></div>
+        <div class="modal-meta-item"><div class="label">Deadline</div><div class="value">${formatDeadline(c.deadline)}</div></div>
+        <div class="modal-meta-item"><div class="label">Industry Tracks</div><div class="value" style="font-size:13px;">${c.industries.join(', ')}</div></div>
+        <div class="modal-meta-item"><div class="label">Current Stage</div><div class="value">${c.stage}</div></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3>${ICONS.target} What Makes It Unique</h3>
+      <ul style="color:var(--text);padding-left:20px;">${highlightsHTML}</ul>
+    </div>
+
+    <div class="modal-actions">
+      ${c.stage !== 'Closed' ? `
+        <a href="${c.applyUrl}" target="_blank" class="btn-primary" id="modalApplyBtn">
+          ${(CURRENT_LANG === 'zh') ? '前往官网报名 →' : 'Apply on Official Site &rarr;'}
+        </a>
+        <button class="btn-secondary" onclick="closeModal();showPage('how')">
+          ${(CURRENT_LANG === 'zh') ? '代为报名' : 'Let Us Apply for You'}
+        </button>
+      ` : `
+        <button class="btn-secondary" style="opacity:0.5;cursor:default;" disabled>
+          ${(CURRENT_LANG === 'zh') ? '报名已截止' : 'Registration Closed'}
+        </button>
+      `}
+    </div>
+    ${c.englishUrl ? `<p style="font-size:12px;color:var(--text-muted);margin-top:12px;">English info: <a href="${c.englishUrl}" target="_blank">${c.englishUrl}</a></p>` : ''}
+  `;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ═══════════ CITIES PAGE ═══════════
+let activeCityId = 'beijing';
+
+function initCities() {
+  // Render chips
+  const chipsDiv = document.getElementById('citiesChips');
+  chipsDiv.innerHTML = cities.map(c => `
+    <button class="cities-map-chip${c.id === activeCityId ? ' active' : ''}"
+            onclick="showCity('${c.id}')">
+      ${c.emoji} ${c.name} <span class="city-region-tag ${c.regionClass}">${c.region}</span>
+    </button>
+  `).join('');
+
+  showCity(activeCityId);
+}
+
+function showCity(cityId) {
+  activeCityId = cityId;
+  const c = cities.find(x => x.id === cityId);
+  if (!c) return;
+
+  // Update chips
+  document.querySelectorAll('.cities-map-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.textContent.includes(c.name));
+  });
+
+  // Cost bar percentage (relative to Beijing=100)
+  const costPct = Math.round((c.costIndex / 100) * 100);
+
+  const detailDiv = document.getElementById('cityDetail');
+  detailDiv.innerHTML = `
+    <div class="city-card active">
+      <div class="city-card-header">
+        <div class="city-card-flag" style="background:${cityColors[c.name]}15;">${c.emoji}</div>
+        <div>
+          <div class="city-card-name">${c.name} <span style="font-size:14px;color:var(--text-muted);">${c.nameCN}</span></div>
+          <div class="city-card-subtitle">
+            <span class="city-region-tag ${c.regionClass}">${c.region} China</span>
+            · ${c.population} population · GDP ${c.gdpRank}
+          </div>
+        </div>
+      </div>
+
+      <div class="city-stats-row">
+        <div class="city-stat">
+          <div class="city-stat-num">${c.universities.split(' ')[0]}</div>
+          <div class="city-stat-label">Project 211 Universities</div>
+        </div>
+        <div class="city-stat">
+          <div class="city-stat-num">${c.population}</div>
+          <div class="city-stat-label">Population</div>
+        </div>
+        <div class="city-stat">
+          <div class="city-stat-num">${c.gdpRank}</div>
+          <div class="city-stat-label">National GDP Rank</div>
+        </div>
+        <div class="city-stat">
+          <div class="cost-bar">
+            <span style="font-size:11px;color:var(--text-muted);">Cost vs Beijing</span>
+            <div class="cost-bar-bg"><div class="cost-bar-fill" style="width:${costPct}%;"></div></div>
+            <span style="font-weight:700;font-size:13px;">${c.costIndex}%</span>
+          </div>
+          <div class="city-stat-label" style="margin-top:6px;">${c.costNote}</div>
+        </div>
+      </div>
+
+      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:16px;line-height:1.7;">${c.description}</p>
+
+      <div class="city-detail-grid">
+        <div class="city-detail-col">
+          <h4>${ICONS.cpu} Key Industries</h4>
+          <div class="city-industry-tags">
+            ${c.industries.map(ind => `<span class="comp-card-tag" style="font-size:12px;font-weight:600;">${ind}</span>`).join('')}
+          </div>
+        </div>
+        <div class="city-detail-col">
+          <h4>${ICONS.globe} Why Overseas Teams Should Look Here</h4>
+          <ul class="city-why-list">
+            ${c.whyOverseas.map(reason => `<li>${reason}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border-light);">
+        <button class="btn-secondary" style="font-size:12px;padding:6px 14px;"
+                onclick="filterByCity('${c.name}')">
+          ${ICONS.trophy} See competitions in ${c.name} &rarr;
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function filterByCity(cityName) {
+  document.getElementById('filterCity').value = cityName;
+  applyFilters();
+  showPage('browse');
+}
+
+// ═══════════ SIGN UP ═══════════
+function openSignup() {
+  document.getElementById('signupOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('signupName').value = '';
+  document.getElementById('signupEmail').value = '';
+  document.getElementById('signupPassword').value = '';
+  document.getElementById('authTerms').checked = false;
+  document.getElementById('signupSubmit').disabled = true;
+  document.getElementById('signupError').classList.remove('show');
+}
+
+function closeSignup(e) {
+  if (e && e.target !== document.getElementById('signupOverlay')) return;
+  document.getElementById('signupOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function checkSignupForm() {
+  var name = document.getElementById('signupName').value.trim();
+  var email = document.getElementById('signupEmail').value.trim();
+  var pw = document.getElementById('signupPassword').value;
+  var terms = document.getElementById('authTerms').checked;
+  document.getElementById('signupSubmit').disabled = !(name && email && pw.length >= 8 && terms);
+}
+
+// Also check on input
+['signupName','signupEmail','signupPassword'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', checkSignupForm);
+});
+
+async function submitSignup() {
+  var name = document.getElementById('signupName').value.trim();
+  var email = document.getElementById('signupEmail').value.trim();
+  var password = document.getElementById('signupPassword').value;
+  var errorDiv = document.getElementById('signupError');
+
+  if (!name || !email || !password) {
+    errorDiv.textContent = 'Please fill in all fields.';
+    errorDiv.classList.add('show');
+    return;
+  }
+  if (password.length < 8) {
+    errorDiv.textContent = 'Password must be at least 8 characters.';
+    errorDiv.classList.add('show');
+    return;
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    errorDiv.textContent = 'Please enter a valid email address.';
+    errorDiv.classList.add('show');
+    return;
+  }
+
+  errorDiv.classList.remove('show');
+
+  // Try API signup
+  try {
+    const resp = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Signup failed');
+    localStorage.setItem('cic_user', JSON.stringify({ name, email }));
+    closeSignup();
+    alert('Account created! Welcome, ' + name + '!');
+    return;
+  } catch(e) {
+    // Fallback: try login if account exists
+    try {
+      const resp = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await resp.json();
+      if (resp.ok) {
+        localStorage.setItem('cic_user', JSON.stringify({ name: data.name, email }));
+        closeSignup();
+        alert('Welcome back, ' + data.name + '!');
+        return;
+      }
+    } catch(e2) {}
+    // Offline fallback
+    localStorage.setItem('cic_user', JSON.stringify({name: name, email: email}));
+    closeSignup();
+    alert('Account created! Welcome, ' + name + '!\n\n(Offline mode — data saved locally.)');
+  }
+}
+
+// ═══════════ CONCIERGE FLOW ═══════════
+function startConcierge() {
+  var user = localStorage.getItem('cic_user');
+  if (!user) {
+    openSignup();
+    return;
+  }
+  // Logged in — open the registration form
+  window.open('registration_form_typeform_en.html', '_blank');
+}
+
+function showConciergeForm() {
+  // Redirect to standalone registration form
+  window.open('registration_form_typeform_en.html', '_blank');
+}
+
+// ═══════════ PAGE NAVIGATION ═══════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+  const pageEl = document.getElementById('page-' + name);
+  if (pageEl) pageEl.classList.add('active');
+
+  const navLink = document.querySelector(`.nav-link[data-page="${name}"]`);
+  if (navLink) navLink.classList.add('active');
+
+  // Scroll to top so user always sees the new page from the beginning
+  window.scrollTo({ top: 0, behavior: 'auto' });
+
+  // Init cities page on first visit
+  if (name === 'cities' && !window._citiesInit) {
+    initCities();
+    window._citiesInit = true;
+  }
+  // Auto-render dashboard
+  if (name === 'dashboard') {
+    renderDashboard();
+  }
+}
+
+// ═══════════ DASHBOARD RENDERING ═══════════
+async function renderDashboard() {
+  var user = localStorage.getItem('cic_user');
+  var userEmail = '';
+  try { var u = JSON.parse(user || '{}'); userEmail = u.email || ''; } catch(e) {}
+
+  var myApps = [];
+  // Try API first
+  try {
+    var resp = await fetch('/api/concierge/my?email=' + encodeURIComponent(userEmail));
+    if (resp.ok) myApps = await resp.json();
+  } catch(e) {
+    // Fallback to localStorage
+    try {
+      var raw = localStorage.getItem('cic_concierge_applications');
+      if (raw) {
+        var allApps = JSON.parse(raw);
+        myApps = allApps.filter(function(a) { return a.email === userEmail; });
+      }
+    } catch(e2) {}
+  }
+
+  var emptyEl = document.getElementById('dashEmpty');
+  var activeEl = document.getElementById('dashActive');
+  var trackingEl = document.getElementById('dashTracking');
+  var countEl = document.getElementById('dashCount');
+  var countSubEl = document.getElementById('dashCountSub');
+  var deadlineEl = document.getElementById('dashNextDeadline');
+  var deadlineSubEl = document.getElementById('dashDeadlineSub');
+
+  if (myApps.length === 0) {
+    if (emptyEl) emptyEl.style.display = 'block';
+    if (activeEl) activeEl.style.display = 'none';
+    return;
+  }
+
+  if (emptyEl) emptyEl.style.display = 'none';
+  if (activeEl) activeEl.style.display = 'block';
+
+  if (countEl) countEl.textContent = myApps.length;
+  if (countSubEl) countSubEl.textContent = 'concierge applications in progress';
+
+  // Find nearest deadline
+  var nearest = null;
+  myApps.forEach(function(app) {
+    if (app.deadline && (!nearest || app.deadline < nearest)) nearest = app.deadline;
+  });
+  if (deadlineEl) deadlineEl.textContent = nearest ? formatDate(nearest) : '—';
+  if (deadlineSubEl) deadlineSubEl.textContent = nearest ? getDaysLeft(nearest) + ' days left' : 'No upcoming deadlines';
+
+  // Render tracking items
+  if (trackingEl) {
+    var html = '';
+    var statuses = {'submitted':'status-interested','under_review':'status-review','shortlisted':'status-review','finalist':'status-applied','winner':'status-applied','not_selected':'status-applied'};
+    var labels = {'submitted':'Submitted','under_review':'Under Review','shortlisted':'Shortlisted','finalist':'Finalist','winner':'🏆 Winner','not_selected':'Not Selected'};
+    myApps.forEach(function(app) {
+      var cls = statuses[app.status] || 'status-interested';
+      var lbl = labels[app.status] || 'Pending';
+      html += '<div class="tracking-item">';
+      html += '<div class="tracking-status ' + cls + '"></div>';
+      html += '<div class="tracking-info">';
+      html += '<div class="tracking-name">' + escapeHtml(app.compName || 'Unknown Competition') + '</div>';
+      html += '<div class="tracking-date">' + lbl + ' · Deadline: ' + formatDate(app.deadline) + '</div>';
+      html += '</div></div>';
+    });
+    trackingEl.innerHTML = html;
+  }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  var d = new Date(dateStr);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[d.getMonth()] + ' ' + d.getDate();
+}
+
+function getDaysLeft(dateStr) {
+  if (!dateStr) return 0;
+  var now = new Date(); now.setHours(0,0,0,0);
+  var target = new Date(dateStr); target.setHours(0,0,0,0);
+  return Math.max(0, Math.ceil((target - now) / 86400000));
+}
+
+// ═══════════ KEYBOARD SHORTCUTS ═══════════
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeSignup();
+  }
+});
+
+// ═══════════ I18N — LANGUAGE TOGGLE ═══════════
+var CURRENT_LANG = localStorage.getItem('cic_lang') || 'en';
+
+var I18N = {
+  en: {},
+  zh: {
+    // Nav
+    nav_comp: '赛事',
+    nav_cities: '探索城市',
+    nav_org: '主办方入驻',
+    nav_how: '如何运作',
+    nav_dash: '代投进度',
+    nav_signup: '免费注册',
+
+    // Hero
+    hero_title: '中国创新创业大赛 — 一站式平台',
+    hero_sub: '覆盖20+中国城市的200+项赛事。按城市、行业、奖金和截止日筛选，找到最适合你创业的舞台。',
+    hero_stat1: '在招赛事',
+    hero_stat2: '覆盖城市',
+    hero_stat3: '总奖金池',
+    hero_stat4: '行业赛道',
+
+    // Filters
+    filter_city: '城市',
+    filter_all_cities: '全部城市',
+    filter_ind: '行业',
+    filter_all_ind: '全部行业',
+    filter_prize: '奖金范围',
+    filter_all: '全部',
+    filter_all2: '全部',
+    filter_deadline: '截止日',
+    filter_results: '个结果',
+    filter_reset: '重置',
+    filter_urgent: '本月截止',
+    filter_soon: '未来2个月',
+    filter_open: '长期开放',
+
+    // Empty state
+    empty_title: '没有匹配的赛事',
+    empty_sub: '请调整筛选条件或点击重置。',
+
+    // How It Works (merged)
+    how_title: '两种参赛方式',
+    how_s1t: 'DIY — 自己报名',
+    how_s1d: '浏览200+赛事，点击"立即报名"跳转官方页面。<strong>100%免费，永久免费。</strong>自己填表、追踪，所有奖金归你。',
+    how_s2t: '代投 — 我们全包',
+    how_s2d: '填写一份表单，上传路演PPT。<strong>我们替你投递多场赛事。</strong>零前期费用。获奖后仅收取50%服务费。',
+
+    // Dashboard
+    dash_title: '我的代投申请',
+    dash_tracked: '活跃申请',
+    dash_tracked_sub: '代投进行中',
+    dash_materials: '材料就绪',
+    dash_materials_sub: '已上传 · 随时更新',
+    dash_deadline: '最近截止日',
+    dash_deadline_sub: '天内截止',
+    dash_progress: '申请进度',
+    dash_your_materials: '你的材料',
+    dash_upload_btn: '更新报名表',
+    dash_upload_hint: 'PDF 或 PPTX 格式，最大 20MB。用于代投服务。',
+
+    // Organizer page
+    org_badge: '主办方免费入驻',
+    org_hero_title: '触达全球创新者，吸引世界级项目',
+    org_hero_sub: '让你的赛事被最优秀的海外创业团队看到。我们打破语言壁垒，把你的赛事推到10000+正在寻找中国机会的全球创始人面前。',
+    org_stat1: '网络海外创业团队',
+    org_stat2: '覆盖国家',
+    org_stat3: '推广语言',
+    org_stat4: '基础展示永久免费',
+    org_benefits_title: '你将获得',
+    org_b1t: '全球曝光',
+    org_b1d: '你的赛事将出现在中国顶尖创新赛事的可搜索数据库中。我们在 LinkedIn、邮件通讯和合作伙伴网络中推广精选赛事——触达波士顿、柏林、班加罗尔等地的创始人。',
+    org_b2t: '英文推广',
+    org_b2d: '我们将赛事详情翻译成专业英文——资格要求、提交要求、奖金结构和时间表。不再有翻译丢失。你的赛事读起来就像原生英文机会。',
+    org_b3t: '优质申请者筛选',
+    org_b3d: '我们的平台吸引认真寻求中国市场的海外团队。我们预筛行业匹配度、阶段和国际资格——让你的评审团把时间花在合格的候选人身上，而不是噪音。',
+    org_b4t: '申请者分析',
+    org_b4d: '获取页面浏览量、点击率和申请者人口统计的月度报告。了解哪些地区和行业对你的赛事最感兴趣——用数据塑造你的下一次推广策略。',
+    org_b5t: '投资对接',
+    org_b5d: '超越赛事——获奖团队成为本地投资基金、产业园和政府人才计划的候选者。你的赛事是完整创新管道的第一个接触点。',
+    org_b6t: '零成本，零风险',
+    org_b6d: '基础展示完全免费——无设置费、无订阅、无隐藏费用。我们仅提供可选的付费推广服务。一切由你掌控。',
+    org_steps_title: '开始入驻 — 3个简单步骤',
+    org_s1t: '提交赛事信息',
+    org_s1d: '填写下方快速表单，输入赛事名称、日期、奖金和参赛资格。只需3分钟。',
+    org_s2t: '我们审核并翻译',
+    org_s2d: '我们的团队核实详情，翻译成专业英文，并为全球受众格式化。通常在48小时内完成。',
+    org_s3t: '上线并开始接收申请',
+    org_s3d: '你的赛事在 Compete in China 上线。我们通过各渠道推广。你开始收到合格的海外申请者。',
+    org_cta1: '免费入驻赛事 →',
+    org_cta2: '在线客服咨询',
+    org_form_title: '入驻你的赛事',
+    org_form_sub: '免费基础展示。我们将在48小时内审核并发布。',
+    org_name_ph: '赛事名称 *',
+    org_city_first: '选择城市 *',
+    org_prize_ph: '奖金池（例如：总奖金 ¥500万）',
+    org_deadline_ph: '报名截止日期',
+    org_ind_ph: '行业聚焦（例如：AI、生物科技）',
+    org_web_ph: '官方网站 / 报名链接 *',
+    org_desc_ph: '赛事简介……',
+    org_contact_ph: '你的姓名 / 机构名称 *',
+    org_email_ph: '联系邮箱 *',
+    org_submit: '提交审核 →',
+    org_footer: '提交即表示你确认有权代表本赛事。我们将在48小时内给你发邮件。',
+    org_contact: ' prefer 直接沟通？联系我们：',
+
+    // Organizer disclaimer
+    org_disc_title: '⚠️ 入驻须知与免责声明 / Listing Disclaimer',
+    org_disc_1: '1. <strong>信息真实性：</strong>提交方须确保所有赛事信息真实、准确、完整。如因信息不实导致的任何后果，由提交方承担。',
+    org_disc_2: '2. <strong>非虚假宣传：</strong>提交方承诺赛事宣传内容不含虚假、夸大或误导性信息。所有奖金金额、参赛条件、评审标准均以实际情况为准。',
+    org_disc_3: '3. <strong>人工审核发布：</strong>所有赛事资料提交后需经 Compete in China 团队人工审核。审核通过后方可展示发布。我们保留拒绝或要求修改不符合规范内容的权利。',
+    org_disc_4: '4. <strong>审核时效：</strong>通常在 48 小时内完成审核并上线。如需加急，请联系 competitions@techinbridge.com。',
+
+    // Concierge page
+    conc_title: '🎯 一次提交，多赛投递，零前期费用。',
+    conc_sub: '我们处理中文报名。你专注于产品。通过一次提交，参加全国200+创新创业大赛。',
+    conc_tagline1: '💡 不只是参赛 — 这是扩大你在中国影响力的最低成本方式。',
+    conc_tagline2: '你的项目将被多个城市的投资人、产业园和政府人才计划看到。逐步建立中国影响力 — 从一场比赛开始。',
+    conc_why_title: '为什么选择代投服务？',
+    conc_why_sub: '参加中国赛事很复杂。我们让它变得简单。',
+    conc_adv1t: '节省 40+ 小时',
+    conc_adv1d: '每场中国赛事报名需要2-3小时 — 填表、翻译材料、了解要求。我们<strong>一次帮你投多场</strong>。你只需上传一次材料。',
+    conc_adv2t: '零前期费用',
+    conc_adv2d: '<span class="highlight-text">完全免费使用。</span>无报名费、无服务费、无隐藏收费。只在<strong>获奖后收取50%奖金</strong> — 且仅限我们代投的赛事。',
+    conc_adv3t: '建立中国影响力',
+    conc_adv3d: '每次参赛都是一次接触 — 与城市政府、产业园和投资人建立联系。即使没获奖，你的项目也进入了他们的视野。<strong>低成本的中国品牌建设。</strong>',
+    conc_adv4t: '智能匹配',
+    conc_adv4d: '我们按行业、阶段和城市，将你的项目匹配到<strong>最合适的赛事</strong>。不用再猜哪个比赛适合你。我们了解整个赛事格局，为你挑选最佳机会。',
+    conc_cost_title: '💰 费用对比：自己报名 vs. 代投服务',
+    conc_cost_h1: '',
+    conc_cost_h2: '自己报名 (DIY)',
+    conc_cost_h3: '代投服务',
+    conc_cost_r1l: '前期费用',
+    conc_cost_r1c: '免费 — 无前期费用',
+    conc_cost_r2l: '每场耗时',
+    conc_cost_r2c: '0 — 我们全包',
+    conc_cost_r3l: '语言障碍',
+    conc_cost_r3c: '已解决 — 我们翻译并提交',
+    conc_cost_r4l: '成功费用',
+    conc_cost_r4c: '奖金的50% — 仅获奖后收取',
+    conc_cost_r5l: '多赛策略',
+    conc_cost_r5c: '轻松 — 一次上传，投递多场',
+    conc_cost_note: '* 直接报名（你自行点击"立即报名"）永无费用。',
+    conc_steps_title: '🔄 如何运作 — 4个简单步骤',
+    conc_s1t: '创建账号',
+    conc_s1d: '快速注册 — 姓名、邮箱、密码。10秒搞定。',
+    conc_s2t: '填写一张表',
+    conc_s2d: '告诉我们你的团队、项目、知识产权和中国计划。上传路演PPT。',
+    conc_s3t: '我们匹配并投递',
+    conc_s3d: '我们将你匹配到最佳赛事，并处理所有中文报名 — <strong>包括与组委会的所有沟通</strong>。',
+    conc_s4t: '追踪并获奖',
+    conc_s4d: '在个人看板上追踪所有申请。我们通知你每个阶段的状态 — 已提交 → 审核中 → 入围 → 结果。<strong>如果你获奖并计划在中国落地，我们可以支持你的后续步骤。</strong>',
+    conc_faq_title: '❓ 常见问题',
+    conc_faq_q1: 'Q: 真的没有前期费用吗？',
+    conc_faq_a1: 'A: 零。我们不收报名费。只在获奖后收取50%奖金，且仅限我们主动管理的赛事。',
+    conc_faq_q2: 'Q: 我还能自己直接报名吗？',
+    conc_faq_a2: 'A: 当然。直接报名（你点击"立即报名"自行提交）始终免费，永不产生我们的服务费。代投为可选服务。',
+    conc_faq_q3: 'Q: 需要准备什么材料？',
+    conc_faq_a3: 'A: 只需你的路演PPT（PDF/PPTX）和基本的团队/项目信息。我们的表单涵盖了赛事主办方通常要求的所有内容。',
+    conc_faq_q4: 'Q: 多久能收到回复？',
+    conc_faq_a4: 'A: 我们在收到材料后48小时内提交。赛事结果取决于各活动的评审时间 — 通常4-12周。',
+    conc_cta: '🚀 立即开始 — 完全免费',
+    conc_cta_sub: '无需信用卡。无需承诺。随时取消。',
+
+    // LinkedIn Newsletter CTA
+    conc_newsletter_title: '关注我们的领英专栏',
+    conc_newsletter_sub: '每周获取中国创新赛事、人才项目和政策更新 — 直接推送到你的领英动态。',
+    conc_newsletter_btn: '在领英上关注',
+    carousel_title: '重点推荐赛事',
+    footer_newsletter: '订阅我们的领英专栏获取每周更新：',
+    footer_newsletter_btn: '在领英上关注',
+
+    // Chat widget
+    chat_name: 'Compete in China 助手',
+    chat_status: '通常即时回复',
+    chat_hi: '你好！我是 Compete in China 助手。有什么可以帮你？',
+    chat_menu: '你可以问我：',
+    chat_m1: '· 如何找到适合我行业的赛事',
+    chat_m2: '· 代投服务如何运作',
+    chat_m3: '· 如何入驻我的赛事',
+    chat_m4: '· 账号和材料相关问题',
+    chat_faq1: '查找赛事',
+    chat_faq2: '代投服务',
+    chat_faq3: '入驻赛事',
+    chat_faq4: '联系人工',
+    chat_ph: '输入你的消息...',
+
+    // Signup modal (simplified)
+    signup_title: '创建免费账号',
+    signup_sub: '只需3个字段，10秒搞定。无需信用卡。',
+    signup_name: '姓名',
+    signup_name_ph: '例如：Sarah Chen',
+    signup_email: '邮箱',
+    signup_email_ph: 'you@example.com',
+    signup_pw: '密码',
+    signup_pw_ph: '至少 8 个字符',
+    signup_auth_simple: '我同意 <a href="#" onclick="event.preventDefault();alert(\"服务条款 — 完整文件将在上线时提供。\")">服务条款</a> 和 <a href="#" onclick="event.preventDefault();alert(\"隐私政策 — 完整文件将在上线时提供。\")">隐私政策</a>。',
+    signup_cancel: '取消',
+    signup_submit: '创建账号 →',
+
+    // Footer
+    footer_1: 'Compete in China 是由',
+    footer_2: '所有赛事信息来源于官方渠道。我们不保证结果。报名链接跳转至官方页面。',
+    footer_3: '保留所有权利。',
+
+    // City page
+    cities_title: '探索城市',
+    cities_sub: '中国的主要创新枢纽——产业聚焦、生活成本和为什么海外团队应该关注。',
+
+    // Dynamic: competition cards
+    btn_apply: 'Apply Now',
+    btn_concierge: 'Let Us Apply',
+    label_highlights: 'Highlights',
+    label_prize: 'Prize',
+    label_track: 'Track',
+    label_deadline: 'Deadline',
+    label_stage: 'Stage',
+    label_apply: 'Apply',
+    label_concierge: 'Concierge',
+    status_urgent: 'Urgent',
+    status_closing: 'Closing Soon',
+    status_open: 'Open',
+    status_tba: 'TBA',
+
+    // Concierge new keys (2025-06)
+    conc_adv5t: '赛事助理',
+    conc_adv5d: '我们负责与组委会的<strong>所有沟通</strong> — 资格确认、材料更新、赛程变更、结果通知。你专注于产品；我们处理所有文书工作和往返沟通。',
+    conc_adv6t: '中国落地支持',
+    conc_adv6d: '计划在中国设立实体？我们全程指导<strong>公司注册、人才政策、地方激励申请</strong>。获奖后提供端到端支持 — 服务收费标准提前告知，透明无隐藏。',
+    conc_faq_q5: 'Q: 获奖后我计划在中国设立公司 — 你们能帮忙吗？',
+    conc_faq_a5: 'A: 当然可以。我们提供中国实体注册、人才项目申请和地方激励申请的端到端支持。我们在任何合作开始前会提前告知透明的服务收费方案 — 无隐藏费用。',
+    conc_faq_q6: 'Q: 谁负责与赛事组委会沟通？',
+    conc_faq_a6: 'A: 我们负责。作为你的代投服务方，我们处理所有组委会沟通 — 资格问题、材料更新、赛程变更和结果通知。你专注于产品；我们处理所有往返沟通。',
+  }
+};
+
+function applyLanguage(lang) {
+  CURRENT_LANG = lang;
+  localStorage.setItem('cic_lang', lang);
+  var isZh = (lang === 'zh');
+  var btn = document.getElementById('langToggle');
+  if (btn) btn.textContent = isZh ? 'EN' : '中文';
+  document.title = isZh
+    ? 'Compete in China — 中国创新创业赛事一站式平台'
+    : 'Compete in China — All Innovation Competitions, One Platform';
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n');
+    var t = I18N[lang] && I18N[lang][key];
+    if (!t) return;
+    var pureText = true;
+    for (var i = 0; i < el.childNodes.length; i++) {
+      if (el.childNodes[i].nodeType === 1 && !el.childNodes[i].getAttribute('data-i18n')) {
+        pureText = false; break;
+      }
+    }
+    if (pureText) el.textContent = t;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-ph');
+    if (I18N[lang] && I18N[lang][key] !== undefined) el.placeholder = I18N[lang][key];
+  });
+  document.querySelectorAll('[data-i18n-first]').forEach(function(el) {
+    var key = el.getAttribute('data-i18n-first');
+    if (el.options && el.options.length > 0 && I18N[lang] && I18N[lang][key] !== undefined) el.options[0].text = I18N[lang][key];
+  });
+  var g = document.getElementById('chatGreeting');
+  if (g) {
+    var d = I18N[isZh ? 'zh' : 'en'];
+    var hi = d['chat_hi'] || "Hi there! I'm the Compete in China assistant. How can I help you today?";
+    var menu = d['chat_menu'] || 'You can ask me about:';
+    g.innerHTML = '<span data-i18n="chat_hi">' + hi + '</span><br><br>' +
+      '<span data-i18n="chat_menu">' + menu + '</span><br>' +
+      '<span data-i18n="chat_m1">' + (d['chat_m1']||'· How to find competitions') + '</span><br>' +
+      '<span data-i18n="chat_m2">' + (d['chat_m2']||'· How concierge submission works') + '</span><br>' +
+      '<span data-i18n="chat_m3">' + (d['chat_m3']||'· Listing your competition') + '</span><br>' +
+      '<span data-i18n="chat_m4">' + (d['chat_m4']||'· Account and materials') + '</span>';
+  }
+  if (typeof competitions !== 'undefined' && typeof renderCards === 'function') renderCards(competitions);
+}
+
+function toggleLanguage() { var next = (CURRENT_LANG === 'en') ? 'zh' : 'en'; applyLanguage(next); }
+
+
+// ═════════ INIT ═════════
+applyLanguage(CURRENT_LANG);
+loadCompetitions();
+
+
+// ═══════════ ORGANIZER FORM ═══════════
+function submitOrganizerForm() {
+  var name = document.getElementById('orgCompName').value.trim();
+  var city = document.getElementById('orgCity').value;
+  var website = document.getElementById('orgWebsite').value.trim();
+  var contact = document.getElementById('orgContact').value.trim();
+  var email = document.getElementById('orgEmail').value.trim();
+
+  if (!name || !city || !website || !contact || !email) {
+    alert('Please fill in all required fields (marked with *).');
+    return;
+  }
+  if (!email.includes('@') || !email.includes('.')) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+
+  var formData = {
+    name: name,
+    city: city,
+    prize: document.getElementById('orgPrize').value.trim(),
+    deadline: document.getElementById('orgDeadline').value,
+    industry: document.getElementById('orgIndustry').value.trim(),
+    website: website,
+    description: document.getElementById('orgDesc').value.trim(),
+    contact: contact,
+    email: email
+  };
+
+  console.log('Organizer submission:', formData);
+
+  alert('Thank you, ' + contact + '!\n\nYour competition "' + name + '" has been submitted for review.\n\nWe will review and translate your listing within 48 hours and contact you at ' + email + '.\n\n(This is a demo \u2014 in production, this would create a ticket and notify our team.)');
+
+  ['orgCompName','orgCity','orgPrize','orgDeadline','orgIndustry','orgWebsite','orgDesc','orgContact','orgEmail'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+// ═══════════ AI CHAT WIDGET ═══════════
+function toggleChat() {
+  var panel = document.getElementById('chatPanel');
+  var bubble = document.getElementById('chatBubble');
+  var isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    bubble.style.display = '';
+  } else {
+    panel.classList.add('open');
+    bubble.style.display = 'none';
+  }
+}
+
+function openChat() {
+  var panel = document.getElementById('chatPanel');
+  var bubble = document.getElementById('chatBubble');
+  panel.classList.add('open');
+  bubble.style.display = 'none';
+  document.getElementById('chatInput').focus();
+}
+
+function sendChat() {
+  var input = document.getElementById('chatInput');
+  var msg = input.value.trim();
+  if (!msg) return;
+
+  var body = document.getElementById('chatBody');
+  body.innerHTML += '<div class="chat-msg user">' + escapeHtml(msg) + '</div>';
+  input.value = '';
+
+  setTimeout(function() {
+    var reply = getChatReply(msg);
+    body.innerHTML += '<div class="chat-msg bot">' + reply + '</div>';
+    body.scrollTop = body.scrollHeight;
+  }, 600 + Math.random() * 800);
+
+  body.scrollTop = body.scrollHeight;
+}
+
+function sendFaq(question) {
+  document.getElementById('chatInput').value = question;
+  sendChat();
+}
+
+function getChatReply(msg) {
+  var lower = msg.toLowerCase();
+  if (lower.includes('find') || lower.includes('search') || lower.includes('industry')) {
+    return 'Great question! Use the <b>Discover</b> page to browse all competitions. You can filter by city, industry, and prize pool. If you need help narrowing down, just tell me your industry and stage!';
+  }
+  if (lower.includes('concierge') || lower.includes('apply for me')) {
+    return 'Our <b>Concierge Service</b> handles the entire application for you — filling Chinese forms, translating materials, and submitting to multiple competitions. <br><br>It\'s completely <b>free</b> to use. We only charge a 50% success fee on prize money you actually win, and only for competitions we submit on your behalf.';
+  }
+  if (lower.includes('list') || lower.includes('competition') || lower.includes('organizer')) {
+    return `You can list your competition for <b>free</b> on our <a href="javascript:showPage('organizers')" style="color:var(--accent);">For Organizers</a> page. Just fill out the form with your competition details, and we'll review, translate, and publish within 48 hours!`;
+  }
+  if (lower.includes('contact') || lower.includes('human') || lower.includes('real person') || lower.includes('talk')) {
+    return 'You can reach our team directly at <b>competitions@techinbridge.com</b>. We typically respond within 24 hours. You can also connect with us on <a href="https://www.linkedin.com/company/techinbridge" target="_blank" style="color:var(--accent);">LinkedIn</a>.';
+  }
+  return `Thanks for your message! I'm a demo assistant, so my knowledge is limited. For detailed questions, the best way is to email us at <b>competitions@techinbridge.com</b> — our team responds quickly and can give you specific guidance. 😊`;
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Startup Registration — Compete in China</title>
+<meta name="description" content="Register your overseas startup for China innovation competitions. One form, multiple competitions.">
+<style>
+  :root {
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #111827;
+    --text2: #6b7280;
+    --text3: #9ca3af;
+    --accent: #2563eb;
+    --accent-h: #1d4ed8;
+    --accent-l: #eff6ff;
+    --border: #e5e7eb;
+    --border-f: #2563eb;
+    --green: #059669;
+    --green-l: #ecfdf5;
+    --amber: #d97706;
+    --amber-l: #fffbeb;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6; font-size: 15px;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  }
+
+  /* ── Progress Bar ── */
+  .progress-wrap {
+    position: sticky; top: 0; z-index: 50;
+    width: 100%; max-width: 680px; padding: 16px 20px 0;
+    background: linear-gradient(180deg, var(--bg) 80%, transparent);
+  }
+  .progress-bar {
+    height: 4px; background: var(--border); border-radius: 2px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent); border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .progress-label {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--text2); margin-bottom: 8px;
+  }
+  .progress-label strong { color: var(--text); font-size: 13px; }
+
+  /* ── Card ── */
+  .card-wrap { width: 100%; max-width: 680px; padding: 20px; }
+  .card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 36px 40px;
+    transition: opacity 0.3s, transform 0.3s;
+    min-height: 320px;
+  }
+  .card.anim-out { opacity: 0; transform: translateY(-12px); }
+  .card.anim-in  { opacity: 1; transform: translateY(0); }
+
+  .card-title {
+    font-size: 22px; font-weight: 700; margin-bottom: 6px; color: var(--text);
+  }
+  .card-subtitle {
+    font-size: 13.5px; color: var(--text2); margin-bottom: 28px;
+  }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 20px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 5px;
+    color: var(--text);
+  }
+  .field label .req { color: #ef4444; margin-left: 2px; }
+  .field label .opt { color: var(--text3); font-weight: 400; font-size: 12px; margin-left: 4px; }
+  .field .hint { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .field input[type="text"],
+  .field input[type="email"],
+  .field input[type="tel"],
+  .field input[type="url"],
+  .field select,
+  .field textarea {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 14px; font-family: inherit; color: var(--text);
+    background: #fafbfc; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--border-f);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: #fff;
+  }
+  .field textarea { resize: vertical; min-height: 90px; }
+  .field select {
+    cursor: pointer; appearance: none;
+    background: #fafbfc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%236b7280'/%3E%3C/svg%3E") no-repeat right 12px center;
+    padding-right: 32px;
+  }
+
+  .row { display: flex; gap: 14px; }
+  .row .field { flex: 1; }
+  @media (max-width: 500px) { .row { flex-direction: column; gap: 0; } }
+
+  /* ── Chips ── */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-size: 13px; padding: 8px 16px; border-radius: 20px;
+    border: 1.5px solid var(--border); background: #fafbfc;
+    cursor: pointer; transition: all 0.15s; user-select: none;
+    font-weight: 500; color: var(--text2);
+  }
+  .chip:hover { border-color: var(--accent); background: var(--accent-l); color: var(--accent); }
+  .chip.selected {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+
+  /* ── Buttons ── */
+  .btn-row { display: flex; gap: 12px; margin-top: 28px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 12px 28px; border-radius: var(--radius-sm); font-size: 14px;
+    font-weight: 600; cursor: pointer; border: none; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--accent-h); }
+  .btn-secondary { background: #fff; color: var(--accent); border: 1.5px solid var(--accent); }
+  .btn-secondary:hover:not(:disabled) { background: var(--accent-l); }
+  .btn-ghost { background: transparent; color: var(--text2); }
+  .btn-ghost:hover:not(:disabled) { color: var(--text); background: #f3f4f6; }
+
+  /* ── WhatsApp Floating Button ── */
+  .wa-float {
+    position: fixed; bottom: 24px; right: 24px; z-index: 200;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  }
+  .wa-tooltip {
+    background: var(--card); box-shadow: var(--shadow-lg); border-radius: var(--radius);
+    padding: 14px 16px; font-size: 13px; color: var(--text); display: none;
+    max-width: 220px; line-height: 1.5;
+  }
+  .wa-tooltip.show { display: block; }
+  .wa-tooltip strong { display: block; margin-bottom: 4px; font-size: 14px; }
+  .wa-btn {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #25d366; color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; box-shadow: 0 4px 16px rgba(37,211,102,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .wa-btn:hover { transform: scale(1.08); box-shadow: 0 6px 22px rgba(37,211,102,0.5); }
+
+  /* ── Authorization Card ── */
+  .auth-card {
+    background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: var(--radius-sm);
+    padding: 20px; margin-top: 16px;
+  }
+  .auth-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .auth-card p { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 10px; }
+  .auth-card ul { font-size: 13px; color: var(--text2); padding-left: 20px; margin-bottom: 12px; }
+  .auth-card ul li { margin-bottom: 4px; }
+  .auth-card .agree-row {
+    display: flex; align-items: flex-start; gap: 10px; margin-top: 14px;
+    padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .auth-card .agree-row input { margin-top: 2px; accent-color: var(--accent); width: 16px; height: 16px; }
+  .auth-card .agree-row label { font-size: 13px; color: var(--text); cursor: pointer; line-height: 1.6; }
+
+  /* ── Success / Submit ── */
+  .success-icon {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--green-l);
+    display: flex; align-items: center; justify-content: center; font-size: 32px;
+    margin: 0 auto 20px;
+  }
+  .wa-cta-card {
+    background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: var(--radius-sm);
+    padding: 20px; margin-top: 20px; text-align: center;
+  }
+  .wa-cta-card h4 { font-size: 15px; color: #065f46; margin-bottom: 6px; }
+  .wa-cta-card p { font-size: 13px; color: #166534; margin-bottom: 14px; }
+  .btn-wa {
+    background: #25d366; color: #fff; border: none; padding: 11px 22px;
+    border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: background 0.15s;
+  }
+  .btn-wa:hover { background: #20b858; }
+
+  /* ── Logo Area ── */
+  .logo-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 24px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: var(--accent); color: #fff; display: flex;
+    align-items: center; justify-content: center; font-weight: 800; font-size: 14px;
+  }
+  .logo-text { font-weight: 700; font-size: 15px; color: var(--text); }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: #1f2937; color: #fff; padding: 10px 24px; border-radius: 8px;
+    font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Footer */
+  .footer {
+    text-align: center; padding: 32px 20px; color: var(--text3);
+    font-size: 12px; max-width: 680px;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span id="stepLabel">Step 1 of 8</span>
+    <strong id="stepName">Team Info</strong>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<!-- FORM CARD -->
+<div class="card-wrap">
+  <div class="card" id="formCard">
+
+    <!-- STEP 0: Welcome -->
+    <div id="step0" class="step active">
+      <div class="logo-row">
+        <div class="logo-icon">C</div>
+        <div class="logo-text">Compete in China</div>
+      </div>
+      <div class="card-title">Register Your Startup</div>
+      <div class="card-subtitle">
+        One form. Multiple competitions. Zero cost to explore the Chinese market.<br>
+        Takes <strong>~8 minutes</strong>. All fields are in English.
+      </div>
+      <div style="background:var(--accent-l);border-radius:var(--radius-sm);padding:16px 20px;margin-bottom:20px;font-size:13px;color:var(--accent);line-height:1.7;">
+        <strong>What happens next?</strong><br>
+        1. Fill out this form → 2. We match you with competitions → 3. You choose which to enter → 4. We handle the Chinese paperwork. 
+        <strong>You just show up (or pitch remotely).</strong>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goToStep(1)" style="width:100%;">Start Registration →</button>
+      </div>
+      <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--text3);">
+        Stuck? <span style="color:var(--accent);cursor:pointer;" onclick="openWhatsApp()">Chat with us on WhatsApp</span>
+      </div>
+    </div>
+
+    <!-- STEP 1: Team Basic Info -->
+    <div id="step1" class="step" style="display:none;">
+      <div class="card-title">1. Team Basic Info</div>
+      <div class="card-subtitle">Tell us who you are at a glance</div>
+
+      <div class="row">
+        <div class="field">
+          <label>Project / Team Name <span class="req">*</span></label>
+          <input type="text" id="f_team_name" placeholder="Your project or team name">
+        </div>
+        <div class="field">
+          <label>Country / Region <span class="req">*</span></label>
+          <input type="text" id="f_country" placeholder="e.g. Singapore, Germany, USA">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Team Size</label>
+          <select id="f_team_size">
+            <option value="">Select</option>
+            <option>1–3 people</option>
+            <option>4–10 people</option>
+            <option>11–30 people</option>
+            <option>30+ people</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Project Stage</label>
+          <select id="f_stage">
+            <option value="">Select</option>
+            <option>R&D</option>
+            <option>Incubation</option>
+            <option>Pilot / MVP</option>
+            <option>Early Revenue</option>
+            <option>Growth / Scaling</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>One-Liner <span class="req">*</span> <span class="opt">(max 30 words)</span></label>
+        <input type="text" id="f_oneliner" placeholder="Describe your core technology and advantage in one sentence">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(0)">← Back</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goToStep(2)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Contact Person -->
+    <div id="step2" class="step" style="display:none;">
+      <div class="card-title">2. Primary Contact</div>
+      <div class="card-subtitle">Who should we reach out to?</div>
+
+      <div class="row">
+        <div class="field">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="f_contact_name" placeholder="Your full name">
+        </div>
+        <div class="field">
+          <label>Role in Team <span class="req">*</span></label>
+          <input type="text" id="f_contact_role" placeholder="e.g. Founder, CEO, CTO">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <div style="display:flex;gap:8px;align-items:flex-start;">
+            <input type="email" id="f_contact_email" placeholder="you@company.com" style="flex:1;" oninput="onEmailInput()">
+            <button type="button" id="btnSendCode" class="btn btn-secondary" style="white-space:nowrap;padding:11px 16px;font-size:13px;" onclick="sendVerifyCode()" disabled>Send Code</button>
+          </div>
+          <div class="hint">We'll verify your email to ensure you can receive our follow-up communications.</div>
+        </div>
+        <div class="field" id="fieldVerifyCode" style="display:none;">
+          <label>Verification Code <span class="req">*</span></label>
+          <input type="text" id="f_verify_code" placeholder="Enter 6-digit code" maxlength="6" style="max-width:240px;letter-spacing:4px;font-size:16px;text-align:center;">
+          <div class="hint" style="color:#d97706;">Demo mode: code shown in notification. Production: sent via email.</div>
+        </div>
+        <div class="field">
+          <label>WhatsApp / Phone</label>
+          <input type="tel" id="f_contact_phone" placeholder="+ country code">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>LinkedIn Profile</label>
+          <input type="url" id="f_contact_linkedin" placeholder="https://linkedin.com/in/...">
+        </div>
+        <div class="field">
+          <label>WeChat ID (if any)</label>
+          <input type="text" id="f_contact_wechat" placeholder="WeChat ID">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goToStep(3)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Project Overview -->
+    <div id="step3" class="step" style="display:none;">
+      <div class="card-title">3. Project Overview</div>
+      <div class="card-subtitle">Help us understand what you&rsquo;re building</div>
+
+      <div class="field">
+        <label>Industry Track <span class="req">*</span> <span class="opt">(select up to 3)</span></label>
+        <div class="chip-group" id="chipIndustry">
+          <span class="chip" data-val="AI / FinTech / XR">AI / FinTech / XR</span>
+          <span class="chip" data-val="Healthcare & Biotech">Healthcare & Biotech</span>
+          <span class="chip" data-val="Next-Gen IT">Next-Gen IT</span>
+          <span class="chip" data-val="Advanced Manufacturing">Advanced Manufacturing</span>
+          <span class="chip" data-val="New Energy / Materials">New Energy / Materials</span>
+          <span class="chip" data-val="Creative & Cultural">Creative & Cultural</span>
+          <span class="chip" data-val="AgriTech / FoodTech">AgriTech / FoodTech</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Keyword Tags</label>
+        <input type="text" id="f_keywords" placeholder="e.g. NLP, Machine Learning, B2B SaaS, Computer Vision">
+      </div>
+
+      <div class="field">
+        <label>Product / Service Description</label>
+        <textarea id="f_product_desc" placeholder="Briefly introduce your product, application areas, innovation highlights, and competitive differentiation. Keep it concise."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Business Model & Market Potential</label>
+        <textarea id="f_business_model" placeholder="Target customers, market size, competitive advantages, growth opportunities. Brief is fine."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(2)">← Back</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goToStep(4)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Financing & IP -->
+    <div id="step4" class="step" style="display:none;">
+      <div class="card-title">4. Financing & IP</div>
+      <div class="card-subtitle">Funding history and intellectual property</div>
+
+      <div class="field">
+        <label>Have you raised funding?</label>
+        <div class="chip-group" id="chipFunded">
+          <span class="chip" data-val="yes">Yes</span>
+          <span class="chip" data-val="no">No</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Funding Round</label>
+          <select id="f_funding_round">
+            <option value="">Select</option>
+            <option>Pre-Seed</option>
+            <option>Seed</option>
+            <option>Angel</option>
+            <option>Series A</option>
+            <option>Series B</option>
+            <option>Series C+</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Amount Raised</label>
+          <input type="text" id="f_funding_amount" placeholder="e.g. USD 500,000">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Investors (if any)</label>
+        <input type="text" id="f_investors" placeholder="Investor names">
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin:20px 0;"></div>
+
+      <div class="field">
+        <label>Patents / Trademarks / IP</label>
+        <textarea id="f_ip" placeholder="List any filed or granted patents, trademarks, copyrights. Write 'None' if not applicable." rows="3"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(3)">← Back</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goToStep(5)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: China Development Plan -->
+    <div id="step5" class="step" style="display:none;">
+      <div class="card-title">5. China Development Plan</div>
+      <div class="card-subtitle">Your ambitions for the Chinese market</div>
+
+      <div class="row">
+        <div class="field">
+          <label>Target Funding in China</label>
+          <input type="text" id="f_cn_funding" placeholder="e.g. RMB 5,000,000 or USD 700,000">
+        </div>
+        <div class="field">
+          <label>Preferred Cities in China</label>
+          <input type="text" id="f_cn_cities" placeholder="e.g. Shenzhen, Shanghai, Hangzhou">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Interest in setting up a China entity?</label>
+        <div class="chip-group" id="chipRegister">
+          <span class="chip" data-val="definitely">Definitely</span>
+          <span class="chip" data-val="considering">Considering</span>
+          <span class="chip" data-val="not_now">Not right now</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Company Setup Plan (if any)</label>
+        <textarea id="f_cn_setup" placeholder="Planned timing, structure (JV / WFOE), equity split ideas, etc." rows="2"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Next 6–12 Months Roadmap</label>
+        <textarea id="f_roadmap" placeholder="Key goals, milestones, support needed in the next 6–12 months." rows="3"></textarea>
+      </div>
+
+      <div class="field">
+        <label>What support do you need from TechinBridge?</label>
+        <div class="chip-group" id="chipSupport">
+          <span class="chip" data-val="Investor matchmaking">Investor matchmaking</span>
+          <span class="chip" data-val="Corporate / industry partners">Corporate / industry partners</span>
+          <span class="chip" data-val="Office space / landing park">Office space / landing park</span>
+          <span class="chip" data-val="Policy guidance & applications">Policy guidance & applications</span>
+          <span class="chip" data-val="Brand exposure & promotion">Brand exposure & promotion</span>
+          <span class="chip" data-val="Industry network & connections">Industry network & connections</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(4)">← Back</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goToStep(6)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 6: Core Team -->
+    <div id="step6" class="step" style="display:none;">
+      <div class="card-title">6. Core Team</div>
+      <div class="card-subtitle">The people behind the project</div>
+
+      <div class="field">
+        <label>Core Members <span class="req">*</span></label>
+        <textarea id="f_team_members" placeholder="Briefly introduce 2–3 key members: name, role, highest degree (institution), expertise, and responsibilities. No need to list everyone." rows="4"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Team Stability & Collaboration History</label>
+        <input type="text" id="f_team_stability" placeholder="e.g. Co-founders worked together at MIT for 5 years / Team has been together 3+ years. Keep it brief.">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(5)">← Back</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goToStep(7)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 7: Marketing Authorization -->
+    <div id="step7" class="step" style="display:none;">
+      <div class="card-title">7. Marketing Authorization</div>
+      <div class="card-subtitle">Help us promote your project to Chinese investors & partners</div>
+
+      <div class="auth-card">
+        <h4>Authorize TechinBridge for Promotional Use</h4>
+        <p>
+          We can help amplify your project's visibility in China — through project spotlight articles,
+          short videos, and posts on the TechinBridge website, LinkedIn, and other platforms.
+        </p>
+        <p><strong>What we MAY share:</strong></p>
+        <ul>
+          <li>Project overview (industry, product, technology highlights)</li>
+          <li>Competition participation & awards</li>
+          <li>Team public background (no personal contact info)</li>
+          <li>Non-confidential pages from your pitch deck</li>
+        </ul>
+        <p><strong>What we will NEVER share:</strong></p>
+        <ul>
+          <li>Confidential IP details (core algorithms, source code)</li>
+          <li>Personal contact info (email, phone, WeChat)</li>
+          <li>Financial data, customer lists, or sensitive business info</li>
+        </ul>
+        <p style="color:var(--green);font-weight:600;">Goal: Increase your project's exposure among Chinese investors, industrial parks, and partners — attracting more opportunities.</p>
+        <div class="agree-row">
+          <input type="checkbox" id="f_auth_agree">
+          <label for="f_auth_agree">
+            <strong>I agree</strong> to authorize TechinBridge to promote my project within the scope described above.<br>
+            <span style="color:var(--text2);">(You may revoke this authorization at any time via email.)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goToStep(6)">← Back</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="goToStep(8)">Next →</button>
+      </div>
+    </div>
+
+    <!-- STEP 8: Attachments & Submit -->
+    <div id="step8" class="step" style="display:none;">
+      <div class="card-title">8. Attachments & Submit</div>
+      <div class="card-subtitle">Last step — almost there!</div>
+
+      <div class="field">
+        <label>Pitch Deck / Business Plan <span class="opt">(optional)</span></label>
+        <div class="hint" style="margin-bottom:6px;">PDF or PPT format, max 20 MB recommended. You can paste a link below.</div>
+        <input type="text" id="f_pitch_deck" placeholder="Google Drive / Dropbox / other link">
+      </div>
+
+      <div class="field">
+        <label>Additional Materials</label>
+        <input type="text" id="f_extra_links" placeholder="Any other links or notes">
+      </div>
+
+      <div class="field">
+        <label>Anything else you want us to know?</label>
+        <textarea id="f_notes" placeholder="Open space — tell us anything." rows="3"></textarea>
+      </div>
+
+      <div class="btn-row" style="flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="goToStep(7)">← Back</button>
+        <button class="btn btn-primary" style="flex:1;" id="btnSubmit" onclick="submitForm()">Submit Registration</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS: After Submit -->
+    <div id="stepSuccess" class="step" style="display:none;text-align:center;">
+      <div class="success-icon">✓</div>
+      <div class="card-title">Registration Submitted!</div>
+      <div class="card-subtitle" style="margin-bottom:20px;">
+        Thank you! We'll review your submission and get back to you <strong>within 48 hours</strong>.
+      </div>
+
+      <div class="wa-cta-card">
+        <h4>Want faster service?</h4>
+        <p>Message us on WhatsApp — we'll prioritize your application and answer questions instantly.</p>
+        <button class="btn-wa" onclick="openWhatsApp()">💬 Chat on WhatsApp</button>
+      </div>
+
+      <div style="margin-top:20px;font-size:13px;color:var(--text2);">
+        <p>We'll email you at <strong id="confirmEmail" style="color:var(--accent);">your email</strong></p>
+        <p style="margin-top:6px;">In the meantime, <a href="https://www.techinbridge.com" target="_blank">explore TechinBridge →</a></p>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /card-wrap -->
+
+<div class="footer">
+  <strong>TechinBridge</strong> · Give you one more option.<br>
+  www.techinbridge.com · This form is for competition registration & project matching only. Your info will not be shared with third parties.
+</div>
+
+<!-- WHATSAPP FLOATING BUTTON -->
+<div class="wa-float">
+  <div class="wa-tooltip" id="waTooltip">
+    <strong>Need help?</strong>
+    Chat with us on WhatsApp for instant support.
+  </div>
+  <button class="wa-btn" onclick="openWhatsApp()" onmouseenter="document.getElementById('waTooltip').classList.add('show')" onmouseleave="document.getElementById('waTooltip').classList.remove('show')" title="Chat on WhatsApp">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </button>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ═══════════ STATE ═══════════
+const TOTAL_STEPS = 8;
+let currentStep = 0;
+
+// Chip selection tracking
+const chipSelections = {};
+
+function initChips(groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  if (!chipSelections[groupId]) chipSelections[groupId] = [];
+
+  group.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+      const maxSelect = groupId === 'chipIndustry' ? 3 : 1;
+      const val = this.dataset.val;
+
+      if (this.classList.contains('selected')) {
+        this.classList.remove('selected');
+        chipSelections[groupId] = chipSelections[groupId].filter(v => v !== val);
+      } else {
+        if (maxSelect === 1) {
+          group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+          chipSelections[groupId] = [];
+        }
+        if (chipSelections[groupId].length >= maxSelect && maxSelect > 1) {
+          showToast('Max ' + maxSelect + ' selections allowed');
+          return;
+        }
+        this.classList.add('selected');
+        chipSelections[groupId].push(val);
+      }
+    });
+  });
+}
+
+// Init all chip groups
+['chipIndustry','chipFunded','chipRegister','chipSupport'].forEach(initChips);
+
+// ═══════════ NAVIGATION ═══════════
+function goToStep(n) {
+  // Email verification gate: going to step 3+ requires verified email
+  if (n >= 3) {
+    var email = document.getElementById('f_contact_email').value.trim();
+    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (re.test(email) && !emailVerified) {
+      showToast('Please verify your email before continuing. Click "Send Code" and enter the code you receive.', 5000);
+      return;
+    }
+  }
+
+  // Hide all steps
+  document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
+  // Show target
+  var target = document.getElementById('step' + n);
+  if (target) {
+    target.style.display = 'block';
+    target.classList.add('anim-in');
+  }
+
+  currentStep = n;
+  updateProgress(n);
+
+  // Scroll to top of card
+  document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateProgress(n) {
+  var names = [
+    'Welcome', 'Team Info', 'Contact', 'Project', 'Financing & IP',
+    'China Plan', 'Core Team', 'Authorization', 'Attachments'
+  ];
+  var stepLabel = document.getElementById('stepLabel');
+  var stepName = document.getElementById('stepName');
+  var fill = document.getElementById('progressFill');
+
+  if (n === 0) {
+    stepLabel.textContent = 'Welcome';
+    stepName.textContent = 'Compete in China';
+    fill.style.width = '0%';
+  } else if (n >= 1 && n <= TOTAL_STEPS) {
+    stepLabel.textContent = 'Step ' + n + ' of ' + TOTAL_STEPS;
+    stepName.textContent = names[n] || '';
+    fill.style.width = Math.round((n / TOTAL_STEPS) * 100) + '%';
+  }
+}
+
+// ═══════════ SUBMIT ═══════════
+function submitForm() {
+  // Email verification check
+  if (!emailVerified) {
+    showToast('Please go back to Step 2 and verify your email before submitting.', 4000);
+    return;
+  }
+
+  // Collect all form data
+  var data = {
+    team_name:      document.getElementById('f_team_name')?.value || '',
+    country:        document.getElementById('f_country')?.value || '',
+    team_size:      document.getElementById('f_team_size')?.value || '',
+    stage:          document.getElementById('f_stage')?.value || '',
+    oneliner:       document.getElementById('f_oneliner')?.value || '',
+    contact_name:   document.getElementById('f_contact_name')?.value || '',
+    contact_role:   document.getElementById('f_contact_role')?.value || '',
+    contact_email:  document.getElementById('f_contact_email')?.value || '',
+    contact_phone:  document.getElementById('f_contact_phone')?.value || '',
+    contact_linkedin: document.getElementById('f_contact_linkedin')?.value || '',
+    contact_wechat: document.getElementById('f_contact_wechat')?.value || '',
+    industry:       (chipSelections['chipIndustry'] || []).join(', '),
+    keywords:       document.getElementById('f_keywords')?.value || '',
+    product_desc:   document.getElementById('f_product_desc')?.value || '',
+    business_model: document.getElementById('f_business_model')?.value || '',
+    funded:         (chipSelections['chipFunded'] || []).join(', '),
+    funding_round:  document.getElementById('f_funding_round')?.value || '',
+    funding_amount: document.getElementById('f_funding_amount')?.value || '',
+    investors:      document.getElementById('f_investors')?.value || '',
+    ip:             document.getElementById('f_ip')?.value || '',
+    cn_funding:     document.getElementById('f_cn_funding')?.value || '',
+    cn_cities:      document.getElementById('f_cn_cities')?.value || '',
+    register_cn:    (chipSelections['chipRegister'] || []).join(', '),
+    cn_setup:       document.getElementById('f_cn_setup')?.value || '',
+    roadmap:        document.getElementById('f_roadmap')?.value || '',
+    support_needed: (chipSelections['chipSupport'] || []).join(', '),
+    team_members:   document.getElementById('f_team_members')?.value || '',
+    team_stability: document.getElementById('f_team_stability')?.value || '',
+    auth_agree:     document.getElementById('f_auth_agree')?.checked || false,
+    pitch_deck:     document.getElementById('f_pitch_deck')?.value || '',
+    extra_links:    document.getElementById('f_extra_links')?.value || '',
+    notes:          document.getElementById('f_notes')?.value || ''
+  };
+
+  // In production, this would POST to an API
+  // For demo, store in localStorage (shared with admin panel)
+  try {
+    // Store as single registration (for backward compat)
+    localStorage.setItem('competeinchina_registration', JSON.stringify(data));
+    localStorage.setItem('competeinchina_timestamp', new Date().toISOString());
+    // Also push to registrations array for admin panel
+    var regs = [];
+    try {
+      var existing = localStorage.getItem('competeinchina_registrations');
+      if (existing) regs = JSON.parse(existing);
+    } catch(e) {}
+    // Avoid exact duplicate by email
+    if (!regs.some(function(r) { return r.contact_email === data.contact_email; })) {
+      regs.push(data);
+    }
+    localStorage.setItem('competeinchina_registrations', JSON.stringify(regs));
+  } catch(e) {}
+
+  // Show success
+  document.getElementById('confirmEmail').textContent = data.contact_email || 'your email';
+  document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
+  document.getElementById('stepSuccess').style.display = 'block';
+  document.getElementById('stepSuccess').classList.add('anim-in');
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('stepLabel').textContent = 'Complete!';
+  document.getElementById('stepName').textContent = 'Submitted';
+  document.getElementById('btnSubmit').style.display = 'none';
+}
+
+// ═══════════ WHATSAPP ═══════════
+function openWhatsApp() {
+  // REPLACE THIS with your actual WhatsApp Business number
+  // Format: country code + number, no +, no spaces
+  var phone = '85252072721';
+  var msg = encodeURIComponent('Hi TechinBridge! I just submitted the competition registration form and have a question.');
+  window.open('https://wa.me/' + phone + '?text=' + msg, '_blank');
+}
+
+// ═══════════ EMAIL VERIFICATION (Demo Mode) ═══════════
+var verifyCode = '';
+var emailVerified = false;
+
+function onEmailInput() {
+  var email = document.getElementById('f_contact_email').value.trim();
+  var btn = document.getElementById('btnSendCode');
+  var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  btn.disabled = !re.test(email);
+  emailVerified = false;
+}
+
+function sendVerifyCode() {
+  var email = document.getElementById('f_contact_email').value.trim();
+  var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!re.test(email)) { showToast('Please enter a valid email first.'); return; }
+
+  // Generate 6-digit code
+  verifyCode = String(Math.floor(100000 + Math.random() * 900000));
+  
+  // Show code in toast (demo mode - in production, send via email API)
+  showToast('Demo mode: Your verification code is ' + verifyCode + ' (in production, this would be emailed to ' + email + ')', 6000);
+  
+  // Show verification code field
+  var field = document.getElementById('fieldVerifyCode');
+  field.style.display = 'block';
+  
+  // Update button
+  var btn = document.getElementById('btnSendCode');
+  btn.textContent = 'Code Sent';
+  btn.disabled = true;
+  btn.style.background = '#d1fae5';
+  btn.style.borderColor = '#6ee7b7';
+  btn.style.color = '#047857';
+  
+  // Focus on code input
+  setTimeout(function() {
+    document.getElementById('f_verify_code').focus();
+  }, 200);
+}
+
+function isEmailVerified() {
+  var code = document.getElementById('f_verify_code').value.trim();
+  if (!verifyCode) return false;
+  if (code !== verifyCode) return false;
+  emailVerified = true;
+  return true;
+}
+
+// ═══════════ TOAST ═══════════
+function showToast(msg, dur) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, dur || 2000);
+}
+
+// ═══════════ INIT ═══════════
+document.addEventListener('DOMContentLoaded', function() {
+  goToStep(0);
+});
+</script>
+
+</body>
+</html>
