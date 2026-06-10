@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Compete in China — All Innovation Competitions, One Platform</title>
-<meta name="description" content="Discover 200+ China innovation competitions for overseas startups. Filter by city, industry, prize, and deadline. One account, one dashboard, one submission.">
+<title>Compete in China. Grow with China. — Innovation Competition Platform</title>
+<meta name="description" content="Compete in China. Grow with China. Discover 200+ innovation competitions across 20+ Chinese cities. Your gateway to China's startup ecosystem.">
 <style>
   :root {
     --bg: #f6f8fb;
@@ -186,6 +186,23 @@
   .deadline-normal { background: var(--accent-light); color: var(--accent); }
   .deadline-urgent { background: var(--amber-light); color: var(--amber); }
   .deadline-soon { background: var(--red-light); color: var(--red); }
+  .deadline-closed { background: #f1f5f9; color: #94a3b8; }
+
+  /* ── Expired / Closed Competitions ── */
+  .comp-card-expired {
+    opacity: 0.62;
+    filter: grayscale(0.3);
+    cursor: pointer;
+  }
+  .comp-card-expired:hover {
+    opacity: 0.8;
+    filter: grayscale(0.1);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border);
+  }
+  .comp-card-expired::before { background: #94a3b8 !important; }
+  .comp-card-expired:hover::before { opacity: 1; }
+  .badge-closed { background: #f1f5f9; color: #94a3b8; }
 
   /* ── Industry Icon Colors ── */
   .ind-ai { color: #7c3aed; }
@@ -908,10 +925,10 @@
 <div class="page active" id="page-browse">
 
   <div class="hero">
-    <h1 data-i18n="hero_title">China Innovation Competitions — All in One Place</h1>
-    <p data-i18n="hero_sub">200+ competitions across 20+ Chinese cities. Filter by city, industry, prize, and deadline. Find the right stage for your startup.</p>
+    <h1 data-i18n="hero_title">Compete in China. Grow with China.</h1>
+    <p data-i18n="hero_sub">Discover 200+ innovation competitions across China. Filter by city, industry, prize, and deadline — and find the right stage for your startup.</p>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-num" id="stat-total">9</div><div class="hero-stat-label" data-i18n="hero_stat1">Active Competitions</div></div>
+      <div class="hero-stat"><div class="hero-stat-num" id="stat-total">9</div><div class="hero-stat-label" data-i18n="hero_stat1">Competitions Listed</div></div>
       <div class="hero-stat"><div class="hero-stat-num">20+</div><div class="hero-stat-label" data-i18n="hero_stat2">Cities Covered</div></div>
       <div class="hero-stat"><div class="hero-stat-num">¥100M+</div><div class="hero-stat-label" data-i18n="hero_stat3">Total Prize Pool</div></div>
       <div class="hero-stat"><div class="hero-stat-num">12</div><div class="hero-stat-label" data-i18n="hero_stat4">Industry Tracks</div></div>
@@ -975,6 +992,7 @@
         <option value="urgent" data-i18n="filter_urgent">This Month</option>
         <option value="soon" data-i18n="filter_soon">Next 2 Months</option>
         <option value="open" data-i18n="filter_open">Open / TBA</option>
+        <option value="expired" data-i18n="filter_expired">Recently Expired</option>
       </select>
     </div>
     <div class="filter-count"><span id="resultCount">9</span> <span data-i18n="filter_results">results</span></div>
@@ -1521,7 +1539,8 @@ const cityColors = {
   'Guangzhou': '#d97706', 'Hangzhou': '#7c3aed', 'Suzhou': '#0891b2',
   'Hefei': '#4f46e5', 'Nanjing': '#be185d', 'Xiamen': '#0d9488',
   'Chengdu': '#ea580c', 'Xi\'an': '#9333ea', 'Wuhan': '#0284c7',
-  'Kunming': '#15803d', 'Jinan': '#b45309', 'Multi-city': '#64748b'
+  'Kunming': '#15803d', 'Jinan': '#b45309', 'Multi-city': '#64748b',
+  'Dongguan': '#6366f1', 'Zhongshan': '#14b8a6'
 };
 
 // ═══════════ COMPETITION DATA ═══════════
@@ -1535,173 +1554,196 @@ const DEFAULT_COMPETITIONS = [
     title: "ITEC 2026 — Beijing Chaoyang International Talent Entrepreneurship Conference",
     city: "Beijing",
     deadline: "2026-08-31",
-    prize: "¥54.5M total (86 slots, max ¥5M Special Prize)",
+    prize: "¥50M+ total prize pool (86 awards, max ¥5M Special Prize)",
     prizeCategory: "huge",
     industries: ["AI", "Robotics", "Aerospace", "Digital Economy", "Biotech & Pharma", "General"],
     level: "District",
-    desc: "14th edition. Prize + Investment + Loan triple engine. Three tracks: Talent, Industry, Special.",
+    desc: "14th edition. 10 industry tracks + 8 special tracks. Open to global entrepreneurs. Prize + Investment + Loan triple-engine support.",
     highlights: [
-      "¥54.5M total prize pool with 86 award slots",
-      "CICC Capital, Hillhouse, Plum Ventures investment consortium",
+      "¥50M+ total prize pool with 86 award slots",
+      "10 industry tracks: Smart Hardware, Embodied AI, Aerospace, General AI, Metaverse, Digital Healthcare, Industrial AI, Data Elements, Digital Culture, Future Industries",
+      "8 special tracks including robotics, photonics, and disruptive tech",
       "Policy matching, landing services, office space included",
-      "Special track for robotics, photonics, and disruptive tech"
+      "Registration open until August 31, 2026"
     ],
     applyUrl: "https://www.chytalents.gov.cn/",
     englishUrl: "https://exploreitec.com/",
-    stage: "Preliminary"
+    stage: "Registration",
+    titleCN: "第十四届朝阳国际人才创业大会（ITEC 2026）全球创业赛"
   },
   {
     id: 2,
-    title: "Shenzhen International Innovation Competition (10th Edition)",
+    title: "China (Shenzhen) Innovation & Entrepreneurship International Competition (10th Edition)",
     city: "Shenzhen",
     deadline: "2026-08-31",
-    prize: "¥9.42M pool (Grand: ¥1.5M; ¥5B VC fund)",
+    prize: "¥9.42M total pool (Grand Prize: ¥1.5M) + ¥5B VC fund",
     prizeCategory: "large",
-    industries: ["AI", "Biotech & Pharma", "New Energy", "Advanced Manufacturing", "Semiconductors", "Digital Economy", "General"],
+    industries: ["AI", "Biotech & Pharma", "New Energy", "Advanced Manufacturing", "Semiconductors", "Robotics", "General"],
     level: "City",
-    desc: "12 overseas branch stations. One of China's largest and most rewarding competitions for global innovators.",
+    desc: "10th edition. 12 overseas division stations across US, Europe, Asia-Pacific. One of China's most prestigious international innovation competitions.",
     highlights: [
-      "12 overseas stations: Boston, London, Paris, Toronto, Sydney + 7 more",
+      "12 overseas stations: Boston, London, Paris, Toronto, Sydney, Stockholm, Amsterdam, Zurich, Barcelona, Seoul, Singapore + more",
       "Grand Prize: ¥1.5M (¥500K immediate + ¥1M landing fund)",
-      "¥5B venture capital pool from 20+ leading VCs",
-      "Up to 24 months free workspace across 434 startup spaces"
+      "¥5B venture capital pool from 50+ investment institutions",
+      "Up to 24 months free workspace across 434 startup spaces in Shenzhen",
+      "No nationality restrictions; must not have registered entity in Shenzhen"
     ],
-    applyUrl: "http://cn.itcsz.cn/",
-    stage: "Registration"
+    applyUrl: "https://www.itcsz.cn/",
+    englishUrl: "",
+    stage: "Registration",
+    titleCN: "中国深圳创新创业大赛国际赛（第十届）"
   },
   {
     id: 3,
-    title: "Jiangsu Talent Innovation & Entrepreneurship Competition 2026",
-    city: "Nanjing",
-    deadline: "2026-07-31",
-    prize: "¥20K (1st) / ¥10K (2nd) / ¥8K (3rd) + Policy Fast-Track",
-    prizeCategory: "small",
-    industries: ["AI", "Semiconductors", "Advanced Manufacturing", "Biotech & Pharma", "New Materials", "New Energy", "General"],
-    level: "Provincial",
-    desc: "5 overseas divisions. Winners get direct access to Jiangsu's Dual Innovation Plan interview.",
-    highlights: [
-      "5 overseas divisions: Munich, Boston, LA, Melbourne, Seoul",
-      "Two categories: Innovation (pre-registration) & Entrepreneurship (registered)",
-      "Direct access to provincial talent program interviews",
-      "Priority recommendation for national-level programs"
-    ],
-    applyUrl: "http://jssrcfwypt.org.cn/",
-    englishUrl: "",
-    stage: "Regional Selection"
-  },
-  {
-    id: 4,
-    title: "12th China Returnee Entrepreneurship Competition & International Sci-Tech Contest",
+    title: "12th China Overseas Scholars Entrepreneurship Competition & International Talent Sci-Tech Contest",
     city: "Suzhou",
     deadline: "2026-06-22",
-    prize: "Cash prizes + comprehensive support services",
+    prize: "Cash prizes (1 First / 3 Second / 6 Third / 10 Excellence) + landing support",
     prizeCategory: "small",
     industries: ["Biotech & Pharma", "Semiconductors", "Medical Devices", "Advanced Manufacturing", "General"],
     level: "National",
-    desc: "Upgraded with new International Talent Sci-Tech Contest track. 5,500+ returnee projects since 2015.",
+    desc: "Jointly organized by China Overseas Scholars Pioneer Park. New International Talent Sci-Tech Contest track for 2026. 5,500+ returnee projects since 2015.",
     highlights: [
-      "New International Talent Sci-Tech Contest track",
-      "Full-chain: competition, mentoring, landing, industrialization",
-      "International Sci-Tech Talent China Tour program",
-      "Suzhou biotech and semiconductor ecosystem matchmaking"
+      "New International Talent Sci-Tech Contest track for non-returnee international teams",
+      "Three sectors: Biomedicine & Bio-manufacturing, IC & Advanced Manufacturing, High-Performance Medical Devices",
+      "Finals in Suzhou, Jiangsu (late July)",
+      "Haichuang China Talent Tour for project-industry matchmaking",
+      "Full-chain support: competition → mentoring → landing → industrialization"
     ],
     applyUrl: "http://oseccn.com/",
-    stage: "Registration"
+    englishUrl: "",
+    stage: "Registration",
+    titleCN: "第十二届中国海外学子创业大赛暨国际人才科技创新创业大赛"
+  },
+  {
+    id: 4,
+    title: "3rd Guangdong-Hong Kong-Macao Greater Bay Area Doctoral & Postdoctoral Innovation Competition",
+    city: "Dongguan",
+    deadline: "2026-07-15",
+    prize: "Grand Prize: ¥500K (Entrepreneurship) / ¥500K (Innovation, staged)",
+    prizeCategory: "medium",
+    industries: ["AI", "Semiconductors", "Robotics", "New Energy", "New Materials", "Biotech & Pharma", "General"],
+    level: "Regional",
+    desc: "10 tracks across innovation and entrepreneurship. Open to global PhDs and postdocs. Finals at Songshan Lake, Dongguan.",
+    highlights: [
+      "10 sectors: AI, Semiconductors, Robotics, New Energy, New Materials, Biomedicine, TCM, Modern Agriculture, Marine Research, Modern Services",
+      "Innovation track: ¥250K + ¥250K upon company registration in Guangdong",
+      "Entrepreneurship track: ¥500K Grand Prize (one-time)",
+      "Open to Hong Kong, Macao, and overseas PhDs/postdocs starting businesses in Guangdong",
+      "Innovation/Entrepreneurship tracks deadline: July 15"
+    ],
+    applyUrl: "https://www.gbadoctor.com",
+    englishUrl: "",
+    stage: "Registration",
+    titleCN: "第三届粤港澳大湾区博士博士后创新创业大赛"
   },
   {
     id: 5,
-    title: "Hefei Global 'Kepiao' Innovation Competition 2026",
-    city: "Hefei",
-    deadline: "",
-    prize: "Free housing + rent subsidy + funding matching",
-    prizeCategory: "small",
-    industries: ["AI", "Advanced Manufacturing", "New Energy", "Semiconductors", "Digital Economy", "General"],
+    title: "HICOOL 2026 Global Entrepreneurship Competition",
+    city: "Beijing",
+    deadline: "2026-04-15",
+    prize: "¥110.8M total (200 awards: 12×¥2M, 36×¥1M, 68×¥500K, 84×¥200K)",
+    prizeCategory: "huge",
+    industries: ["AI", "Robotics", "Biotech & Pharma", "Semiconductors", "New Energy", "Digital Economy", "General"],
     level: "City",
-    desc: "15 days free accommodation for all qualifying teams. No overseas vs. domestic split.",
+    desc: "6th edition. One of China's largest startup competitions. 34,000+ projects from 167 countries over 6 years. Registration closed April 15, 2026.",
     highlights: [
-      "15 days free accommodation for all qualifying teams",
-      "Up to 6 months rent subsidy + free coworking desk",
-      "Single track for all teams — online pitch via Tencent Meeting",
-      "Entry into USTC Silicon Valley Project Library for ongoing matchmaking"
+      "200 award slots with ¥110.8M total prize pool",
+      "12 tracks including AI/Robot, 5G/IoT/Smart City, Biotech/Health, New Energy, Advanced Manufacturing",
+      "New Award + Investment mechanism: winners get priority co-investment from HICOOL partner VCs",
+      "Talent Scout Bonus for successful project referrals",
+      "Full-lifecycle support: residency, healthcare, exit/entry facilitation, incubation, product showcasing"
     ],
-    applyUrl: "https://www.ustc-si.com/",
-    stage: "Open"
+    applyUrl: "https://www.hicool.com/",
+    englishUrl: "https://english.beijing.gov.cn/beijinginfo/sci/event/202602/t20260212_4511406.html",
+    stage: "Closed",
+    titleCN: "HICOOL 2026 全球创业者峰会暨创业大赛"
   },
   {
     id: 6,
-    title: "Huachuang Star 2026 — National Innovation & Entrepreneurship Competition (3rd Edition)",
-    city: "Multi-city",
-    deadline: "",
-    prize: "Multi-city prizes + landing support per city",
-    prizeCategory: "medium",
-    industries: ["AI", "Biotech & Pharma", "New Materials", "New Energy", "Advanced Manufacturing", "Digital Economy", "General"],
-    level: "National",
-    desc: "One application, 14 Chinese cities + overseas tracks. 10 industry tracks.",
+    title: "2026 Hangzhou Innovation & Entrepreneurship Competition for Overseas Talent (GITP)",
+    city: "Hangzhou",
+    deadline: "2026-05-11",
+    prize: "Investor access + government connections + landing support",
+    prizeCategory: "small",
+    industries: ["AI", "Biotech & Pharma", "Robotics", "Advanced Manufacturing", "General"],
+    level: "City",
+    desc: "Organized under GITP Asia. Designed to discover and empower overseas entrepreneurs. 8 industry sectors. Registration closed May 11, 2026.",
     highlights: [
-      "14 hub cities: Shanghai, Beijing, Shenzhen, Wuhan, Hangzhou, Hefei, Chengdu + more",
-      "10 industry tracks covering AI, biotech, new materials, traditional industries",
-      "Two pathways: Team Group (pre-registration) / Enterprise Group (registered)",
-      "Test multiple ecosystems with one application"
+      "8 sectors: AI & Pharma, IoT & Smart Hardware, Robotics & Automation, Smart Manufacturing, Automotive Tech, AgriTech, FoodTech, HealthTech",
+      "Pitch to international investors & industry leaders",
+      "Government & VC connections, cross-border collaborations",
+      "11 editions with 12,000+ projects, nearly 400 landed in Hangzhou"
     ],
-    applyUrl: "https://weixin.qq.com/",
-    stage: "Open"
+    applyUrl: "https://hzinnovation2026.tilda.ws",
+    englishUrl: "https://gitp.asia/events/2026-hangzhou-innovation-entrepreneurship-competition-for-overseas-talent/",
+    stage: "Closed",
+    titleCN: "2026 杭州海外高层次人才创新创业大赛"
   },
   {
     id: 7,
-    title: "Win in Guangzhou + Jingu Cup — GBA Innovation Competition",
-    city: "Guangzhou",
-    deadline: "2026-06-30",
-    prize: "Investment-as-award + cash up to ¥50K",
-    prizeCategory: "small",
-    industries: ["AI", "Biotech & Pharma", "Digital Economy", "Advanced Manufacturing", "General"],
-    level: "City",
-    desc: "Investment-as-award model. Three tracks: Seed, Startup, Growth.",
-    highlights: [
-      "Investment-as-award model + cash prizes up to ¥50K",
-      "Three categories: Seed (0-3yr), Startup (3-5yr), Growth (5yr+)",
-      "Greater Bay Area ecosystem access",
-      "Government support for landing in Guangzhou"
-    ],
-    applyUrl: "https://www.gz.gov.cn/",
-    stage: "Registration"
-  },
-  {
-    id: 8,
-    title: "Xiamen 'Talents Gather in Fujian' Global Innovation Competition",
-    city: "Xiamen",
-    deadline: "2026-06-30",
-    prize: "~¥4M pool + ¥100K settlement bonus (30% extra for foreign nationals)",
-    prizeCategory: "large",
-    industries: ["Semiconductors", "Biotech & Pharma", "Advanced Manufacturing", "New Materials", "General"],
-    level: "Provincial",
-    desc: "Provincial B-level talent recognition. 30% bonus for foreign nationals.",
-    highlights: [
-      "Provincial B-level talent recognition (¥100K settlement bonus)",
-      "30% additional bonus for foreign national winners",
-      "Focus on Electronics & IT, Biotech, Advanced Manufacturing",
-      "Fujian provincial government backing"
-    ],
-    applyUrl: "https://www.fujiantalent.com/",
-    stage: "Registration"
-  },
-  {
-    id: 9,
-    title: "Startup in Shanghai 2026",
+    title: "2026 'Startup in Shanghai' International Innovation & Entrepreneurship Competition",
     city: "Shanghai",
     deadline: "2026-05-31",
-    prize: "Free office space + innovation fund (¥5M+ angel required)",
+    prize: "Shanghai Innovation Fund grants + 6 months free office + VC matchmaking",
     prizeCategory: "medium",
     industries: ["AI", "Biotech & Pharma", "Semiconductors", "New Energy", "Advanced Manufacturing", "New Materials", "General"],
     level: "City",
-    desc: "14th edition. Nearly 70,000 tech companies since 2012 — 94 have gone public. CLOSED for 2026.",
+    desc: "14th edition. Nearly 70,000 tech companies since 2012 — 94 have gone public. Three categories: Team, Startup Enterprise, Growth-Stage. Registration closed May 31.",
     highlights: [
       "14 editions, nearly 70,000 participants, 94 IPOs since 2012",
-      "6 months free office space for finalists",
-      "Priority access to tech-finance loans and VC matchmaking",
-      "Core team members prioritized for talent program recommendations"
+      "Three categories: Team (pre-registration), Startup Enterprise, Growth-Stage",
+      "Up to 6 months free office space for finalists",
+      "Priority access to partner bank loans, 100+ VC institutions",
+      "Full lifecycle support: workshops, accelerator camps, founder training"
     ],
     applyUrl: "https://www.startup-sh.cn/cyds/en",
-    stage: "Closed"
+    englishUrl: "https://english.shanghai.gov.cn/en-Latest-TalentsinShanghai/20260403/3859e68d8a914d2bbbe259f63b8c188c.html",
+    stage: "Closed",
+    titleCN: "2026「创·在上海」国际创新创业大赛"
+  },
+  {
+    id: 8,
+    title: "2026 'Win in Nanjing' Overseas Talent Entrepreneurship Competition",
+    city: "Nanjing",
+    deadline: "2026-02-28",
+    prize: "¥1.02M total (6×¥50K, 12×¥30K, 18×¥20K) + D-class talent housing",
+    prizeCategory: "small",
+    industries: ["AI", "Semiconductors", "New Energy", "Advanced Manufacturing", "Biotech & Pharma", "New Materials", "General"],
+    level: "City",
+    desc: "Targets Nanjing's '4266' industrial system. 18 industry tracks. Three stages: Launch → Selection → Finals. Registration closed February 28, 2026.",
+    highlights: [
+      "18 tracks covering AI, IC, New Energy Vehicles, Biomedicine, Aerospace, Metaverse, Energy Storage & Hydrogen",
+      "36 winners across three prize tiers (¥50K / ¥30K / ¥20K)",
+      "D-class talent housing benefits for qualifying winners who settle in Nanjing",
+      "VC matching with professional investment institutions"
+    ],
+    applyUrl: "http://jssrcfwypt.org.cn/",
+    englishUrl: "https://www.competehub.dev/en/competitions/urls9c6eac19cb34044d592577536b186d18",
+    stage: "Closed",
+    titleCN: "2026「赢在南京」海外人才创业大赛"
+  },
+  {
+    id: 9,
+    title: "2026 Guangdong Overseas Chinese Innovation & Entrepreneurship Competition (AI+)",
+    city: "Zhongshan",
+    deadline: "2026-05-31",
+    prize: "Cash prizes + landing support + Greater Bay Area ecosystem access",
+    prizeCategory: "medium",
+    industries: ["AI", "Robotics", "Semiconductors", "Advanced Manufacturing", "General"],
+    level: "Provincial",
+    desc: "Launched in Zhongshan, focused on AI + humanoid robotics. Dual-track format with Open Innovation Challenge. Registration closed May 31, 2026.",
+    highlights: [
+      "Focus track: AI + Humanoid Robotics",
+      "Open Innovation Challenge: projects matched with real industry needs",
+      "Greater Bay Area (GBA) ecosystem access and landing support",
+      "Main competition + Open Innovation Challenge dual-track format",
+      "Precise project-to-industry matching for technical application scenarios"
+    ],
+    applyUrl: "https://www.gdoverseas.org.cn/",
+    englishUrl: "",
+    stage: "Closed",
+    titleCN: "2026 广东「侨创赛」(AI+) 海外侨界创新创业大赛"
   }
 ];
 
@@ -2122,16 +2164,17 @@ const cities = [
 
 // ═══════════ COMPETITION RENDER ═══════════
 function getBadgeClass(stage) {
-  if (stage === 'Closed') return 'badge-soon';
+  if (stage === 'Closed') return 'badge-closed';
   if (stage === 'Registration') return 'badge-urgent';
   return 'badge-open';
 }
 
 function getDeadlineClass(deadline) {
   if (!deadline) return 'deadline-normal';
-  const d = new Date(deadline);
+  const d = new Date(deadline + 'T00:00:00+08:00');
   const now = new Date();
   const diffDays = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return 'deadline-closed';
   if (diffDays <= 14) return 'deadline-soon';
   if (diffDays <= 45) return 'deadline-urgent';
   return 'deadline-normal';
@@ -2140,8 +2183,9 @@ function getDeadlineClass(deadline) {
 function formatDeadline(deadline) {
   if (!deadline) return 'Open / TBA';
   const d = new Date(deadline + 'T00:00:00+08:00');
-  if (d < new Date()) return 'Closed: ' + d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
-  const diffDays = Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24));
+  const now = new Date();
+  const diffDays = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return 'Closed ' + d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
   if (diffDays <= 7) return diffDays + 'd left — ' + d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
   return d.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
 }
@@ -2163,9 +2207,20 @@ function renderCards(comps) {
   }
   empty.style.display = 'none';
 
-  grid.innerHTML = comps.map(c => `
-    <div class="comp-card" onclick="openDetail(${c.id})">
-      <span class="comp-card-badge ${getBadgeClass(c.stage)}">${c.stage}</span>
+  // Sort: active first, then expired
+  const sorted = [...comps].sort((a, b) => {
+    if (a.stage === 'Closed' && b.stage !== 'Closed') return 1;
+    if (a.stage !== 'Closed' && b.stage === 'Closed') return -1;
+    return 0;
+  });
+
+  grid.innerHTML = sorted.map(c => {
+    const isClosed = c.stage === 'Closed';
+    const cardClass = isClosed ? 'comp-card comp-card-expired' : 'comp-card';
+    const badgeText = isClosed ? 'Closed' : c.stage;
+    return `
+    <div class="${cardClass}" onclick="openDetail(${c.id})">
+      <span class="comp-card-badge ${getBadgeClass(c.stage)}">${badgeText}</span>
       <div class="comp-card-city">${cityDot(cityColors[c.city] || '#64748b')} ${c.city}</div>
       <div class="comp-card-title">${c.title}</div>
       <div class="comp-card-desc">${c.desc}</div>
@@ -2177,7 +2232,8 @@ function renderCards(comps) {
         </span>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // ═══════════ FILTER ═══════════
@@ -2211,6 +2267,12 @@ function applyFilters() {
       });
     } else if (deadline === 'open') {
       filtered = filtered.filter(c => !c.deadline);
+    } else if (deadline === 'expired') {
+      filtered = filtered.filter(c => {
+        if (!c.deadline) return false;
+        const d = new Date(c.deadline + 'T00:00:00+08:00');
+        return d < now;
+      });
     }
   }
 
@@ -2264,7 +2326,10 @@ function openDetail(id) {
           ${(CURRENT_LANG === 'zh') ? '代为报名' : 'Let Us Apply for You'}
         </button>
       ` : `
-        <button class="btn-secondary" style="opacity:0.5;cursor:default;" disabled>
+        <p style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:10px;">
+          ${(CURRENT_LANG === 'zh') ? '该赛事报名已截止 · 仅供了解和参考' : 'Registration closed — for reference only. Check back for next edition.'}
+        </p>
+        <button class="btn-secondary" style="opacity:0.4;cursor:default;width:100%;" disabled>
           ${(CURRENT_LANG === 'zh') ? '报名已截止' : 'Registration Closed'}
         </button>
       `}
@@ -2620,9 +2685,9 @@ var I18N = {
     nav_signup: '免费注册',
 
     // Hero
-    hero_title: '中国创新创业大赛 — 一站式平台',
-    hero_sub: '覆盖20+中国城市的200+项赛事。按城市、行业、奖金和截止日筛选，找到最适合你创业的舞台。',
-    hero_stat1: '在招赛事',
+    hero_title: '在中国竞技，与中国共成长。',
+    hero_sub: '发现200+项覆盖中国20+城市的创新创业大赛。按城市、行业、奖金和截止日筛选，找到最适合你的创业舞台。',
+    hero_stat1: '赛事总数',
     hero_stat2: '覆盖城市',
     hero_stat3: '总奖金池',
     hero_stat4: '行业赛道',
@@ -2641,6 +2706,7 @@ var I18N = {
     filter_urgent: '本月截止',
     filter_soon: '未来2个月',
     filter_open: '长期开放',
+    filter_expired: '近期已截止',
 
     // Empty state
     empty_title: '没有匹配的赛事',
