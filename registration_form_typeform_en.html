@@ -336,8 +336,8 @@
         </div>
         <div class="field" id="fieldVerifyCode" style="display:none;">
           <label>Verification Code <span class="req">*</span></label>
-          <input type="text" id="f_verify_code" placeholder="Enter 6-digit code" maxlength="6" style="max-width:240px;letter-spacing:4px;font-size:16px;text-align:center;">
-          <div class="hint" style="color:#d97706;">Demo mode: code shown in notification. Production: sent via email.</div>
+          <input type="text" id="f_verify_code" placeholder="Enter 6-digit code" maxlength="6" style="max-width:240px;letter-spacing:4px;font-size:16px;text-align:center;" oninput="onVerifyCodeInput()">
+          <div class="hint" style="color:#d97706;" id="hintVerifyCode">Demo mode: after clicking "Send Code", the 6-digit code will appear as a notification at the top of the page. Enter it here.</div>
         </div>
         <div class="field">
           <label>WhatsApp / Phone</label>
@@ -681,7 +681,7 @@ function goToStep(n) {
     var email = document.getElementById('f_contact_email').value.trim();
     var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (re.test(email) && !emailVerified) {
-      showToast('Please verify your email before continuing. Click "Send Code" and enter the code you receive.', 5000);
+      showToast('⚠️ Please verify your email first: click "Send Code", then enter the 6-digit code shown in the notification.', 6000);
       return;
     }
   }
@@ -852,6 +852,33 @@ function isEmailVerified() {
   if (code !== verifyCode) return false;
   emailVerified = true;
   return true;
+}
+
+// Auto-verify as user types the code (real-time)
+function onVerifyCodeInput() {
+  var code = document.getElementById('f_verify_code').value.trim();
+  var codeInput = document.getElementById('f_verify_code');
+  
+  if (code.length === 6 && isEmailVerified()) {
+    // Verification success
+    showToast('✓ Email verified successfully!', 3000);
+    codeInput.style.borderColor = '#059669';
+    codeInput.style.background = '#f0fdf4';
+    document.getElementById('fieldVerifyCode').querySelector('.hint').textContent = '✓ Email verified.';
+    document.getElementById('fieldVerifyCode').querySelector('.hint').style.color = '#059669';
+  } else if (code.length === 6) {
+    // Wrong code
+    showToast('✗ Incorrect verification code. Please check and try again.', 3000);
+    codeInput.style.borderColor = '#ef4444';
+    codeInput.style.background = '#fef2f2';
+    codeInput.value = '';
+    codeInput.focus();
+  } else {
+    // Still typing — reset visual
+    codeInput.style.borderColor = 'var(--border)';
+    codeInput.style.background = '#fafbfc';
+    emailVerified = false;
+  }
 }
 
 // ═══════════ TOAST ═══════════
