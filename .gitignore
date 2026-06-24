@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Database (contains user data)
+db/*.db
+db/*.db-wal
+db/*.db-shm
+
+# Environment variables (sensitive!)
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cache
+.cache/

@@ -337,7 +337,7 @@
         <div class="field" id="fieldVerifyCode" style="display:none;">
           <label>Verification Code <span class="req">*</span></label>
           <input type="text" id="f_verify_code" placeholder="Enter 6-digit code" maxlength="6" style="max-width:240px;letter-spacing:4px;font-size:16px;text-align:center;" oninput="onVerifyCodeInput()">
-          <div class="hint" style="color:#d97706;" id="hintVerifyCode">Demo mode: after clicking "Send Code", the 6-digit code will appear as a notification at the top of the page. Enter it here.</div>
+          <div class="hint" id="hintVerifyCode">We've sent a 6-digit code to your email. Enter it below to verify.</div>
         </div>
         <div class="field">
           <label>WhatsApp / Phone</label>
@@ -681,7 +681,7 @@ function goToStep(n) {
     var email = document.getElementById('f_contact_email').value.trim();
     var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (re.test(email) && !emailVerified) {
-      showToast('⚠️ Please verify your email first: click "Send Code", then enter the 6-digit code shown in the notification.', 6000);
+      showToast('⚠️ Please verify your email first: click "Send Code", then enter the code we emailed you.', 6000);
       return;
     }
   }
@@ -722,7 +722,7 @@ function updateProgress(n) {
   }
 }
 
-// ═══════════ SUBMIT ═══════════
+// ═══════════ SUBMIT (Real API) ═══════════
 function submitForm() {
   // Email verification check
   if (!emailVerified) {
@@ -766,34 +766,74 @@ function submitForm() {
     notes:          document.getElementById('f_notes')?.value || ''
   };
 
-  // In production, this would POST to an API
-  // For demo, store in localStorage (shared with admin panel)
-  try {
-    // Store as single registration (for backward compat)
-    localStorage.setItem('competeinchina_registration', JSON.stringify(data));
-    localStorage.setItem('competeinchina_timestamp', new Date().toISOString());
-    // Also push to registrations array for admin panel
-    var regs = [];
-    try {
-      var existing = localStorage.getItem('competeinchina_registrations');
-      if (existing) regs = JSON.parse(existing);
-    } catch(e) {}
-    // Avoid exact duplicate by email
-    if (!regs.some(function(r) { return r.contact_email === data.contact_email; })) {
-      regs.push(data);
-    }
-    localStorage.setItem('competeinchina_registrations', JSON.stringify(regs));
-  } catch(e) {}
+  // Disable submit button
+  var btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
 
-  // Show success
-  document.getElementById('confirmEmail').textContent = data.contact_email || 'your email';
-  document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
-  document.getElementById('stepSuccess').style.display = 'block';
-  document.getElementById('stepSuccess').classList.add('anim-in');
-  document.getElementById('progressFill').style.width = '100%';
-  document.getElementById('stepLabel').textContent = 'Complete!';
-  document.getElementById('stepName').textContent = 'Submitted';
-  document.getElementById('btnSubmit').style.display = 'none';
+  // Step 1: Register/Login user
+  fetch('/api/users/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: data.contact_email,
+      password: 'auto_' + Date.now(), // auto-generated, user can set later
+      full_name: data.contact_name
+    })
+  })
+  .then(function(res) {
+    if (!res.ok && res.status !== 409) throw new Error('Register failed');
+    return res.json();
+  })
+  .then(function(result) {
+    // Step 2: Submit registration with token
+    var token;
+    if (result.success && result.token) {
+      token = result.token;
+    } else {
+      // Already registered — login
+      return fetch('/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.contact_email, password: '' })
+      }).then(function(r) { return r.json(); });
+    }
+
+    return { success: true, token: token };
+  })
+  .then(function(authResult) {
+    if (!authResult.success || !authResult.token) throw new Error('Auth failed');
+
+    // Submit registration data
+    return fetch('/api/registrations', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + authResult.token
+      },
+      body: JSON.stringify(data)
+    }).then(function(r) { return r.json(); });
+  })
+  .then(function(regResult) {
+    if (!regResult.success) throw new Error(regResult.message || 'Submission failed');
+
+    // Show success screen
+    document.getElementById('confirmEmail').textContent = data.contact_email || 'your email';
+    document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
+    document.getElementById('stepSuccess').style.display = 'block';
+    document.getElementById('stepSuccess').classList.add('anim-in');
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('stepLabel').textContent = 'Complete!';
+    document.getElementById('stepName').textContent = 'Submitted';
+
+    console.log('[Submit] Registration submitted successfully:', regResult);
+  })
+  .catch(function(err) {
+    console.error('[submitForm] Error:', err);
+    showToast(err.message || 'Submission failed. Please try again.', 5000);
+    btn.disabled = false;
+    btn.textContent = 'Submit Registration';
+  });
 }
 
 // ═══════════ WHATSAPP ═══════════
@@ -805,16 +845,28 @@ function openWhatsApp() {
   window.open('https://wa.me/' + phone + '?text=' + msg, '_blank');
 }
 
-// ═══════════ EMAIL VERIFICATION (Demo Mode) ═══════════
-var verifyCode = '';
+// ═══════════ EMAIL VERIFICATION (Real API) ═══════════
 var emailVerified = false;
+var pendingEmail = '';
 
 function onEmailInput() {
   var email = document.getElementById('f_contact_email').value.trim();
   var btn = document.getElementById('btnSendCode');
   var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   btn.disabled = !re.test(email);
-  emailVerified = false;
+  // Reset verification state when email changes
+  if (email !== pendingEmail) {
+    emailVerified = false;
+    pendingEmail = email;
+    document.getElementById('fieldVerifyCode').style.display = 'none';
+    btn.textContent = 'Send Code';
+    btn.disabled = !re.test(email);
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    var codeInput = document.getElementById('f_verify_code');
+    if (codeInput) { codeInput.style.borderColor = 'var(--border)'; codeInput.style.background = '#fafbfc'; }
+  }
 }
 
 function sendVerifyCode() {
@@ -822,62 +874,92 @@ function sendVerifyCode() {
   var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!re.test(email)) { showToast('Please enter a valid email first.'); return; }
 
-  // Generate 6-digit code
-  verifyCode = String(Math.floor(100000 + Math.random() * 900000));
-  
-  // Show code in toast (demo mode - in production, send via email API)
-  showToast('Demo mode: Your verification code is ' + verifyCode + ' (in production, this would be emailed to ' + email + ')', 6000);
-  
-  // Show verification code field
-  var field = document.getElementById('fieldVerifyCode');
-  field.style.display = 'block';
-  
-  // Update button
   var btn = document.getElementById('btnSendCode');
-  btn.textContent = 'Code Sent';
   btn.disabled = true;
-  btn.style.background = '#d1fae5';
-  btn.style.borderColor = '#6ee7b7';
-  btn.style.color = '#047857';
-  
-  // Focus on code input
-  setTimeout(function() {
-    document.getElementById('f_verify_code').focus();
-  }, 200);
+  btn.textContent = 'Sending...';
+
+  fetch('/api/send-verify-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.success) {
+      showToast('✓ Verification code sent to ' + email + '. Check your inbox!', 4000);
+
+      // Show verification code field
+      var field = document.getElementById('fieldVerifyCode');
+      field.style.display = 'block';
+
+      // Update button
+      btn.textContent = 'Code Sent';
+      btn.style.background = '#d1fae5';
+      btn.style.borderColor = '#6ee7b7';
+      btn.style.color = '#047857';
+
+      // Focus on code input
+      setTimeout(function() {
+        document.getElementById('f_verify_code').focus();
+      }, 200);
+    } else {
+      showToast(data.message || 'Failed to send code. Please try again.', 4000);
+      btn.disabled = false;
+      btn.textContent = 'Send Code';
+    }
+  })
+  .catch(function(err) {
+    console.error('[sendVerifyCode] Error:', err);
+    showToast('Network error. Please check your connection and try again.', 4000);
+    btn.disabled = false;
+    btn.textContent = 'Send Code';
+  });
 }
 
-function isEmailVerified() {
-  var code = document.getElementById('f_verify_code').value.trim();
-  if (!verifyCode) return false;
-  if (code !== verifyCode) return false;
-  emailVerified = true;
-  return true;
+// Verify code via API
+function verifyCodeAtServer(email, code) {
+  return fetch('/api/verify-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, code: code })
+  }).then(function(res) { return res.json(); });
 }
 
-// Auto-verify as user types the code (real-time)
+// Auto-verify as user types the code
 function onVerifyCodeInput() {
   var code = document.getElementById('f_verify_code').value.trim();
   var codeInput = document.getElementById('f_verify_code');
-  
-  if (code.length === 6 && isEmailVerified()) {
-    // Verification success
-    showToast('✓ Email verified successfully!', 3000);
-    codeInput.style.borderColor = '#059669';
-    codeInput.style.background = '#f0fdf4';
-    document.getElementById('fieldVerifyCode').querySelector('.hint').textContent = '✓ Email verified.';
-    document.getElementById('fieldVerifyCode').querySelector('.hint').style.color = '#059669';
-  } else if (code.length === 6) {
-    // Wrong code
-    showToast('✗ Incorrect verification code. Please check and try again.', 3000);
-    codeInput.style.borderColor = '#ef4444';
-    codeInput.style.background = '#fef2f2';
-    codeInput.value = '';
-    codeInput.focus();
+
+  if (code.length === 6) {
+    var email = document.getElementById('f_contact_email').value.trim();
+
+    verifyCodeAtServer(email, code)
+      .then(function(result) {
+        if (result.success) {
+          emailVerified = true;
+          showToast('✓ Email verified successfully!', 3000);
+          codeInput.style.borderColor = '#059669';
+          codeInput.style.background = '#f0fdf4';
+          var hint = document.getElementById('hintVerifyCode');
+          hint.textContent = '✓ Email verified.';
+          hint.style.color = '#059669';
+        } else {
+          emailVerified = false;
+          showToast(result.message || 'Incorrect code. Please try again.', 3000);
+          codeInput.style.borderColor = '#ef4444';
+          codeInput.style.background = '#fef2f2';
+          codeInput.value = '';
+          setTimeout(function() { codeInput.focus(); }, 100);
+        }
+      })
+      .catch(function(err) {
+        console.error('[onVerifyCodeInput] Error:', err);
+        showToast('Verification failed. Please check your connection.', 3000);
+      });
   } else {
-    // Still typing — reset visual
+    emailVerified = false;
     codeInput.style.borderColor = 'var(--border)';
     codeInput.style.background = '#fafbfc';
-    emailVerified = false;
   }
 }
 
