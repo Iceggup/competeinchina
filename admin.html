@@ -6,10 +6,10 @@
 <title>Compete in China — Admin Panel</title>
 <style>
   :root {
-    --bg: #f6f8fb;
+    --bg: #f8fafb;
     --surface: #ffffff;
     --text: #0f172a;
-    --text-secondary: #64748b;
+    --text-secondary: #475569;
     --text-muted: #94a3b8;
     --border: #e2e8f0;
     --border-light: #f1f5f9;
@@ -23,34 +23,51 @@
     --amber: #f59e0b;
     --amber-light: #fffbeb;
     --radius: 10px;
-    --radius-sm: 6px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.08);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.06);
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
     background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
 
   /* Header */
   .admin-header {
     background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: 0 20px; height: 52px; display: flex; align-items: center;
+    padding: 0 24px; height: 54px; display: flex; align-items: center;
     justify-content: space-between;
   }
-  .admin-header h1 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .admin-header h1 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
   .admin-header .badge {
-    font-size: 11px; padding: 3px 10px; border-radius: 10px;
+    font-size: 11px; padding: 4px 12px; border-radius: 12px;
     background: var(--accent-light); color: var(--accent); font-weight: 600;
   }
   .header-actions { display: flex; gap: 8px; }
 
+  /* Tab Navigation */
+  .tab-nav {
+    display: flex; gap: 0; padding: 0 24px; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    padding: 12px 20px; font-size: 13px; font-weight: 600; border: none;
+    background: transparent; color: var(--text-muted); cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
   /* Buttons */
   .btn {
-    padding: 7px 16px; border-radius: 18px; font-size: 12px; font-weight: 600;
+    padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
     cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 5px;
-    transition: all 0.15s;
+    transition: all 0.15s; font-family: inherit;
   }
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-primary:hover { background: var(--accent-hover); }
@@ -58,97 +75,106 @@
   .btn-outline:hover { background: var(--accent-light); }
   .btn-danger { background: var(--red-light); color: var(--red); border: 1px solid var(--red); }
   .btn-danger:hover { background: var(--red); color: #fff; }
-  .btn-sm { padding: 4px 10px; font-size: 11px; }
+  .btn-sm { padding: 5px 12px; font-size: 11px; }
   .btn-success { background: var(--green); color: #fff; }
   .btn-success:hover { opacity: 0.9; }
-  .btn-amber { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber); }
+  .btn-ghost { background: transparent; color: var(--text-secondary); }
+  .btn-ghost:hover { background: #f1f5f9; }
 
   /* Layout */
-  .admin-layout { display: flex; height: calc(100vh - 52px); }
+  .admin-layout { display: flex; height: calc(100vh - 54px - 43px); }
 
-  /* Sidebar — Competition Table */
+  /* Sidebar */
   .sidebar {
-    width: 420px; min-width: 420px; border-right: 1px solid var(--border);
-    background: var(--surface); display: flex; flex-direction: column;
-    overflow: hidden;
+    width: 380px; min-width: 380px; border-right: 1px solid var(--border);
+    background: var(--surface); display: flex; flex-direction: column; overflow: hidden;
   }
   .sidebar-header {
-    padding: 14px 16px; border-bottom: 1px solid var(--border-light);
+    padding: 14px 18px; border-bottom: 1px solid var(--border-light);
     display: flex; align-items: center; justify-content: space-between;
   }
   .sidebar-header h2 { font-size: 14px; font-weight: 600; }
   .sidebar-count { font-size: 11px; color: var(--text-muted); }
+  .sidebar-search {
+    padding: 8px 18px; border-bottom: 1px solid var(--border-light);
+  }
+  .sidebar-search input {
+    width: 100%; padding: 7px 12px; border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); font-size: 12px; color: var(--text);
+    background: var(--surface); font-family: inherit;
+  }
+  .sidebar-search input:focus { outline: none; border-color: var(--accent); }
   .sidebar-list { flex: 1; overflow-y: auto; }
   .list-item {
-    padding: 12px 16px; border-bottom: 1px solid var(--border-light);
+    padding: 12px 18px; border-bottom: 1px solid var(--border-light);
     cursor: pointer; transition: background 0.1s;
     display: flex; align-items: flex-start; gap: 10px;
   }
+  .list-item:nth-child(even) { background: #fafbfc; }
   .list-item:hover { background: var(--accent-light); }
-  .list-item.active { background: var(--accent-light); border-left: 3px solid var(--accent); padding-left: 13px; }
+  .list-item.active { background: var(--accent-light); border-left: 3px solid var(--accent); padding-left: 15px; }
   .list-item-num {
-    width: 24px; height: 24px; border-radius: 6px; background: var(--border);
+    width: 26px; height: 26px; border-radius: 7px; background: var(--border);
     display: flex; align-items: center; justify-content: center;
     font-size: 11px; font-weight: 700; color: var(--text-muted); flex-shrink: 0;
   }
   .list-item-info { flex: 1; min-width: 0; }
   .list-item-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .list-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; display: flex; gap: 8px; }
+  .list-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 8px; }
   .list-item-stage {
-    font-size: 10px; padding: 1px 8px; border-radius: 8px; font-weight: 600;
+    font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
   }
-  .stage-R \(\{background:var(--green-light);color:var(--green);}\)
-  .stage-O \(\{background:var(--accent-light);color:var(--accent);}\)
-  .stage-P \(\{background:var(--amber-light);color:var(--amber);}\)
-  .stage-C \(\{background:var(--red-light);color:var(--red);}\)
-  .stage-RS \(\{background:var(--amber-light);color:var(--amber);}\)
+  .stage-R { background:var(--green-light);color:var(--green); }
+  .stage-O { background:var(--accent-light);color:var(--accent); }
+  .stage-P { background:var(--amber-light);color:var(--amber); }
+  .stage-C { background:var(--red-light);color:var(--red); }
+  .stage-RS { background:var(--amber-light);color:var(--amber); }
   .list-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
 
-  /* Main — Form */
-  .main-panel { flex: 1; overflow-y: auto; padding: 20px 28px; }
-  .main-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  /* Main Panel */
+  .main-panel { flex: 1; overflow-y: auto; padding: 24px 32px; }
+  .main-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
   .form-empty { text-align: center; padding: 80px 20px; color: var(--text-muted); }
-  .form-empty p { margin-top: 8px; font-size: 14px; }
+  .form-empty h3 { margin: 12px 0 4px; color: var(--text); }
 
   /* Form */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .form-grid-full { grid-column: 1 / -1; }
   .form-group { display: flex; flex-direction: column; }
   .form-group label {
-    font-size: 11px; font-weight: 600; color: var(--text-secondary);
-    margin-bottom: 4px; display: flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600; color: var(--text-secondary);
+    margin-bottom: 5px; display: flex; align-items: center; gap: 4px;
   }
   .form-group label .required { color: var(--red); }
   .form-group input, .form-group select, .form-group textarea {
-    padding: 8px 12px; border: 1.5px solid var(--border);
+    padding: 10px 14px; border: 1.5px solid var(--border);
     border-radius: var(--radius-sm); font-size: 13px; color: var(--text);
     font-family: inherit; background: var(--surface);
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-    outline: none; border-color: var(--accent);
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
   }
-  .form-group textarea { resize: vertical; min-height: 60px; }
-  .form-group .help { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .form-group .help { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .form-group input.input-error { border-color: var(--red); }
 
   /* Industry checkboxes */
-  .industry-checks { display: flex; flex-wrap: wrap; gap: 6px; }
+  .industry-checks { display: flex; flex-wrap: wrap; gap: 8px; }
   .industry-check {
-    display: flex; align-items: center; gap: 4px; font-size: 12px;
-    padding: 5px 10px; border: 1px solid var(--border); border-radius: 16px;
-    cursor: pointer; user-select: none; transition: all 0.15s;
-    background: var(--surface);
+    display: flex; align-items: center; gap: 5px; font-size: 12px;
+    padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 20px;
+    cursor: pointer; user-select: none; transition: all 0.15s; background: var(--surface);
   }
-  .industry-check.checked {
-    background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 600;
-  }
+  .industry-check.checked { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 600; }
   .industry-check input { display: none; }
 
-  /* Highlights list */
-  .highlights-list { display: flex; flex-direction: column; gap: 6px; }
-  .highlight-row { display: flex; gap: 6px; align-items: center; }
+  /* Highlights */
+  .highlights-list { display: flex; flex-direction: column; gap: 8px; }
+  .highlight-row { display: flex; gap: 8px; align-items: center; }
   .highlight-row input { flex: 1; }
   .highlight-row button {
-    width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border);
+    width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border);
     background: var(--surface); cursor: pointer; font-size: 16px; display: flex;
     align-items: center; justify-content: center; color: var(--text-muted);
   }
@@ -156,19 +182,67 @@
 
   /* Form footer */
   .form-footer {
-    margin-top: 24px; padding-top: 16px;
+    margin-top: 28px; padding-top: 18px;
     border-top: 1px solid var(--border-light);
-    display: flex; gap: 10px; align-items: center;
+    display: flex; gap: 12px; align-items: center;
   }
   .form-footer .status-msg {
-    font-size: 12px; margin-left: auto; padding: 6px 12px; border-radius: var(--radius-sm);
+    font-size: 12px; margin-left: auto; padding: 6px 14px; border-radius: var(--radius-sm);
   }
   .status-saved { background: var(--green-light); color: var(--green); }
   .status-error { background: var(--red-light); color: var(--red); }
 
+  /* Stats cards */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--surface); border-radius: var(--radius); padding: 20px;
+    border: 1px solid var(--border-light); box-shadow: var(--shadow);
+  }
+  .stat-card .stat-num { font-size: 28px; font-weight: 800; color: var(--accent); }
+  .stat-card .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  /* Registrations table */
+  .table-wrap {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border-light); overflow: hidden;
+  }
+  .table-header {
+    display: flex; padding: 14px 20px; background: #fafbfc;
+    border-bottom: 1px solid var(--border); font-weight: 600; font-size: 12px;
+    color: var(--text-secondary); position: sticky; top: 0; z-index: 1;
+  }
+  .table-body { max-height: 500px; overflow-y: auto; }
+  .table-row {
+    display: flex; padding: 12px 20px; border-bottom: 1px solid var(--border-light);
+    font-size: 12px; align-items: center; transition: background 0.1s;
+  }
+  .table-row:nth-child(even) { background: #fafbfc; }
+  .table-row:hover { background: var(--accent-light); }
+  .col-1 { width: 60px; }
+  .col-2 { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .col-3 { width: 140px; }
+  .col-4 { width: 100px; }
+  .col-5 { width: 120px; }
+  .status-badge {
+    padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;
+  }
+  .status-pending { background: var(--amber-light); color: #b45309; }
+  .status-reviewed { background: var(--accent-light); color: var(--accent); }
+  .status-approved { background: var(--green-light); color: var(--green); }
+  .status-rejected { background: var(--red-light); color: var(--red); }
+
+  /* Site Content cards */
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .config-card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 1px solid var(--border-light); padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .config-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
   /* Toast */
   .toast {
-    position: fixed; bottom: 24px; right: 24px; padding: 12px 20px;
+    position: fixed; bottom: 24px; right: 24px; padding: 12px 22px;
     border-radius: var(--radius); font-size: 13px; font-weight: 600;
     box-shadow: var(--shadow-md); z-index: 100; display: none;
     animation: slideIn 0.2s ease;
@@ -181,16 +255,16 @@
   /* Import area */
   .import-area {
     border: 2px dashed var(--border); border-radius: var(--radius);
-    padding: 24px; text-align: center; margin-top: 12px;
-    cursor: pointer; transition: all 0.15s;
+    padding: 32px; text-align: center; cursor: pointer; transition: all 0.15s;
   }
   .import-area:hover { border-color: var(--accent); background: var(--accent-light); }
 
   /* Responsive */
   @media (max-width: 900px) {
     .admin-layout { flex-direction: column; }
-    .sidebar { width: 100%; min-width: 100%; max-height: 280px; }
+    .sidebar { width: 100%; min-width: 100%; max-height: 260px; }
     .form-grid { grid-template-columns: 1fr; }
+    .config-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -202,566 +276,464 @@
     <span class="badge" id="totalBadge">9 competitions</span>
   </h1>
   <div class="header-actions">
-    <button class="btn btn-outline btn-sm" onclick="importJSON()">📥 Import JSON</button>
-    <button class="btn btn-outline btn-sm" onclick="exportJSON()">📤 Export JSON</button>
-    <button class="btn btn-outline btn-sm" id="btnTemplate" onclick="loadTemplate()">📋 Load Template</button>
+    <button class="btn btn-outline btn-sm" onclick="importJSON()">📥 Import</button>
+    <button class="btn btn-outline btn-sm" onclick="exportJSON()">📤 Export</button>
+    <button class="btn btn-outline btn-sm" onclick="exportCSV()">📊 Export CSV</button>
     <button class="btn btn-primary btn-sm" onclick="addNew()">+ Add Competition</button>
   </div>
 </div>
 
-<div class="admin-layout">
-  <!-- Sidebar: Competition List -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2>All Competitions</h2>
-      <span class="sidebar-count" id="sidebarCount">9 items</span>
-    </div>
-    <div class="sidebar-list" id="sidebarList"></div>
-  </div>
+<!-- Tab Navigation -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('competitions')">🏆 Competitions</button>
+  <button class="tab-btn" onclick="switchTab('registrations')">📋 Registrations</button>
+  <button class="tab-btn" onclick="switchTab('concierge')">🤝 Concierge</button>
+  <button class="tab-btn" onclick="switchTab('content')">🎨 Site Content</button>
+</div>
 
-  <!-- Main: Form -->
-  <div class="main-panel" id="mainPanel">
-    <div class="form-empty">
-      <div style="font-size:48px;margin-bottom:12px;">📝</div>
-      <h3>Select a competition or add a new one</h3>
-      <p>Use the sidebar to select an existing item, or click "Add Competition" to create one.</p>
+<!-- ═══ Tab: Competitions ═══ -->
+<div class="tab-content active" id="tab-competitions">
+  <div class="admin-layout">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2>All Competitions</h2>
+        <span class="sidebar-count" id="sidebarCount">9 items</span>
+      </div>
+      <div class="sidebar-search">
+        <input type="text" id="searchInput" placeholder="Search competitions..." oninput="filterSidebar()">
+      </div>
+      <div class="sidebar-list" id="sidebarList"></div>
     </div>
+    <div class="main-panel" id="mainPanel">
+      <div class="form-empty">
+        <div style="font-size:48px;margin-bottom:12px;">📝</div>
+        <h3>Select a competition or add a new one</h3>
+        <p>Use the sidebar to select an existing item, or click "Add Competition" to create one.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Tab: Registrations ═══ -->
+<div class="tab-content" id="tab-registrations" style="padding:24px;">
+  <div class="stats-grid" id="regStats"></div>
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="col-1">#</span><span class="col-2">Team</span><span class="col-3">Contact</span><span class="col-4">Status</span><span class="col-5">Date</span><span style="width:100px;">Action</span>
+    </div>
+    <div class="table-body" id="regTableBody">
+      <div style="padding:48px;text-align:center;color:var(--text-muted);">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Tab: Concierge ═══ -->
+<div class="tab-content" id="tab-concierge" style="padding:24px;">
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="col-1">#</span><span class="col-2">Company</span><span class="col-3">Contact</span><span class="col-4">Status</span><span class="col-5">Date</span>
+    </div>
+    <div class="table-body" id="concTableBody">
+      <div style="padding:48px;text-align:center;color:var(--text-muted);">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Tab: Site Content ═══ -->
+<div class="tab-content" id="tab-content" style="padding:24px 32px;">
+  <div class="config-grid" id="configGrid"></div>
+  <div style="margin-top:24px;">
+    <button class="btn btn-primary" onclick="saveAllConfig()">💾 Save All Site Content</button>
+    <span class="status-msg status-saved" id="configStatus" style="display:none;margin-left:12px;">Saved ✓</span>
   </div>
 </div>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
-
-<!-- Hidden file input -->
 <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileImport(event)">
 
 <script>
 // ═══════════ STATE ═══════════
 const API_BASE = '/api/admin';
 let competitions = [];
+let registrations = [];
+let conciergeApps = [];
+let siteConfig = {};
 let editingId = null;
 let nextId = 1;
-let apiAvailable = true;
+let currentTab = 'competitions';
 
 async function apiFetch(path, opts = {}) {
-  try {
-    const resp = await fetch(API_BASE + path, opts);
-    if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err.error || 'API error ' + resp.status);
-    }
-    return await resp.json();
-  } catch(e) {
-    apiAvailable = false;
-    showToast('API connection failed: ' + e.message, 'error');
-    throw e;
+  const resp = await fetch('/api/admin' + path, opts);
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.message || 'API error ' + resp.status);
   }
+  return await resp.json();
 }
 
-// ═══════════ STAGE OPTIONS ═══════════
-const STAGES = ['Registration', 'Open', 'Preliminary', 'Regional Selection', 'Closed'];
-const LEVELS = ['National', 'Provincial', 'City', 'District'];
-const PRIZE_CATS = [
-  { value: 'small', label: 'Small (< ¥500K)' },
-  { value: 'medium', label: 'Medium (¥500K – ¥2M)' },
-  { value: 'large', label: 'Large (¥2M – ¥10M)' },
-  { value: 'huge', label: 'Huge (> ¥10M)' }
-];
-const INDUSTRIES = [
-  'AI', 'Biotech & Pharma', 'Semiconductors', 'New Energy',
-  'Advanced Manufacturing', 'New Materials', 'Aerospace',
-  'Robotics', 'Digital Economy', 'Medical Devices', 'General'
-];
-const CITIES = [
-  'Beijing', 'Shanghai', 'Shenzhen', 'Guangzhou', 'Hangzhou', 'Suzhou',
-  'Hefei', 'Nanjing', 'Xiamen', 'Chengdu', 'Xi\'an', 'Wuhan',
-  'Kunming', 'Jinan', 'Multi-city'
-];
+// ═══════════ TABS ═══════════
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.tab-btn:nth-child(${{competitions:1,registrations:2,concierge:3,content:4}[tab]})`).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'registrations') loadRegistrations();
+  if (tab === 'concierge') loadConcierge();
+  if (tab === 'content') loadSiteConfig();
+}
 
-const stageClass = {
-  'Registration': 'stage-R', 'Open': 'stage-O', 'Preliminary': 'stage-P',
-  'Closed': 'stage-C', 'Regional Selection': 'stage-RS'
-};
+// ═══════════ STAGE / CONSTANTS ═══════════
+const STAGES = ['Registration','Open','Preliminary','Regional Selection','Closed'];
+const LEVELS = ['National','Provincial','City','District'];
+const PRIZE_CATS = [
+  {value:'small',label:'Small (< ¥500K)'},{value:'medium',label:'Medium (¥500K – ¥2M)'},
+  {value:'large',label:'Large (¥2M – ¥10M)'},{value:'huge',label:'Huge (> ¥10M)'}
+];
+const INDUSTRIES = ['AI','Biotech & Pharma','Semiconductors','New Energy','Advanced Manufacturing','New Materials','Aerospace','Robotics','Digital Economy','Medical Devices','General'];
+const CITIES = ['Beijing','Shanghai','Shenzhen','Guangzhou','Hangzhou','Suzhou','Hefei','Nanjing','Xiamen','Chengdu',"Xi'an",'Wuhan','Kunming','Jinan','Multi-city'];
+const stageClass = {'Registration':'stage-R','Open':'stage-O','Preliminary':'stage-P','Closed':'stage-C','Regional Selection':'stage-RS'};
 
 // ═══════════ INIT ═══════════
 async function init() {
   try {
     competitions = await apiFetch('/competitions');
-    showToast('Loaded ' + competitions.length + ' competitions from server', 'success');
+    showToast('Loaded ' + competitions.length + ' competitions', 'success');
   } catch(e) {
-    // Fallback: localStorage for offline use
     const saved = localStorage.getItem('competeinchina_competitions');
-    if (saved) {
-      competitions = JSON.parse(saved);
-      showToast('Offline mode: loaded from localStorage', 'error');
-    }
+    if (saved) { competitions = JSON.parse(saved); showToast('Offline mode', 'error'); }
   }
   if (competitions.length === 0) {
-    competitions = [
-      { id: 1, title: "ITEC 2026 — Beijing Chaoyang", city: "Beijing",
-        deadline: "2026-08-31", prize: "¥54.5M", prizeCategory: "huge",
-        industries: ["AI","Robotics"], level: "District",
-        desc: "14th edition.", highlights: ["Prize pool"], applyUrl: "https://...", stage: "Preliminary" }
-    ];
+    competitions = [{id:1,title:"ITEC 2026 — Beijing Chaoyang",city:"Beijing",deadline:"2026-08-31",prize:"¥54.5M",prizeCategory:"huge",industries:["AI","Robotics"],level:"District",desc:"14th edition.",highlights:["Prize pool"],applyUrl:"https://...",stage:"Preliminary"}];
   }
-  nextId = Math.max(...competitions.map(c => c.id), 0) + 1;
+  nextId = Math.max(...competitions.map(c=>c.id),0)+1;
   renderSidebar();
 }
 
-function saveToLocal() {
-  localStorage.setItem('competeinchina_competitions', JSON.stringify(competitions));
+// ═══════════ SIDEBAR ═══════════
+function filterSidebar() {
+  renderSidebar();
 }
 
-// ═══════════ SIDEBAR ═══════════
 function renderSidebar() {
   const list = document.getElementById('sidebarList');
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
   document.getElementById('sidebarCount').textContent = competitions.length + ' items';
   document.getElementById('totalBadge').textContent = competitions.length + ' competitions';
-
-  if (competitions.length === 0) {
-    list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">No competitions yet.<br>Click "Add Competition" to start.</div>';
+  let filtered = competitions;
+  if (q) filtered = competitions.filter(c => c.title.toLowerCase().includes(q) || c.city.toLowerCase().includes(q));
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted);">No matches found.</div>';
     return;
   }
-
-  list.innerHTML = competitions.map(c => `
-    <div class="list-item ${editingId === c.id ? 'active' : ''}" onclick="editCompetition(${c.id})">
+  list.innerHTML = filtered.map(c => `
+    <div class="list-item ${editingId===c.id?'active':''}" onclick="editCompetition(${c.id})">
       <div class="list-item-num">${c.id}</div>
       <div class="list-item-info">
-        <div class="list-item-title">${c.title}</div>
+        <div class="list-item-title">${escapeHtml(c.title)}</div>
         <div class="list-item-meta">
           <span>${c.city}</span>
-          <span class="list-item-stage ${stageClass[c.stage] || 'stage-O'}">${c.stage || 'Open'}</span>
-          <span>${c.deadline || 'TBA'}</span>
+          <span class="list-item-stage ${stageClass[c.stage]||'stage-O'}">${c.stage||'Open'}</span>
+          <span>${c.deadline||'TBA'}</span>
         </div>
       </div>
       <div class="list-item-actions">
         <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();editCompetition(${c.id})" title="Edit">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteCompetition(${c.id})" title="Delete">🗑</button>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// ═══════════ ADD NEW ═══════════
+// ═══════════ COMPETITION CRUD ═══════════
 async function addNew() {
-  const newComp = {
-    title: '',
-    city: 'Beijing',
-    deadline: '',
-    prize: '',
-    prizeCategory: 'small',
-    industries: [],
-    level: 'City',
-    desc: '',
-    highlights: [''],
-    applyUrl: '',
-    englishUrl: '',
-    stage: 'Registration'
-  };
+  const nc = {title:'',city:'Beijing',deadline:'',prize:'',prizeCategory:'small',industries:[],level:'City',desc:'',highlights:[''],applyUrl:'',englishUrl:'',stage:'Registration'};
   try {
-    const result = await apiFetch('/competitions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newComp)
-    });
-    // Reload from server to get fresh list with server-assigned id
+    const result = await apiFetch('/competitions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(nc)});
     await reloadFromServer();
     editingId = result.id;
-    const c = competitions.find(x => x.id === result.id);
+    const c = competitions.find(x=>x.id===result.id);
     if (c) renderForm(c);
-    showToast('Competition created', 'success');
+    showToast('Competition created','success');
   } catch(e) {
-    // Offline fallback
-    newComp.id = nextId++;
-    competitions.push(newComp);
-    editingId = newComp.id;
-    saveToLocal();
-    renderSidebar();
-    renderForm(newComp);
+    nc.id = nextId++; competitions.push(nc); editingId = nc.id;
+    localStorage.setItem('competeinchina_competitions',JSON.stringify(competitions));
+    renderSidebar(); renderForm(nc);
   }
 }
 
 async function reloadFromServer() {
-  try {
-    competitions = await apiFetch('/competitions');
-    nextId = Math.max(...competitions.map(c => c.id), 0) + 1;
-    saveToLocal();
-    renderSidebar();
-  } catch(e) {}
+  try { competitions = await apiFetch('/competitions'); nextId = Math.max(...competitions.map(c=>c.id),0)+1; renderSidebar(); } catch(e) {}
 }
 
-// ═══════════ EDIT ═══════════
-function editCompetition(id) {
-  editingId = id;
-  const c = competitions.find(x => x.id === id);
-  if (!c) return;
-  renderSidebar();
-  renderForm(c);
-}
+function editCompetition(id) { editingId = id; const c = competitions.find(x=>x.id===id); if (!c) return; renderSidebar(); renderForm(c); }
 
-// ═══════════ DELETE ═══════════
 async function deleteCompetition(id) {
-  if (!confirm('Delete competition #' + id + '? This cannot be undone.')) return;
-  try {
-    await apiFetch('/competitions/' + id, { method: 'DELETE' });
-    await reloadFromServer();
-    if (editingId === id) {
-      editingId = null;
-      document.getElementById('mainPanel').innerHTML = `
-        <div class="form-empty">
-          <div style="font-size:48px;">🗑</div>
-          <h3>Deleted</h3>
-          <p>Competition #${id} has been removed.</p>
-        </div>`;
-    }
-    showToast('Competition deleted', 'success');
-  } catch(e) {
-    // Offline fallback
-    competitions = competitions.filter(c => c.id !== id);
-    if (editingId === id) {
-      editingId = null;
-      document.getElementById('mainPanel').innerHTML = `
-        <div class="form-empty"><div style="font-size:48px;">🗑</div><h3>Deleted</h3><p>Competition #${id} has been removed.</p></div>`;
-    }
-    saveToLocal();
-    renderSidebar();
-    showToast('Deleted (offline)', 'error');
-  }
+  if (!confirm('Delete #'+id+'?')) return;
+  try { await apiFetch('/competitions/'+id,{method:'DELETE'}); await reloadFromServer(); if (editingId===id) { editingId=null; showEmpty('🗑','Deleted','#'+id+' removed.'); } showToast('Deleted','success'); }
+  catch(e) { competitions=competitions.filter(c=>c.id!==id); if (editingId===id) { editingId=null; showEmpty('🗑','Deleted','#'+id+' removed.'); } renderSidebar(); }
+}
+
+function showEmpty(icon,title,msg) {
+  document.getElementById('mainPanel').innerHTML = `<div class="form-empty"><div style="font-size:48px;">${icon}</div><h3>${title}</h3><p>${msg}</p></div>`;
 }
 
 // ═══════════ RENDER FORM ═══════════
 function renderForm(c) {
   const industryChecks = INDUSTRIES.map(ind => `
-    <label class="industry-check ${c.industries.includes(ind) ? 'checked' : ''}" onclick="toggleIndustry('${ind}')">
-      <input type="checkbox" ${c.industries.includes(ind) ? 'checked' : ''}> ${ind}
-    </label>
-  `).join('');
-
-  const highlightRows = c.highlights.map((h, i) => `
+    <label class="industry-check ${c.industries.includes(ind)?'checked':''}" onclick="toggleIndustry('${ind}')">
+      <input type="checkbox" ${c.industries.includes(ind)?'checked':''}> ${ind}</label>`).join('');
+  const hRows = c.highlights.map((h,i)=>`
     <div class="highlight-row">
-      <input type="text" value="${escapeHtml(h)}" placeholder="Highlight ${i+1} — e.g. ¥5M grand prize + free office space"
-             onchange="updateHighlight(${i}, this.value)">
-      ${c.highlights.length > 1 ? `<button onclick="removeHighlight(${i})" title="Remove">×</button>` : ''}
-    </div>
-  `).join('');
+      <input type="text" value="${escapeHtml(h)}" placeholder="Highlight ${i+1}" onchange="updateHighlight(${i},this.value)">
+      ${c.highlights.length>1?`<button onclick="removeHighlight(${i})">×</button>`:''}</div>`).join('');
 
   document.getElementById('mainPanel').innerHTML = `
-    <h2>${c.id ? '✏️ Edit Competition' : '➕ New Competition'} <span style="font-size:12px;color:var(--text-muted);font-weight:400;">#${c.id}</span></h2>
-
+    <h2>${c.id?'✏️ Edit':'➕ New'} <span style="font-size:12px;color:var(--text-muted);font-weight:400;">#${c.id||''}</span>
+      <label style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;">
+        <input type="checkbox" id="fFeatured" ${c.featured?'checked':''} onchange="updateField('featured',this.checked?1:0)" style="accent-color:var(--accent);"> Featured
+      </label>
+    </h2>
     <div class="form-grid">
       <div class="form-group form-grid-full">
         <label><span class="required">*</span> Title</label>
-        <input type="text" id="fTitle" value="${escapeHtml(c.title)}" placeholder="e.g. ITEC 2026 — Beijing Chaoyang International Talent Entrepreneurship Conference"
-               onchange="updateField('title', this.value)">
-        <span class="help">Full competition name in English. Include year and city.</span>
+        <input type="text" id="fTitle" value="${escapeHtml(c.title)}" placeholder="Competition title in English" onchange="updateField('title',this.value)">
+        <span class="help">Full name. Include year and city.</span>
       </div>
-
-      <div class="form-group">
-        <label><span class="required">*</span> City</label>
-        <select id="fCity" onchange="updateField('city', this.value)">
-          ${CITIES.map(city => `<option ${c.city === city ? 'selected' : ''}>${city}</option>`).join('')}
-        </select>
-        <span class="help">Host city. Use "Multi-city" if multiple host cities.</span>
+      <div class="form-group"><label><span class="required">*</span> City</label>
+        <select id="fCity" onchange="updateField('city',this.value)">${CITIES.map(ci=>`<option ${c.city===ci?'selected':''}>${ci}</option>`).join('')}</select>
       </div>
-
-      <div class="form-group">
-        <label>Stage</label>
-        <select id="fStage" onchange="updateField('stage', this.value)">
-          ${STAGES.map(s => `<option ${c.stage === s ? 'selected' : ''}>${s}</option>`).join('')}
-        </select>
-        <span class="help">Registration → Preliminary → Regional Selection → Closed</span>
+      <div class="form-group"><label>Stage</label>
+        <select id="fStage" onchange="updateField('stage',this.value)">${STAGES.map(s=>`<option ${c.stage===s?'selected':''}>${s}</option>`).join('')}</select>
       </div>
-
-      <div class="form-group">
-        <label>Deadline</label>
-        <input type="text" id="fDeadline" value="${c.deadline}" placeholder="YYYY-MM-DD or leave empty for TBA"
-               onchange="updateField('deadline', this.value)">
-        <span class="help">Format: 2026-08-31. Leave empty if no deadline or ongoing.</span>
+      <div class="form-group"><label>Deadline</label>
+        <input type="text" id="fDeadline" value="${c.deadline}" placeholder="YYYY-MM-DD" onchange="updateField('deadline',this.value)">
       </div>
-
-      <div class="form-group">
-        <label><span class="required">*</span> Prize Category</label>
-        <select id="fPrizeCat" onchange="updateField('prizeCategory', this.value)">
-          ${PRIZE_CATS.map(pc => `<option value="${pc.value}" ${c.prizeCategory === pc.value ? 'selected' : ''}>${pc.label}</option>`).join('')}
-        </select>
-        <span class="help">For filtering. Choose the closest range.</span>
+      <div class="form-group"><label><span class="required">*</span> Prize Category</label>
+        <select id="fPrizeCat" onchange="updateField('prizeCategory',this.value)">${PRIZE_CATS.map(pc=>`<option value="${pc.value}" ${c.prizeCategory===pc.value?'selected':''}>${pc.label}</option>`).join('')}</select>
       </div>
-
-      <div class="form-group">
-        <label><span class="required">*</span> Prize Description</label>
-        <input type="text" id="fPrize" value="${escapeHtml(c.prize)}" placeholder="e.g. ¥54.5M total (86 slots, max ¥5M Special Prize)"
-               onchange="updateField('prize', this.value)">
-        <span class="help">One line summary. Include total pool + top prize amount.</span>
+      <div class="form-group"><label><span class="required">*</span> Prize Description</label>
+        <input type="text" id="fPrize" value="${escapeHtml(c.prize)}" placeholder="e.g. ¥5M grand prize" onchange="updateField('prize',this.value)">
       </div>
-
-      <div class="form-group">
-        <label>Level</label>
-        <select id="fLevel" onchange="updateField('level', this.value)">
-          ${LEVELS.map(l => `<option ${c.level === l ? 'selected' : ''}>${l}</option>`).join('')}
-        </select>
-        <span class="help">National / Provincial / City / District</span>
+      <div class="form-group"><label>Level</label>
+        <select id="fLevel" onchange="updateField('level',this.value)">${LEVELS.map(l=>`<option ${c.level===l?'selected':''}>${l}</option>`).join('')}</select>
       </div>
-
-      <div class="form-group form-grid-full">
-        <label><span class="required">*</span> Industries</label>
+      <div class="form-group form-grid-full"><label><span class="required">*</span> Industries</label>
         <div class="industry-checks" id="industryChecks">${industryChecks}</div>
-        <span class="help">Select all that apply. At least one required.</span>
       </div>
-
-      <div class="form-group form-grid-full">
-        <label>Short Description</label>
-        <textarea id="fDesc" placeholder="2-line summary shown on card. Keep it concise."
-                  onchange="updateField('desc', this.value)">${escapeHtml(c.desc)}</textarea>
-        <span class="help">Appears on the competition card. ~120 chars max.</span>
+      <div class="form-group form-grid-full"><label>Short Description</label>
+        <textarea id="fDesc" onchange="updateField('desc',this.value)">${escapeHtml(c.desc)}</textarea>
       </div>
-
-      <div class="form-group form-grid-full">
-        <label>Highlights (Bullet Points)</label>
-        <div class="highlights-list" id="highlightsList">${highlightRows}</div>
-        <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addHighlight()">+ Add Highlight</button>
-        <span class="help">3-5 bullet points showing what makes this competition unique.</span>
+      <div class="form-group form-grid-full"><label>Highlights</label>
+        <div class="highlights-list" id="highlightsList">${hRows}</div>
+        <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addHighlight()">+ Add</button>
       </div>
-
-      <div class="form-group">
-        <label><span class="required">*</span> Official Application URL</label>
-        <input type="text" id="fApplyUrl" value="${escapeHtml(c.applyUrl)}" placeholder="https://..."
-               onchange="updateField('applyUrl', this.value)">
-        <span class="help">Link to the official registration page (Chinese or English).</span>
+      <div class="form-group"><label><span class="required">*</span> Apply URL</label>
+        <input type="text" id="fApplyUrl" value="${escapeHtml(c.applyUrl)}" placeholder="https://..." onchange="updateField('applyUrl',this.value)">
       </div>
-
-      <div class="form-group">
-        <label>English Info URL (optional)</label>
-        <input type="text" id="fEnglishUrl" value="${escapeHtml(c.englishUrl || '')}" placeholder="https://..."
-               onchange="updateField('englishUrl', this.value)">
-        <span class="help">If there's a separate English page about this competition.</span>
+      <div class="form-group"><label>English Info URL</label>
+        <input type="text" id="fEnglishUrl" value="${escapeHtml(c.englishUrl||'')}" placeholder="https://..." onchange="updateField('englishUrl',this.value)">
       </div>
     </div>
-
     <div class="form-footer">
-      <button class="btn btn-primary" onclick="saveForm()">💾 Save Competition</button>
+      <button class="btn btn-primary" onclick="saveForm()">💾 Save</button>
       <button class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
       <span class="status-msg status-saved" id="statusMsg" style="display:none;">Saved ✓</span>
-    </div>
-  `;
-}
-
-// ═══════════ FORM HELPERS ═══════════
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function updateField(field, value) {
-  const c = competitions.find(x => x.id === editingId);
-  if (!c) return;
-  c[field] = value;
-  // No save here — save happens in saveForm()
-}
-
-function toggleIndustry(ind) {
-  const c = competitions.find(x => x.id === editingId);
-  if (!c) return;
-  const idx = c.industries.indexOf(ind);
-  if (idx >= 0) c.industries.splice(idx, 1);
-  else c.industries.push(ind);
-  // Re-render industry checks only
-  const checks = document.getElementById('industryChecks');
-  if (checks) {
-    checks.innerHTML = INDUSTRIES.map(i => `
-      <label class="industry-check ${c.industries.includes(i) ? 'checked' : ''}" onclick="toggleIndustry('${i}')">
-        <input type="checkbox" ${c.industries.includes(i) ? 'checked' : ''}> ${i}
-      </label>
-    `).join('');
-  }
-}
-
-function addHighlight() {
-  const c = competitions.find(x => x.id === editingId);
-  if (!c) return;
-  c.highlights.push('');
-  renderForm(c);
-}
-
-function removeHighlight(index) {
-  const c = competitions.find(x => x.id === editingId);
-  if (!c) return;
-  c.highlights.splice(index, 1);
-  renderForm(c);
-}
-
-function updateHighlight(index, value) {
-  const c = competitions.find(x => x.id === editingId);
-  if (!c) return;
-  c.highlights[index] = value;
-}
-
-function saveForm() {
-  // Read all fields from DOM to ensure latest values
-  const c = competitions.find(x => x.id === editingId);
-  if (!c) return;
-
-  c.title = document.getElementById('fTitle')?.value || '';
-  c.city = document.getElementById('fCity')?.value || 'Beijing';
-  c.stage = document.getElementById('fStage')?.value || 'Registration';
-  c.deadline = document.getElementById('fDeadline')?.value || '';
-  c.prizeCategory = document.getElementById('fPrizeCat')?.value || 'small';
-  c.prize = document.getElementById('fPrize')?.value || '';
-  c.level = document.getElementById('fLevel')?.value || 'City';
-  c.desc = document.getElementById('fDesc')?.value || '';
-  c.applyUrl = document.getElementById('fApplyUrl')?.value || '';
-  c.englishUrl = document.getElementById('fEnglishUrl')?.value || '';
-
-  // Validate
-  if (!c.title.trim()) { showToast('Title is required', 'error'); return; }
-  if (!c.prize.trim()) { showToast('Prize description is required', 'error'); return; }
-  if (c.industries.length === 0) { showToast('Select at least one industry', 'error'); return; }
-  if (!c.applyUrl.trim()) { showToast('Application URL is required', 'error'); return; }
-
-  // Save to API
-  apiFetch('/competitions/' + c.id, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(c)
-  }).then(() => {
-    saveToLocal();
-    renderSidebar();
-    const status = document.getElementById('statusMsg');
-    if (status) { status.style.display = 'inline'; setTimeout(() => { status.style.display = 'none'; }, 2000); }
-    showToast('Competition saved ✓', 'success');
-  }).catch(() => {
-    // Offline fallback
-    saveToLocal();
-    renderSidebar();
-    const status = document.getElementById('statusMsg');
-    if (status) { status.style.display = 'inline'; setTimeout(() => { status.style.display = 'none'; }, 2000); }
-    showToast('Saved offline (API unavailable)', 'error');
-  });
-}
-
-function cancelEdit() {
-  editingId = null;
-  renderSidebar();
-  document.getElementById('mainPanel').innerHTML = `
-    <div class="form-empty">
-      <div style="font-size:48px;margin-bottom:12px;">📝</div>
-      <h3>Select a competition or add a new one</h3>
-      <p>Use the sidebar to select an existing item, or click "Add Competition" to create one.</p>
     </div>`;
 }
 
-// ═══════════ TEMPLATE ═══════════
-function loadTemplate() {
-  addNew().then(() => {
-    const c = competitions.find(x => x.id === editingId);
-    if (!c) return;
-    c.title = 'EXAMPLE — City Name Innovation Competition 2026';
-    c.city = 'Shanghai';
-    c.deadline = '2026-12-31';
-    c.prize = '¥2M total (Grand: ¥500K) + office space';
-    c.prizeCategory = 'medium';
-    c.industries = ['AI', 'Biotech & Pharma', 'Advanced Manufacturing'];
-    c.level = 'City';
-    c.desc = '3rd edition. Open to global teams. Focus on early-stage deep tech startups.';
-    c.highlights = [
-      '¥500K grand prize + 12 months free office space',
-      '3 overseas preliminary rounds: Berlin, Singapore, Toronto',
-      'Direct access to city-level talent program',
-      'Mentorship from top-tier VC partners'
-    ];
-    c.applyUrl = 'https://example.com/apply';
-    c.englishUrl = 'https://example.com/en';
-    c.stage = 'Registration';
-    renderSidebar();
-    renderForm(c);
-    showToast('Template loaded — replace all fields and click Save', 'success');
-  });
+function escapeHtml(s) { return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''; }
+function updateField(f,v) { const c=competitions.find(x=>x.id===editingId); if(c) c[f]=v; }
+function toggleIndustry(ind) {
+  const c=competitions.find(x=>x.id===editingId); if(!c) return;
+  const i=c.industries.indexOf(ind); if(i>=0) c.industries.splice(i,1); else c.industries.push(ind);
+  const ch=document.getElementById('industryChecks');
+  if(ch) ch.innerHTML = INDUSTRIES.map(ic=>`<label class="industry-check ${c.industries.includes(ic)?'checked':''}" onclick="toggleIndustry('${ic}')"><input type="checkbox" ${c.industries.includes(ic)?'checked':''}> ${ic}</label>`).join('');
 }
+function addHighlight() { const c=competitions.find(x=>x.id===editingId); if(c) { c.highlights.push(''); renderForm(c); } }
+function removeHighlight(i) { const c=competitions.find(x=>x.id===editingId); if(c) { c.highlights.splice(i,1); renderForm(c); } }
+function updateHighlight(i,v) { const c=competitions.find(x=>x.id===editingId); if(c) c.highlights[i]=v; }
+
+function saveForm() {
+  const c=competitions.find(x=>x.id===editingId); if(!c) return;
+  c.title=document.getElementById('fTitle')?.value||''; c.city=document.getElementById('fCity')?.value||'Beijing';
+  c.stage=document.getElementById('fStage')?.value||'Registration'; c.deadline=document.getElementById('fDeadline')?.value||'';
+  c.prizeCategory=document.getElementById('fPrizeCat')?.value||'small'; c.prize=document.getElementById('fPrize')?.value||'';
+  c.level=document.getElementById('fLevel')?.value||'City'; c.desc=document.getElementById('fDesc')?.value||'';
+  c.applyUrl=document.getElementById('fApplyUrl')?.value||''; c.englishUrl=document.getElementById('fEnglishUrl')?.value||'';
+  c.featured = document.getElementById('fFeatured')?.checked ? 1 : 0;
+  if (!c.title.trim()) { showToast('Title required','error'); return; }
+  if (!c.prize.trim()) { showToast('Prize required','error'); return; }
+  if (c.industries.length===0) { showToast('Select at least one industry','error'); return; }
+  if (!c.applyUrl.trim()) { showToast('Apply URL required','error'); return; }
+  apiFetch('/competitions/'+c.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)}).then(()=>{
+    renderSidebar(); const s=document.getElementById('statusMsg'); if(s){s.style.display='inline';setTimeout(()=>s.style.display='none',2000);}
+    showToast('Saved ✓','success');
+  }).catch(()=>{ renderSidebar(); showToast('Saved (offline)','error'); });
+}
+
+function cancelEdit() { editingId=null; renderSidebar(); showEmpty('📝','Select a competition','Use the sidebar or click "Add Competition".'); }
 
 // ═══════════ IMPORT / EXPORT ═══════════
-function importJSON() {
-  document.getElementById('fileInput').click();
+function importJSON() { document.getElementById('fileInput').click(); }
+async function handleFileImport(e) {
+  const f=e.target.files[0]; if(!f) return;
+  const reader=new FileReader(); reader.onload=async function(ev){
+    try { const data=JSON.parse(ev.target.result); if(!Array.isArray(data)) throw new Error('Array expected');
+      competitions=data; nextId=Math.max(...competitions.map(c=>c.id),0)+1; editingId=null;
+      localStorage.setItem('competeinchina_competitions',JSON.stringify(competitions));
+      let n=0; for(const c of data) { await apiFetch('/competitions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)}); n++; }
+      await reloadFromServer(); showEmpty('✅','Imported '+competitions.length+' competitions','Synced '+n+' to server.');
+      showToast('Imported ✓','success');
+    } catch(err) { showToast('Invalid JSON: '+err.message,'error'); }
+  }; reader.readAsText(f); e.target.value='';
 }
-
-async function handleFileImport(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      if (!Array.isArray(data)) throw new Error('JSON must be an array');
-      competitions = data;
-      nextId = Math.max(...competitions.map(c => c.id), 0) + 1;
-      editingId = null;
-      saveToLocal();
-      // Also push to server
-      try {
-        // Delete all existing, then re-add? Or just overwrite?
-        // For simplicity, save locally and let user manually save each
-        // Alternatively: POST each competition
-        let uploaded = 0;
-        for (const comp of data) {
-          await apiFetch('/competitions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(comp)
-          });
-          uploaded++;
-        }
-        showToast(`Imported ${data.length} locally, ${uploaded} synced to server`, 'success');
-      } catch(e) {
-        showToast(`Imported ${data.length} locally (server sync failed)`, 'error');
-      }
-      await reloadFromServer();
-      document.getElementById('mainPanel').innerHTML = `
-        <div class="form-empty">
-          <div style="font-size:48px;">✅</div>
-          <h3>Imported ${competitions.length} competitions</h3>
-          <p>Select one from the sidebar to edit.</p>
-        </div>`;
-    } catch(err) {
-      showToast('Invalid JSON file: ' + err.message, 'error');
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-
 async function exportJSON() {
-  // Try to get latest from server first
+  try { competitions = await apiFetch('/competitions'); } catch(e) {}
+  const blob=new Blob([JSON.stringify(competitions,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='competitions.json'; a.click();
+  showToast('Exported ✓','success');
+}
+
+// ═══════════ REGISTRATIONS TAB ═══════════
+async function loadRegistrations() {
   try {
-    const fresh = await apiFetch('/competitions');
-    competitions = fresh;
-  } catch(e) {}
-  const blob = new Blob([JSON.stringify(competitions, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'competitions.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('Exported competitions.json ✓', 'success');
+    const data = await apiFetch('/registrations');
+    registrations = data.registrations || [];
+  } catch(e) { registrations = []; }
+  renderRegStats();
+  renderRegTable();
+}
+
+function renderRegStats() {
+  const total=registrations.length, pending=registrations.filter(r=>r.status==='pending').length;
+  document.getElementById('regStats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total Registrations</div></div>
+    <div class="stat-card"><div class="stat-num">${pending}</div><div class="stat-label">Pending Review</div></div>
+    <div class="stat-card"><div class="stat-num">${registrations.filter(r=>r.status==='approved').length}</div><div class="stat-label">Approved</div></div>`;
+}
+
+function renderRegTable() {
+  const body = document.getElementById('regTableBody');
+  if (registrations.length===0) { body.innerHTML='<div style="padding:48px;text-align:center;color:var(--text-muted);">No registrations yet.</div>'; return; }
+  body.innerHTML = registrations.map(r => `
+    <div class="table-row">
+      <span class="col-1">#${r.id}</span>
+      <span class="col-2"><strong>${escapeHtml(r.team_name||'')}</strong></span>
+      <span class="col-3">${escapeHtml(r.contact_email||'')}</span>
+      <span class="col-4"><span class="status-badge status-${r.status}">${r.status}</span></span>
+      <span class="col-5">${(r.submitted_at||'').substring(0,10)}</span>
+      <span style="width:100px;">
+        <select onchange="updateRegStatus(${r.id},this.value)" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);">
+          <option ${r.status==='pending'?'selected':''}>pending</option>
+          <option ${r.status==='reviewed'?'selected':''}>reviewed</option>
+          <option ${r.status==='approved'?'selected':''}>approved</option>
+          <option ${r.status==='rejected'?'selected':''}>rejected</option>
+        </select>
+      </span>
+    </div>`).join('');
+}
+
+async function updateRegStatus(id,status) {
+  try {
+    await apiFetch('/registrations/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+    const r=registrations.find(x=>x.id===id); if(r) r.status=status;
+    renderRegTable(); renderRegStats();
+    showToast('Status updated to '+status,'success');
+  } catch(e) { showToast('Update failed','error'); }
+}
+
+// ═══════════ CONCIERGE TAB ═══════════
+async function loadConcierge() {
+  try {
+    const data = await apiFetch('/concierge');
+    conciergeApps = data.applications || [];
+  } catch(e) { conciergeApps = []; }
+  const body = document.getElementById('concTableBody');
+  if (conciergeApps.length===0) { body.innerHTML='<div style="padding:48px;text-align:center;color:var(--text-muted);">No concierge applications yet.</div>'; return; }
+  body.innerHTML = conciergeApps.map(a => `
+    <div class="table-row">
+      <span class="col-1">#${a.id}</span>
+      <span class="col-2"><strong>${escapeHtml(a.company_name||'')}</strong></span>
+      <span class="col-3">${escapeHtml(a.email||'')}</span>
+      <span class="col-4"><span class="status-badge status-${a.status||'pending'}">${a.status||'pending'}</span></span>
+      <span class="col-5">${(a.created_at||'').substring(0,10)}</span>
+    </div>`).join('');
+}
+
+// ═══════════ SITE CONTENT TAB ═══════════
+async function loadSiteConfig() {
+  try {
+    const data = await fetch('/api/config').then(r=>r.json());
+    siteConfig = data.config || {};
+  } catch(e) { siteConfig = {}; }
+  const grid = document.getElementById('configGrid');
+  grid.innerHTML = `
+    <div class="config-card" style="grid-column:1/-1;">
+      <h3>🏠 Hero Section</h3>
+      <div class="form-grid">
+        <div class="form-group form-grid-full"><label>Hero Title</label>
+          <input type="text" id="cfg_hero_title" value="${escapeHtml(siteConfig.hero_title||'')}" placeholder="Compete in China. Grow with China."></div>
+        <div class="form-group form-grid-full"><label>Hero Subtitle</label>
+          <textarea id="cfg_hero_subtitle">${escapeHtml(siteConfig.hero_subtitle||'')}</textarea></div>
+      </div>
+    </div>
+    <div class="config-card"><h3>📊 Stats</h3>
+      <div class="form-group"><label>Competitions Stat</label><input type="text" id="cfg_stat_competitions" value="${escapeHtml(siteConfig.stat_competitions||'')}" placeholder="200+"></div>
+      <div class="form-group"><label>Cities Stat</label><input type="text" id="cfg_stat_cities" value="${escapeHtml(siteConfig.stat_cities||'')}" placeholder="20+"></div>
+    </div>
+    <div class="config-card"><h3>📊 More Stats</h3>
+      <div class="form-group"><label>Startups Stat</label><input type="text" id="cfg_stat_startups" value="${escapeHtml(siteConfig.stat_startups||'')}" placeholder="5,000+"></div>
+      <div class="form-group"><label>Prize Pool Stat</label><input type="text" id="cfg_stat_prize_pool" value="${escapeHtml(siteConfig.stat_prize_pool||'')}" placeholder="$50M+"></div>
+    </div>
+    <div class="config-card" style="grid-column:1/-1;">
+      <h3>📢 Announcement Bar</h3>
+      <div class="form-group"><label>Active</label>
+        <label style="font-weight:400;cursor:pointer;"><input type="checkbox" id="cfg_announcement_active" ${siteConfig.announcement_active?'checked':''} style="accent-color:var(--accent);"> Show announcement bar</label></div>
+      <div class="form-group"><label>Announcement Text</label>
+        <input type="text" id="cfg_announcement_text" value="${escapeHtml(siteConfig.announcement_text||'')}" placeholder="New competitions added! Check out the latest events →"></div>
+    </div>`;
+}
+
+async function saveAllConfig() {
+  const keys = ['hero_title','hero_subtitle','stat_competitions','stat_cities','stat_startups','stat_prize_pool','announcement_active','announcement_text'];
+  let saved = 0;
+  for (const key of keys) {
+    const el = document.getElementById('cfg_' + key);
+    if (!el) continue;
+    let value = el.type==='checkbox' ? (el.checked?'1':'0') : el.value;
+    try {
+      await fetch('/api/admin/config/'+key,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value,type:el.type==='checkbox'?'boolean':'text'})});
+      saved++;
+    } catch(e) {}
+  }
+  const s = document.getElementById('configStatus');
+  s.style.display = 'inline'; setTimeout(() => s.style.display='none', 3000);
+  showToast(saved+'/'+keys.length+' config items saved ✓','success');
+}
+
+// ═══════════ CSV EXPORT ═══════════
+function exportCSV() {
+  window.open('/api/admin/export/registrations', '_blank');
+  showToast('CSV download started','success');
 }
 
 // ═══════════ TOAST ═══════════
 function showToast(msg, type) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.className = 'toast show toast-' + type;
-  setTimeout(() => { toast.className = 'toast'; }, 2500);
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show toast-'+type;
+  setTimeout(() => { t.className = 'toast'; }, 2500);
 }
 
-// ═══════════ KEYBOARD ═══════════
+// ═══════════ KEYBOARD SHORTCUTS ═══════════
 document.addEventListener('keydown', function(e) {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    if (editingId) saveForm();
-  }
+  if ((e.ctrlKey||e.metaKey) && e.key==='s') { e.preventDefault(); if (editingId) saveForm(); }
+  if ((e.ctrlKey||e.metaKey) && e.key==='n') { e.preventDefault(); addNew(); }
+  if (e.key==='Escape') { cancelEdit(); }
 });
 
 // ═══════════ INIT ═══════════
 init();
 </script>
-
 </body>
 </html>
