@@ -432,8 +432,19 @@
   .concierge-how-step p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
   .concierge-cta {
     text-align: center; padding: 20px 0;
+    position: sticky; bottom: 0; z-index: 50;
+    background: linear-gradient(0deg, var(--bg) 60%, transparent);
+    padding: 24px 0 20px;
   }
-  .concierge-cta .btn-primary { padding: 14px 40px; font-size: 15px; }
+  .concierge-cta .btn-primary {
+    padding: 16px 48px; font-size: 16px; font-weight: 700;
+    box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+    animation: ctaPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes ctaPulse {
+    0%, 100% { box-shadow: 0 4px 20px rgba(37,99,235,0.35); }
+    50% { box-shadow: 0 6px 30px rgba(37,99,235,0.55); }
+  }
   .concierge-cost-table {
     width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 16px 0;
   }
@@ -1264,18 +1275,6 @@
     </div>
   </div>
 
-  <!-- LinkedIn Newsletter CTA -->
-  <div class="concierge-newsletter-cta">
-    <h4 style="font-size:15px;font-weight:700;margin-bottom:4px;" data-i18n="conc_newsletter_title">Follow Our LinkedIn Newsletter</h4>
-    <p data-i18n="conc_newsletter_sub">Get weekly updates on China innovation competitions, talent programs, and landing policies — delivered straight to your LinkedIn feed.</p>
-    <div class="li-wrap">
-      <a class="libutton" href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7402612108833832960" target="_blank">
-        <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        <span data-i18n="conc_newsletter_btn">Follow on LinkedIn</span>
-      </a>
-    </div>
-  </div>
-
   <!-- Section 4: Cost Comparison -->
   <div class="concierge-how">
     <h3 data-i18n="conc_cost_title">Cost Comparison: DIY vs. Concierge</h3>
@@ -1849,13 +1848,6 @@
     <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
     LinkedIn
   </a><br>
-  <div class="footer-newsletter">
-    <span data-i18n="footer_newsletter">Subscribe to our LinkedIn Newsletter for weekly updates:</span><br>
-    <a class="libutton" href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7402612108833832960" target="_blank">
-      <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-      <span data-i18n="footer_newsletter_btn">Follow on LinkedIn</span>
-    </a>
-  </div>
   <span data-i18n="footer_2">All competition information is sourced from official channels. We do not guarantee results. Registration links go to official pages.</span><br>
   &copy; 2026 Compete in China. <span data-i18n="footer_3">All rights reserved.</span>
 </div>
@@ -3235,6 +3227,13 @@ function showPage(name) {
   // Auto-render dashboard
   if (name === 'dashboard') {
     renderDashboard();
+  }
+  // Auto-scroll to CTA on How It Works page
+  if (name === 'how') {
+    setTimeout(function() {
+      var cta = document.querySelector('.concierge-cta');
+      if (cta) cta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 400);
   }
 }
 
