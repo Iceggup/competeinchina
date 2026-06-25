@@ -1390,6 +1390,139 @@ app.post('/api/admin/auto-close-expired', verifyToken, (req, res) => {
 });
 
 // ════════════════════════════════════════════════════
+//  COMPETITION TRACKING API (赛事追踪看板)
+// ════════════════════════════════════════════════════
+
+const TRACKING_STAGES = [
+  'registering', 'submitted', 'preliminary', 'advanced_semi',
+  'semi_finals', 'advanced_finals', 'finals', 'prize_processing', 'prize_received'
+];
+
+// GET /api/tracking/my — User's tracking records
+app.get('/api/tracking/my', verifyToken, (req, res) => {
+  try {
+    const db = getDb();
+    const records = db.prepare(`
+      SELECT * FROM competition_tracking WHERE user_id = ? ORDER BY stage_updated_at DESC
+    `).all(req.user.userId);
+    db.close();
+    res.json({ success: true, records });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// POST /api/tracking/request — User requests a new competition to track
+app.post('/api/tracking/request', verifyToken, (req, res) => {
+  try {
+    const { competition_name, competition_id, notes } = req.body;
+    if (!competition_name) {
+      return res.status(400).json({ success: false, message: 'Competition name is required.' });
+    }
+    const db = getDb();
+    const result = db.prepare(`
+      INSERT INTO competition_tracking (user_id, competition_name, competition_id, current_stage, notes)
+      VALUES (?, ?, ?, 'registering', ?)
+    `).run(req.user.userId, competition_name, competition_id || null, notes || '');
+    db.close();
+    console.log(`[Tracking] User #${req.user.userId} requested: ${competition_name}`);
+    res.status(201).json({ success: true, id: result.lastInsertRowid, message: 'Tracking request submitted.' });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// ═══ Admin Tracking Endpoints ═══
+
+// GET /api/admin/tracking — List all tracking records
+app.get('/api/admin/tracking', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const db = getDb();
+    const records = db.prepare(`
+      SELECT t.*, u.email as user_email, u.full_name as user_name
+      FROM competition_tracking t JOIN users u ON t.user_id = u.id
+      ORDER BY t.updated_at DESC
+    `).all();
+    db.close();
+    res.json({ success: true, records });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// POST /api/admin/tracking — Admin adds tracking for any user
+app.post('/api/admin/tracking', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const { user_id, competition_name, competition_id, current_stage, notes } = req.body;
+    if (!user_id || !competition_name) {
+      return res.status(400).json({ success: false, message: 'User and competition name are required.' });
+    }
+    const stage = current_stage && TRACKING_STAGES.includes(current_stage) ? current_stage : 'registering';
+    const db = getDb();
+    const result = db.prepare(`
+      INSERT INTO competition_tracking (user_id, competition_name, competition_id, current_stage, notes)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(user_id, competition_name, competition_id || null, stage, notes || '');
+    db.close();
+    console.log(`[Tracking] Admin added record #${result.lastInsertRowid} for user #${user_id}`);
+    res.status(201).json({ success: true, id: result.lastInsertRowid, message: 'Tracking record created.' });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// PATCH /api/admin/tracking/:id — Update tracking record
+app.patch('/api/admin/tracking/:id', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const { current_stage, notes, competition_name, competition_id } = req.body;
+    const db = getDb();
+    const existing = db.prepare('SELECT * FROM competition_tracking WHERE id = ?').get(req.params.id);
+    if (!existing) { db.close(); return res.status(404).json({ success: false, message: 'Record not found.' }); }
+
+    const stage = current_stage && TRACKING_STAGES.includes(current_stage) ? current_stage : existing.current_stage;
+    const stageChanged = stage !== existing.current_stage;
+
+    db.prepare(`
+      UPDATE competition_tracking SET
+        current_stage = ?, notes = ?, competition_name = ?,
+        competition_id = ?, stage_updated_at = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(
+      stage, notes !== undefined ? notes : existing.notes,
+      competition_name || existing.competition_name,
+      competition_id !== undefined ? (competition_id || null) : existing.competition_id,
+      stageChanged ? new Date().toISOString() : existing.stage_updated_at,
+      req.params.id
+    );
+    db.close();
+    console.log(`[Tracking] Admin updated record #${req.params.id} stage=${stage}`);
+    res.json({ success: true, message: 'Tracking record updated.' });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// DELETE /api/admin/tracking/:id — Delete tracking record
+app.delete('/api/admin/tracking/:id', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const db = getDb();
+    db.prepare('DELETE FROM competition_tracking WHERE id = ?').run(req.params.id);
+    db.close();
+    console.log(`[Tracking] Admin deleted record #${req.params.id}`);
+    res.json({ success: true, message: 'Tracking record deleted.' });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// GET /api/admin/tracking/stats — Tracking statistics
+app.get('/api/admin/tracking/stats', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const db = getDb();
+    const total = db.prepare('SELECT COUNT(*) as c FROM competition_tracking').get().c;
+    const stats = { total };
+    TRACKING_STAGES.forEach(s => {
+      stats[s] = db.prepare('SELECT COUNT(*) as c FROM competition_tracking WHERE current_stage = ?').get(s).c;
+    });
+    db.close();
+    res.json({ success: true, stats });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// ════════════════════════════════════════════════════
 //  FALLBACK — serve index.html for all routes
 // ════════════════════════════════════════════════════
 

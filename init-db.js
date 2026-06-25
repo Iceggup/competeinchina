@@ -144,6 +144,24 @@ db.exec(`
 `);
 console.log('  ✓ Created: site_config');
 
+// ─── 6. Competition Tracking Table ──────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS competition_tracking (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    competition_name TEXT NOT NULL,
+    competition_id INTEGER,
+    current_stage TEXT NOT NULL DEFAULT 'registering',
+    stage_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (competition_id) REFERENCES competitions(id)
+  )
+`);
+console.log('  ✓ Created: competition_tracking');
+
 // ─── Insert Seed Data ───────────────────────────
 
 // Site config defaults
@@ -201,6 +219,9 @@ db.exec(`CREATE INDEX idx_registrations_email ON registrations(contact_email)`);
 db.exec(`CREATE INDEX idx_registrations_user ON registrations(user_id)`);
 db.exec(`CREATE INDEX idx_users_email ON users(email)`);
 db.exec(`CREATE INDEX idx_competitions_city ON competitions(city)`);
+db.exec(`CREATE INDEX idx_tracking_user ON competition_tracking(user_id)`);
+db.exec(`CREATE INDEX idx_tracking_comp ON competition_tracking(competition_id)`);
+db.exec(`CREATE INDEX idx_tracking_stage ON competition_tracking(current_stage)`);
 console.log('  ✓ Created indexes');
 
 // ─── Done! ──────────────────────────────────────

@@ -384,6 +384,76 @@
   .upload-area:hover { border-color: var(--accent); background: var(--accent-light); }
   .upload-area p { color: var(--text-muted); font-size: 13px; margin-top: 8px; }
 
+  /* ── Tracking Board (Gantt-chart style) ── */
+  .tracking-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 24px;
+  }
+  .tracking-stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; text-align: center;
+  }
+  .tracking-stat-num { font-size: 24px; font-weight: 700; }
+  .tracking-stat-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .tracking-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin-bottom: 14px;
+    box-shadow: var(--shadow); transition: all 0.15s;
+  }
+  .tracking-card:hover { box-shadow: var(--shadow-md); }
+  .tracking-card-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; flex-wrap: wrap; gap: 8px;
+  }
+  .tracking-card-name {
+    font-size: 15px; font-weight: 700; color: var(--text);
+  }
+  .tracking-card-stage {
+    display: inline-block; padding: 4px 14px; border-radius: 12px;
+    font-size: 11px; font-weight: 700;
+  }
+  .tracking-card-meta {
+    font-size: 11px; color: var(--text-muted);
+  }
+  /* Stage progress bar — 9 dots */
+  .tracking-stage-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 2px; overflow-x: auto; padding: 4px 0;
+  }
+  .tracking-stage-dot-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; min-width: 0; cursor: default;
+  }
+  .tracking-stage-dot {
+    width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--border); background: var(--bg);
+    transition: all 0.3s; position: relative; z-index: 1;
+  }
+  .tracking-stage-dot.past {
+    background: var(--green); border-color: var(--green);
+  }
+  .tracking-stage-dot.current {
+    background: var(--accent); border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.2);
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(37,99,235,0.2); }
+    50% { box-shadow: 0 0 0 8px rgba(37,99,235,0.1); }
+  }
+  .tracking-stage-line {
+    height: 2px; flex: 1; min-width: 4px;
+    background: var(--border); margin: 0 -1px; position: relative; top: -7px;
+  }
+  .tracking-stage-line.done { background: var(--green); }
+  .tracking-stage-label {
+    font-size: 9px; color: var(--text-muted); margin-top: 4px;
+    white-space: nowrap; text-align: center; max-width: 50px;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .tracking-stage-label.active { color: var(--accent); font-weight: 600; }
+  .tracking-stage-label.done { color: var(--green); }
+
   /* ── Concierge Page ── */
   .concierge-hero {
     text-align: center; padding: 32px 0 20px;
@@ -1461,22 +1531,27 @@
   </div>
 </div>
 
-<!-- ═══════════ PAGE: Dashboard ═══════════ -->
+<!-- ═══════════ PAGE: Dashboard — Competition Tracking Board ═══════════ -->
 <div class="page" id="page-dashboard">
   <div class="dash-header">
-    <h2 id="dashWelcome" data-i18n="dash_title">My Concierge Applications</h2>
+    <h2 id="dashWelcome" data-i18n="dash_title">My Competition Tracker</h2>
+    <button class="btn-primary" onclick="requestTracking()" style="font-size:12px;padding:7px 16px;" data-i18n="dash_add">+ Request Tracking</button>
   </div>
 
-  <!-- Important Notice -->
-  <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:20px;font-size:13px;color:#92400e;line-height:1.7;">
-    <strong>This dashboard only shows competitions submitted on your behalf by TechinBridge (Concierge Service).</strong><br>
-    If you applied directly by clicking "Apply Now" on a competition, you must <strong>contact the competition organizer directly</strong> to track your application status. We cannot track self-applied entries.
+  <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:12.5px;color:#1e40af;line-height:1.7;">
+    <strong>📋 This is your Competition Tracking Board.</strong> TechinBridge staff will add competitions and update progress stages for you. You can see every competition we've submitted on your behalf and its current stage.
   </div>
 
-  <!-- No applications state -->
+  <!-- Stats row -->
+  <div class="tracking-stats" id="trackingStats"></div>
+
+  <!-- Tracking records (Gantt-chart style) -->
+  <div id="trackingList"></div>
+
+  <!-- Empty state -->
   <div id="dashEmpty" style="background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:48px 32px;text-align:center;">
-    <div class="empty-illustration" style="margin:0 auto 24px;">
-      <svg viewBox="0 0 120 120" fill="none">
+    <div style="margin:0 auto 24px;">
+      <svg viewBox="0 0 120 120" fill="none" width="100" height="100">
         <rect x="20" y="10" width="80" height="100" rx="10" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1.5"/>
         <rect x="32" y="28" width="56" height="8" rx="4" fill="#cbd5e1"/>
         <rect x="32" y="44" width="40" height="6" rx="3" fill="#e2e8f0"/>
@@ -1485,39 +1560,9 @@
         <path d="M54 82l4 4 8-8" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">No Concierge Applications Yet</h3>
-    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">You haven't submitted any competitions through our Concierge Service. Fill one form and we'll handle the rest.</p>
-    <button class="btn-primary" onclick="showPage('how')" style="font-size:14px;padding:10px 24px;">Start Concierge <span class="arrow">→</span></button>
-  </div>
-
-  <!-- Active Applications -->
-  <div id="dashActive" style="display:none;">
-    <div class="dash-cards">
-      <div class="dash-card">
-        <h3><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg> <span>Active Submissions</span></h3>
-        <div class="dash-stat" id="dashCount">0</div>
-        <div class="dash-stat-label" id="dashCountSub">concierge applications in progress</div>
-      </div>
-      <div class="dash-card">
-        <h3><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <span>Next Deadline</span></h3>
-        <div class="dash-stat" id="dashNextDeadline">—</div>
-        <div class="dash-stat-label" id="dashDeadlineSub">No upcoming deadlines</div>
-      </div>
-    </div>
-
-    <div class="dash-card" style="margin-bottom:16px;">
-      <h3><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> <span>Submission Progress</span></h3>
-      <div id="dashTracking"></div>
-    </div>
-
-    <div class="dash-card">
-      <h3><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> <span>Your Materials</span></h3>
-      <div class="upload-area" onclick="startConcierge()" style="cursor:pointer;">
-        <div style="font-size:32px;margin-bottom:8px;">📄</div>
-        <div style="font-weight:600;font-size:14px;">Update Registration Form</div>
-        <p>Re-submit or update your team info, pitch deck, and preferences. We'll use the latest version for all future submissions.</p>
-      </div>
-    </div>
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">No Competitions Being Tracked Yet</h3>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">After you submit the Concierge registration form, our team will add competitions to your tracking board. You can also request specific competitions.</p>
+    <button class="btn-primary" onclick="startConcierge()" style="font-size:14px;padding:10px 24px;">Start Concierge <span class="arrow">→</span></button>
   </div>
 </div>
 
@@ -3588,105 +3633,127 @@ function viewApplicationDetail(id) {
   window.open('registration_form_typeform_en.html?edit=' + id, '_blank');
 }
 
-// ═══════════ DASHBOARD RENDERING ═══════════
+// ═══════════ DASHBOARD — Competition Tracking Board ═══════════
+
+const TRACKING_STAGES = [
+  { key: 'registering', label: '注册中', color: '#94a3b8' },
+  { key: 'submitted', label: '已投递', color: '#3b82f6' },
+  { key: 'preliminary', label: '初赛阶段', color: '#8b5cf6' },
+  { key: 'advanced_semi', label: '晋级复赛', color: '#06b6d4' },
+  { key: 'semi_finals', label: '复赛中', color: '#10b981' },
+  { key: 'advanced_finals', label: '晋级决赛', color: '#f59e0b' },
+  { key: 'finals', label: '决赛', color: '#ef4444' },
+  { key: 'prize_processing', label: '奖金打款中', color: '#ec4899' },
+  { key: 'prize_received', label: '奖金到账', color: '#22c55e' }
+];
+
+function getStageIndex(stageKey) {
+  return TRACKING_STAGES.findIndex(function(s) { return s.key === stageKey; });
+}
+
 async function renderDashboard() {
   var token = getToken();
   var user = getCurrentUser();
-  var userEmail = user.email || '';
   var userName = user.full_name || user.name || (user.email ? user.email.split('@')[0] : '');
 
-  // Update welcome message
   var welcomeEl = document.getElementById('dashWelcome');
   if (welcomeEl && userName) {
     welcomeEl.innerHTML = 'Welcome back, <span style="color:var(--accent);">' + escapeHtml(userName) + '</span> 👋';
   }
 
-  var myApps = [];
-  // Try API with JWT token
-  if (token) {
-    try {
-      var resp = await fetch('/api/concierge/my', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      if (resp.ok) {
-        var data = await resp.json();
-        if (data.applications) myApps = data.applications;
-      }
-    } catch(e) {
-      console.error('[Dashboard] API failed:', e);
-    }
-  }
-
-  // Fallback to localStorage
-  if (myApps.length === 0 && userEmail) {
-    try {
-      var raw = localStorage.getItem('cic_concierge_applications');
-      if (raw) {
-        var allApps = JSON.parse(raw);
-        myApps = allApps.filter(function(a) { return a.email === userEmail; });
-      }
-    } catch(e2) {}
-  }
-
-  var emptyEl = document.getElementById('dashEmpty');
-  var activeEl = document.getElementById('dashActive');
-  var trackingEl = document.getElementById('dashTracking');
-  var countEl = document.getElementById('dashCount');
-  var countSubEl = document.getElementById('dashCountSub');
-  var deadlineEl = document.getElementById('dashNextDeadline');
-  var deadlineSubEl = document.getElementById('dashDeadlineSub');
-
-  if (myApps.length === 0) {
-    if (emptyEl) emptyEl.style.display = 'block';
-    if (activeEl) activeEl.style.display = 'none';
+  if (!token) {
+    document.getElementById('dashEmpty').style.display = 'block';
+    document.getElementById('trackingList').innerHTML = '';
+    document.getElementById('trackingStats').innerHTML = '';
     return;
   }
 
-  if (emptyEl) emptyEl.style.display = 'none';
-  if (activeEl) activeEl.style.display = 'block';
+  // Fetch tracking records
+  var records = [];
+  try {
+    var resp = await fetch('/api/tracking/my', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    if (data.success) records = data.records || [];
+  } catch(e) { console.error('[Dashboard] API failed:', e); }
 
-  if (countEl) countEl.textContent = myApps.length;
-  if (countSubEl) countSubEl.textContent = 'concierge applications in progress';
-
-  // Find nearest deadline
-  var nearest = null;
-  myApps.forEach(function(app) {
-    if (app.deadline && (!nearest || app.deadline < nearest)) nearest = app.deadline;
-  });
-  if (deadlineEl) deadlineEl.textContent = nearest ? formatDate(nearest) : '—';
-  if (deadlineSubEl) deadlineSubEl.textContent = nearest ? getDaysLeft(nearest) + ' days left' : 'No upcoming deadlines';
-
-  // Render tracking items
-  if (trackingEl) {
-    var html = '';
-    var statuses = {'submitted':'status-interested','under_review':'status-review','shortlisted':'status-review','finalist':'status-applied','winner':'status-applied','not_selected':'status-applied'};
-    var labels = {'submitted':'Submitted','under_review':'Under Review','shortlisted':'Shortlisted','finalist':'Finalist','winner':'🏆 Winner','not_selected':'Not Selected'};
-    myApps.forEach(function(app) {
-      var cls = statuses[app.status] || 'status-interested';
-      var lbl = labels[app.status] || 'Pending';
-      html += '<div class="tracking-item">';
-      html += '<div class="tracking-status ' + cls + '"></div>';
-      html += '<div class="tracking-info">';
-      html += '<div class="tracking-name">' + escapeHtml(app.compName || 'Unknown Competition') + '</div>';
-      html += '<div class="tracking-date">' + lbl + ' · Deadline: ' + formatDate(app.deadline) + '</div>';
-      html += '</div></div>';
-    });
-    trackingEl.innerHTML = html;
+  if (records.length === 0) {
+    document.getElementById('dashEmpty').style.display = 'block';
+    document.getElementById('trackingList').innerHTML = '';
+    document.getElementById('trackingStats').innerHTML = '';
+    return;
   }
+
+  document.getElementById('dashEmpty').style.display = 'none';
+
+  // Render stats
+  var active = records.filter(function(r) { return r.current_stage !== 'prize_received'; }).length;
+  var prize = records.filter(function(r) { return r.current_stage === 'prize_received'; }).length;
+  var latest = records[0]; // sorted by stage_updated_at DESC
+  document.getElementById('trackingStats').innerHTML =
+    '<div class="tracking-stat-card"><div class="tracking-stat-num" style="color:var(--accent);">' + records.length + '</div><div class="tracking-stat-label">Total Tracking</div></div>' +
+    '<div class="tracking-stat-card"><div class="tracking-stat-num" style="color:#f59e0b;">' + active + '</div><div class="tracking-stat-label">In Progress</div></div>' +
+    '<div class="tracking-stat-card"><div class="tracking-stat-num" style="color:var(--green);">' + prize + '</div><div class="tracking-stat-label">Prize Received</div></div>' +
+    '<div class="tracking-stat-card"><div class="tracking-stat-num" style="color:#8b5cf6;font-size:16px;">' + (latest ? TRACKING_STAGES[getStageIndex(latest.current_stage)]?.label || '—' : '—') + '</div><div class="tracking-stat-label">Latest Update</div></div>';
+
+  // Render tracking cards
+  var html = '';
+  records.forEach(function(r) {
+    var idx = getStageIndex(r.current_stage);
+    var stage = TRACKING_STAGES[idx] || TRACKING_STAGES[0];
+
+    // Build 9-dot progress bar
+    var dotsHtml = '<div class="tracking-stage-bar">';
+    for (var i = 0; i < 9; i++) {
+      var cls = '';
+      if (i < idx) cls = 'past';
+      else if (i === idx) cls = 'current';
+      if (i > 0) {
+        dotsHtml += '<div class="tracking-stage-line' + (i <= idx ? ' done' : '') + '"></div>';
+      }
+      dotsHtml += '<div class="tracking-stage-dot-wrap">';
+      dotsHtml += '<div class="tracking-stage-dot ' + cls + '" title="' + TRACKING_STAGES[i].label + '"></div>';
+      dotsHtml += '<span class="tracking-stage-label' + (i === idx ? ' active' : '') + (i < idx ? ' done' : '') + '">' + TRACKING_STAGES[i].label + '</span>';
+      dotsHtml += '</div>';
+    }
+    dotsHtml += '</div>';
+
+    var updated = r.stage_updated_at ? r.stage_updated_at.substring(0, 10) : '—';
+
+    html += '<div class="tracking-card">';
+    html += '<div class="tracking-card-header">';
+    html += '<span class="tracking-card-name">' + escapeHtml(r.competition_name) + '</span>';
+    html += '<span class="tracking-card-stage" style="background:' + stage.color + '15;color:' + stage.color + ';">' + stage.label + '</span>';
+    html += '</div>';
+    html += dotsHtml;
+    html += '<div class="tracking-card-meta" style="margin-top:10px;">Updated: ' + updated + ' · Progress: ' + (idx + 1) + '/9 stages</div>';
+    html += '</div>';
+  });
+
+  document.getElementById('trackingList').innerHTML = html;
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  var d = new Date(dateStr);
-  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return months[d.getMonth()] + ' ' + d.getDate();
-}
-
-function getDaysLeft(dateStr) {
-  if (!dateStr) return 0;
-  var now = new Date(); now.setHours(0,0,0,0);
-  var target = new Date(dateStr); target.setHours(0,0,0,0);
-  return Math.max(0, Math.ceil((target - now) / 86400000));
+// User requests a new competition to be tracked
+async function requestTracking() {
+  var token = getToken();
+  if (!token) { openSignup(); return; }
+  var name = prompt('Which competition would you like us to track for you?\n\nEnter the competition name, and our team will add it to your tracking board.');
+  if (!name || !name.trim()) return;
+  try {
+    var resp = await fetch('/api/tracking/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ competition_name: name.trim() })
+    });
+    var data = await resp.json();
+    if (data.success) {
+      alert('✅ Request submitted! Our team will review and add it to your tracking board.');
+      renderDashboard();
+    } else {
+      alert('Failed to submit request: ' + (data.message || 'Unknown error'));
+    }
+  } catch(e) {
+    alert('Network error. Please try again.');
+  }
 }
 
 // ═══════════ KEYBOARD SHORTCUTS ═══════════
