@@ -358,6 +358,18 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="field">
+          <label>Passport Number <span class="opt">(optional)</span></label>
+          <input type="text" id="f_passport" placeholder="Your passport number">
+          <div class="hint" style="font-size:11px;color:#d97706;margin-top:4px;">
+            ⚠️ Some competitions require a passport photo page for identity verification. 
+            If needed, our staff will contact you one-on-one to explain the purpose and guide you through the process.
+          </div>
+        </div>
+        <div class="field"></div>
+      </div>
+
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
         <button class="btn btn-primary" style="flex:1;" onclick="goToStep(3)">Next →</button>
@@ -490,7 +502,7 @@
       </div>
 
       <div class="field">
-        <label>What support do you need from TechinBridge?</label>
+        <label>What support do you need from TechinBridge? <span class="opt">(select all that apply)</span></label>
         <div class="chip-group" id="chipSupport">
           <span class="chip" data-val="Investor matchmaking">Investor matchmaking</span>
           <span class="chip" data-val="Corporate / industry partners">Corporate / industry partners</span>
@@ -520,6 +532,18 @@
       <div class="field">
         <label>Team Stability & Collaboration History</label>
         <input type="text" id="f_team_stability" placeholder="e.g. Co-founders worked together at MIT for 5 years / Team has been together 3+ years. Keep it brief.">
+      </div>
+
+      <div class="field">
+        <label>CV / Resume <span class="req">*</span> <span class="opt">(PDF only)</span></label>
+        <div class="hint" style="margin-bottom:6px;">Upload your CV/resume in PDF format. This is required for competition applications.</div>
+        <input type="text" id="f_resume" placeholder="Google Drive / Dropbox / other link to your PDF resume">
+      </div>
+
+      <div class="field">
+        <label>Company Website <span class="opt">(optional)</span></label>
+        <input type="text" id="f_website" placeholder="https://www.yourcompany.com — enter 'None' if you don't have one">
+        <div class="hint">If you don't have a company website yet, simply write "None".</div>
       </div>
 
       <div class="btn-row">
@@ -574,9 +598,9 @@
       <div class="card-subtitle">Last step — almost there!</div>
 
       <div class="field">
-        <label>Pitch Deck / Business Plan <span class="opt">(optional)</span></label>
-        <div class="hint" style="margin-bottom:6px;">PDF or PPT format, max 20 MB recommended. You can paste a link below.</div>
-        <input type="text" id="f_pitch_deck" placeholder="Google Drive / Dropbox / other link">
+        <label>Pitch Deck / Business Plan <span class="req">*</span></label>
+        <div class="hint" style="margin-bottom:6px;">PDF or PPT format, max 20 MB recommended. You can paste a Google Drive / Dropbox link below.</div>
+        <input type="text" id="f_pitch_deck" placeholder="Google Drive / Dropbox / other link — required">
       </div>
 
       <div class="field">
@@ -665,7 +689,8 @@ function initChips(groupId) {
 
   group.querySelectorAll('.chip').forEach(chip => {
     chip.addEventListener('click', function() {
-      const maxSelect = groupId === 'chipIndustry' ? 3 : 1;
+      // chipSupport: unlimited multi-select; chipIndustry: max 3; others: single select
+      var maxSelect = groupId === 'chipIndustry' ? 3 : (groupId === 'chipSupport' ? 999 : 1);
       const val = this.dataset.val;
 
       if (this.classList.contains('selected')) {
@@ -676,7 +701,7 @@ function initChips(groupId) {
           group.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
           chipSelections[groupId] = [];
         }
-        if (chipSelections[groupId].length >= maxSelect && maxSelect > 1) {
+        if (chipSelections[groupId].length >= maxSelect && maxSelect > 1 && maxSelect < 999) {
           showToast('Max ' + maxSelect + ' selections allowed');
           return;
         }
@@ -759,6 +784,7 @@ function submitForm() {
     contact_phone:  document.getElementById('f_contact_phone')?.value || '',
     contact_linkedin: document.getElementById('f_contact_linkedin')?.value || '',
     contact_wechat: document.getElementById('f_contact_wechat')?.value || '',
+    passport:       document.getElementById('f_passport')?.value || '',
     industry:       (chipSelections['chipIndustry'] || []).join(', '),
     keywords:       document.getElementById('f_keywords')?.value || '',
     product_desc:   document.getElementById('f_product_desc')?.value || '',
@@ -776,11 +802,33 @@ function submitForm() {
     support_needed: (chipSelections['chipSupport'] || []).join(', '),
     team_members:   document.getElementById('f_team_members')?.value || '',
     team_stability: document.getElementById('f_team_stability')?.value || '',
+    resume:         document.getElementById('f_resume')?.value || '',
+    website:        document.getElementById('f_website')?.value || '',
     auth_agree:     document.getElementById('f_auth_agree')?.checked || false,
     pitch_deck:     document.getElementById('f_pitch_deck')?.value || '',
     extra_links:    document.getElementById('f_extra_links')?.value || '',
     notes:          document.getElementById('f_notes')?.value || ''
   };
+
+  // Validation: required fields
+  if (!data.team_name || !data.oneliner || !data.contact_name || !data.contact_email) {
+    showToast('Please fill in all required fields (marked with *).', 4000);
+    btn.disabled = false;
+    btn.textContent = 'Submit Registration';
+    return;
+  }
+  if (!data.pitch_deck) {
+    showToast('Pitch Deck / Business Plan is required. Please provide a link.', 4000);
+    btn.disabled = false;
+    btn.textContent = 'Submit Registration';
+    return;
+  }
+  if (!data.resume) {
+    showToast('CV / Resume is required. Please provide a PDF link.', 4000);
+    btn.disabled = false;
+    btn.textContent = 'Submit Registration';
+    return;
+  }
 
   // Disable submit button
   var btn = document.getElementById('btnSubmit');

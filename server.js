@@ -630,18 +630,19 @@ app.post('/api/registrations', verifyToken, (req, res) => {
       INSERT INTO registrations (
         user_id, team_name, country, team_size, stage, oneliner,
         contact_name, contact_role, contact_email, contact_phone,
-        contact_linkedin, contact_wechat, industry, keywords,
+        contact_linkedin, contact_wechat, passport, industry, keywords,
         product_desc, business_model, funded, funding_round,
         funding_amount, investors, ip, cn_funding, cn_cities,
         register_cn, cn_setup, roadmap, support_needed,
-        team_members, team_stability, auth_agree, pitch_deck,
+        team_members, team_stability, resume, website,
+        auth_agree, pitch_deck,
         extra_links, notes, competition_ids, status, submitted_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     `).run(
       req.user.userId, data.team_name, data.country || '', data.team_size || '',
       data.stage || '', data.oneliner || '', data.contact_name || '',
       data.contact_role || '', data.contact_email.toLowerCase(), data.contact_phone || '',
-      data.contact_linkedin || '', data.contact_wechat || '',
+      data.contact_linkedin || '', data.contact_wechat || '', data.passport || '',
       Array.isArray(data.industry) ? data.industry.join(', ') : (data.industry || ''),
       data.keywords || '', data.product_desc || '', data.business_model || '',
       Array.isArray(data.funded) ? data.funded.join(', ') : (data.funded || ''),
@@ -651,6 +652,7 @@ app.post('/api/registrations', verifyToken, (req, res) => {
       data.cn_setup || '', data.roadmap || '',
       Array.isArray(data.support_needed) ? data.support_needed.join(', ') : (data.support_needed || ''),
       data.team_members || '', data.team_stability || '',
+      data.resume || '', data.website || '',
       data.auth_agree ? 1 : 0, data.pitch_deck || '',
       data.extra_links || '', data.notes || '',
       Array.isArray(data.competition_ids) ? data.competition_ids.join(', ') : (data.competition_ids || ''),
@@ -758,7 +760,8 @@ app.patch('/api/registrations/:id', verifyToken, (req, res) => {
         product_desc = ?, business_model = ?, funded = ?, funding_round = ?,
         funding_amount = ?, investors = ?, ip = ?, cn_funding = ?, cn_cities = ?,
         register_cn = ?, cn_setup = ?, roadmap = ?, support_needed = ?,
-        team_members = ?, team_stability = ?, pitch_deck = ?,
+        team_members = ?, team_stability = ?, resume = ?, website = ?,
+        passport = ?, pitch_deck = ?,
         extra_links = ?, notes = ?, competition_ids = ?
       WHERE id = ?
     `).run(
@@ -775,7 +778,9 @@ app.patch('/api/registrations/:id', verifyToken, (req, res) => {
       data.cn_cities || reg.cn_cities, data.register_cn || reg.register_cn,
       data.cn_setup || reg.cn_setup, data.roadmap || reg.roadmap,
       data.support_needed || reg.support_needed, data.team_members || reg.team_members,
-      data.team_stability || reg.team_stability, data.pitch_deck || reg.pitch_deck,
+      data.team_stability || reg.team_stability, data.resume || reg.resume,
+      data.website || reg.website, data.passport || reg.passport,
+      data.pitch_deck || reg.pitch_deck,
       data.extra_links || reg.extra_links, data.notes || reg.notes,
       data.competition_ids || reg.competition_ids, req.params.id
     );
