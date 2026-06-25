@@ -134,6 +134,8 @@
   .btn-secondary:hover:not(:disabled) { background: var(--accent-l); }
   .btn-ghost { background: transparent; color: var(--text2); }
   .btn-ghost:hover:not(:disabled) { color: var(--text); background: #f3f4f6; }
+  .btn-outline { background: #fff; color: var(--accent); border: 1.5px solid var(--accent); }
+  .btn-outline:hover:not(:disabled) { background: var(--accent-l); }
 
   /* ── WhatsApp Floating Button ── */
   .wa-float {
@@ -594,11 +596,26 @@
     </div>
 
     <!-- SUCCESS: After Submit -->
-    <div id="stepSuccess" class="step" style="display:none;text-align:center;">
+    <div id="stepSuccess" class="step" style="display:none;">
       <div class="success-icon">✓</div>
       <div class="card-title">Registration Submitted!</div>
       <div class="card-subtitle" style="margin-bottom:20px;">
         Thank you! We'll review your submission and get back to you <strong>within 48 hours</strong>.
+      </div>
+
+      <!-- Submission Summary -->
+      <div id="submissionSummary" style="text-align:left;background:#f8fafb;border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px 20px;margin-bottom:20px;font-size:13px;line-height:1.8;">
+        <h4 style="margin-bottom:10px;font-size:14px;">📋 Your Submission</h4>
+        <div id="summaryContent"></div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="goToDashboard()" style="flex:1;min-width:180px;">
+          📊 View My Dashboard
+        </button>
+        <button class="btn btn-outline" onclick="editSubmission()" style="flex:1;min-width:180px;">
+          ✏️ Edit My Submission
+        </button>
       </div>
 
       <div class="wa-cta-card">
@@ -609,7 +626,6 @@
 
       <div style="margin-top:20px;font-size:13px;color:var(--text2);">
         <p>We'll email you at <strong id="confirmEmail" style="color:var(--accent);">your email</strong></p>
-        <p style="margin-top:6px;">In the meantime, <a href="https://www.techinbridge.com" target="_blank">explore TechinBridge →</a></p>
       </div>
     </div>
 
@@ -773,6 +789,7 @@ function submitForm() {
 
   // Step 1: Authenticate (register or login) using form-specific auth endpoint
   // This endpoint auto-creates user if not exists, or returns token if already registered.
+  var authToken = null;
   fetch('/api/users/auth-for-form', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -787,13 +804,14 @@ function submitForm() {
   })
   .then(function(authResult) {
     if (!authResult.success || !authResult.token) throw new Error('Auth failed');
+    authToken = authResult.token;
 
     // Step 2: Submit registration data with token
     return fetch('/api/registrations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + authResult.token
+        'Authorization': 'Bearer ' + authToken
       },
       body: JSON.stringify(data)
     }).then(function(r) { return r.json(); });
@@ -801,8 +819,14 @@ function submitForm() {
   .then(function(regResult) {
     if (!regResult.success) throw new Error(regResult.message || 'Submission failed');
 
-    // Show success screen
+    // Store token + registration data so user can edit later
+    localStorage.setItem('cic_token', authToken);
+    localStorage.setItem('cic_last_submission', JSON.stringify(data));
+    localStorage.setItem('cic_last_submission_id', regResult.registrationId);
+
+    // Show success screen with summary
     document.getElementById('confirmEmail').textContent = data.contact_email || 'your email';
+    renderSubmissionSummary(data);
     document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
     document.getElementById('stepSuccess').style.display = 'block';
     document.getElementById('stepSuccess').classList.add('anim-in');
@@ -818,6 +842,60 @@ function submitForm() {
     btn.disabled = false;
     btn.textContent = 'Submit Registration';
   });
+}
+
+// ═══════════ SUBMISSION SUMMARY & REDIRECT ═══════════
+
+function renderSubmissionSummary(data) {
+  var fields = [
+    ['Team Name', data.team_name],
+    ['Country', data.country],
+    ['Team Size', data.team_size],
+    ['Stage', data.stage],
+    ['Contact Name', data.contact_name],
+    ['Contact Email', data.contact_email],
+    ['Contact Phone', data.contact_phone],
+    ['Industry', data.industry],
+    ['Stage', data.stage],
+    ['Funded', data.funded],
+    ['CN Cities', data.cn_cities],
+    ['Product Description', data.product_desc ? (data.product_desc.substring(0, 100) + (data.product_desc.length > 100 ? '...' : '')) : '']
+  ];
+  var html = '';
+  fields.forEach(function(f) {
+    if (f[1]) {
+      html += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #e8ecf0;">';
+      html += '<span style="color:var(--text2);font-weight:500;">' + escapeHtml(f[0]) + '</span>';
+      html += '<span style="color:var(--text);font-weight:600;text-align:right;">' + escapeHtml(f[1]) + '</span>';
+      html += '</div>';
+    }
+  });
+  document.getElementById('summaryContent').innerHTML = html || '<p style="color:var(--text2);">Submission details loaded.</p>';
+}
+
+function goToDashboard() {
+  window.location.href = '/?page=dashboard';
+}
+
+function editSubmission() {
+  // Go back to the form steps so user can edit
+  document.getElementById('stepSuccess').style.display = 'none';
+  // Show step 8 (review) again
+  document.querySelectorAll('.step').forEach(function(s, i) {
+    s.style.display = (i === 7) ? 'block' : 'none';
+  });
+  // Update progress
+  document.getElementById('progressFill').style.width = Math.round((8 / TOTAL_STEPS) * 100) + '%';
+  document.getElementById('stepLabel').textContent = 'Step 8 of 8';
+  document.getElementById('stepName').textContent = 'Review & Edit';
+  // Re-enable submit button
+  var btn = document.getElementById('btnSubmit');
+  if (btn) { btn.disabled = false; btn.textContent = 'Submit Registration'; }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ═══════════ WHATSAPP ═══════════

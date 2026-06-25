@@ -494,7 +494,8 @@ async function init() {
   document.getElementById('adminHeader').style.display='';
   document.querySelector('.tab-nav').style.display='';
   try {
-    competitions = await apiFetch('/competitions');
+    const result = await apiFetch('/competitions');
+    competitions = result.competitions || result || [];
     showToast('Loaded ' + competitions.length + ' competitions', 'success');
   } catch(e) {
     const saved = localStorage.getItem('competeinchina_competitions');
@@ -559,7 +560,7 @@ async function addNew() {
 }
 
 async function reloadFromServer() {
-  try { competitions = await apiFetch('/competitions'); nextId = Math.max(...competitions.map(c=>c.id),0)+1; renderSidebar(); } catch(e) {}
+  try { const result = await apiFetch('/competitions'); competitions = result.competitions || result || []; nextId = Math.max(...competitions.map(c=>c.id),0)+1; renderSidebar(); } catch(e) {}
 }
 
 function editCompetition(id) { editingId = id; const c = competitions.find(x=>x.id===id); if (!c) return; renderSidebar(); renderForm(c); }

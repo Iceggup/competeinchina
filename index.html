@@ -3261,25 +3261,34 @@ async function loadProfileApplications() {
     if (data.success && data.applications && data.applications.length > 0) {
       var statusLabels = {'pending':'Pending','reviewed':'Reviewed','approved':'✅ Approved','rejected':'❌ Rejected'};
       var statusColors = {'pending':'#f59e0b','reviewed':'#3b82f6','approved':'#10b981','rejected':'#ef4444'};
-      var html = '<table style="width:100%;font-size:13px;border-collapse:collapse;">';
-      html += '<tr style="border-bottom:1px solid var(--border);">';
-      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Team</th>';
-      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Country</th>';
-      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Industry</th>';
-      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Status</th>';
-      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Submitted</th>';
-      html += '</tr>';
-      data.applications.forEach(function(app) {
+
+      var html = '';
+      data.applications.forEach(function(app, idx) {
         var status = app.status || 'pending';
-        html += '<tr style="border-bottom:1px solid var(--border-light);">';
-        html += '<td style="padding:10px 8px;font-weight:600;">' + escapeHtml(app.team_name || '—') + '</td>';
-        html += '<td style="padding:10px 8px;">' + escapeHtml(app.country || '—') + '</td>';
-        html += '<td style="padding:10px 8px;">' + escapeHtml(app.industry || '—') + '</td>';
-        html += '<td style="padding:10px 8px;"><span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:' + (statusColors[status] || '#94a3b8') + '15;color:' + (statusColors[status] || '#64748b') + ';">' + (statusLabels[status] || status) + '</span></td>';
-        html += '<td style="padding:10px 8px;color:var(--text-muted);">' + (app.submitted_at ? formatDate(app.submitted_at) : '—') + '</td>';
-        html += '</tr>';
+        var canEdit = status === 'pending';
+        html += '<div style="background:#f8fafb;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+        html += '<strong style="font-size:14px;">' + escapeHtml(app.team_name || 'Untitled') + '</strong>';
+        html += '<span style="display:inline-block;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:600;background:' + (statusColors[status] || '#94a3b8') + '15;color:' + (statusColors[status] || '#64748b') + ';">' + (statusLabels[status] || status) + '</span>';
+        html += '</div>';
+        html += '<div style="font-size:12px;color:var(--text-secondary);line-height:1.8;">';
+        html += '<div><span style="color:var(--text-muted);">Country:</span> ' + escapeHtml(app.country || '—') + '</div>';
+        html += '<div><span style="color:var(--text-muted);">Industry:</span> ' + escapeHtml(app.industry || '—') + '</div>';
+        html += '<div><span style="color:var(--text-muted);">Contact:</span> ' + escapeHtml(app.contact_name || '—') + ' · ' + escapeHtml(app.contact_email || '—') + '</div>';
+        html += '<div><span style="color:var(--text-muted);">Stage:</span> ' + escapeHtml(app.stage || '—') + ' · Team Size: ' + escapeHtml(app.team_size || '—') + '</div>';
+        if (app.contact_phone) html += '<div><span style="color:var(--text-muted);">Phone:</span> ' + escapeHtml(app.contact_phone) + '</div>';
+        html += '<div><span style="color:var(--text-muted);">Submitted:</span> ' + (app.submitted_at || '—') + '</div>';
+        html += '</div>';
+
+        // Actions row
+        html += '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">';
+        if (canEdit) {
+          html += '<button class="btn-secondary" style="font-size:11px;padding:6px 14px;" onclick="editApplication(' + app.id + ')">✏️ Edit</button>';
+        }
+        html += '<button class="btn-ghost" style="font-size:11px;padding:6px 14px;" onclick="viewApplicationDetail(' + app.id + ')">👁 View Details</button>';
+        html += '</div>';
+        html += '</div>';
       });
-      html += '</table>';
       listEl.innerHTML = html;
     } else {
       listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">No applications yet. <a href="#" onclick="showPage(\'how\')" style="color:var(--accent);">Start your first Concierge application →</a></p>';
@@ -3288,6 +3297,127 @@ async function loadProfileApplications() {
     console.error('[Profile] Failed to load applications:', e);
     listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Failed to load applications. Please try again later.</p>';
   }
+}
+
+// ═══════════ EDIT APPLICATION ═══════════
+
+var _editingAppId = null;
+
+async function editApplication(id) {
+  var token = getToken();
+  if (!token) return;
+
+  try {
+    var resp = await fetch('/api/users/my-applications', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    var app = (data.applications || []).find(function(a) { return a.id === id; });
+    if (!app) { alert('Application not found.'); return; }
+    if (app.status !== 'pending') { alert('Only pending applications can be edited.'); return; }
+
+    _editingAppId = id;
+    showApplicationEditModal(app);
+  } catch(e) {
+    console.error('[Edit App] Error:', e);
+    alert('Failed to load application.');
+  }
+}
+
+function showApplicationEditModal(app) {
+  // Create edit modal overlay
+  var overlay = document.createElement('div');
+  overlay.id = 'appEditOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.6);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;';
+  overlay.onclick = function(e) { if (e.target === overlay) closeAppEdit(); };
+
+  var fields = [
+    ['Team Name', 'team_name', 'text'],
+    ['Country', 'country', 'text'],
+    ['Team Size', 'team_size', 'text'],
+    ['Stage', 'stage', 'text'],
+    ['Contact Name', 'contact_name', 'text'],
+    ['Contact Role', 'contact_role', 'text'],
+    ['Contact Phone', 'contact_phone', 'text'],
+    ['Contact LinkedIn', 'contact_linkedin', 'text'],
+    ['Contact WeChat', 'contact_wechat', 'text'],
+    ['Industry', 'industry', 'text'],
+    ['Product Description', 'product_desc', 'textarea'],
+    ['Business Model', 'business_model', 'text'],
+    ['Funding', 'funded', 'text'],
+    ['Funding Round', 'funding_round', 'text'],
+    ['CN Cities', 'cn_cities', 'text'],
+    ['Notes', 'notes', 'textarea']
+  ];
+
+  var formHtml = fields.map(function(f) {
+    var val = (app[f[1]] || '').replace(/"/g, '&quot;');
+    if (f[2] === 'textarea') {
+      return '<div class="form-group"><label>' + f[0] + '</label><textarea id="edit_' + f[1] + '" style="width:100%;min-height:60px;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;">' + escapeHtml(app[f[1]] || '') + '</textarea></div>';
+    }
+    return '<div class="form-group"><label>' + f[0] + '</label><input type="text" id="edit_' + f[1] + '" value="' + escapeHtml(app[f[1]] || '') + '" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;"></div>';
+  }).join('');
+
+  overlay.innerHTML = `
+    <div onclick="event.stopPropagation()" style="background:var(--surface);border-radius:16px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);padding:28px 24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="font-size:17px;font-weight:700;">✏️ Edit Application #${app.id}</h3>
+        <button onclick="closeAppEdit()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);">&times;</button>
+      </div>
+      <div style="max-height:55vh;overflow-y:auto;padding-right:4px;">
+        ${formHtml}
+      </div>
+      <div id="appEditError" class="signup-error"></div>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button class="btn-secondary" onclick="closeAppEdit()" style="flex:1;">Cancel</button>
+        <button class="btn-primary" onclick="saveApplicationEdit()" style="flex:1;">💾 Save Changes</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAppEdit() {
+  var overlay = document.getElementById('appEditOverlay');
+  if (overlay) overlay.remove();
+  document.body.style.overflow = '';
+  _editingAppId = null;
+}
+
+async function saveApplicationEdit() {
+  var token = getToken();
+  if (!token || !_editingAppId) return;
+
+  var fieldNames = ['team_name','country','team_size','stage','contact_name','contact_role','contact_phone','contact_linkedin','contact_wechat','industry','product_desc','business_model','funded','funding_round','cn_cities','notes'];
+  var updates = {};
+  fieldNames.forEach(function(f) {
+    var el = document.getElementById('edit_' + f);
+    if (el) updates[f] = el.value;
+  });
+
+  var errorDiv = document.getElementById('appEditError');
+  try {
+    var resp = await fetch('/api/registrations/' + _editingAppId, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(updates)
+    });
+    var data = await resp.json();
+    if (data.success) {
+      closeAppEdit();
+      loadProfileApplications(); // Refresh list
+      alert('✅ Application updated successfully!');
+    } else {
+      if (errorDiv) { errorDiv.textContent = data.message || 'Update failed'; errorDiv.classList.add('show'); }
+    }
+  } catch(e) {
+    if (errorDiv) { errorDiv.textContent = 'Network error. Please try again.'; errorDiv.classList.add('show'); }
+  }
+}
+
+function viewApplicationDetail(id) {
+  // Redirect to the registration form page with the application data
+  window.open('registration_form_typeform_en.html?edit=' + id, '_blank');
 }
 
 // ═══════════ DASHBOARD RENDERING ═══════════

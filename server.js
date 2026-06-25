@@ -725,6 +725,75 @@ app.patch('/api/registrations/:id/status', verifyToken, (req, res) => {
   }
 });
 
+// PATCH /api/registrations/:id — User can edit their own pending registration
+app.patch('/api/registrations/:id', verifyToken, (req, res) => {
+  try {
+    const db = getDb();
+    const reg = db.prepare('SELECT * FROM registrations WHERE id = ?').get(req.params.id);
+
+    if (!reg) {
+      db.close();
+      return res.status(404).json({ success: false, message: 'Registration not found.' });
+    }
+
+    // Only the owner or admin can edit
+    if (reg.user_id !== req.user.userId && req.user.role !== 'admin') {
+      db.close();
+      return res.status(403).json({ success: false, message: 'Access denied.' });
+    }
+
+    // Only pending registrations can be edited by users
+    if (reg.status !== 'pending' && req.user.role !== 'admin') {
+      db.close();
+      return res.status(400).json({ success: false, message: 'Only pending registrations can be edited.' });
+    }
+
+    const data = req.body;
+    // Update all editable fields
+    db.prepare(`
+      UPDATE registrations SET
+        team_name = ?, country = ?, team_size = ?, stage = ?, oneliner = ?,
+        contact_name = ?, contact_role = ?, contact_phone = ?,
+        contact_linkedin = ?, contact_wechat = ?, industry = ?, keywords = ?,
+        product_desc = ?, business_model = ?, funded = ?, funding_round = ?,
+        funding_amount = ?, investors = ?, ip = ?, cn_funding = ?, cn_cities = ?,
+        register_cn = ?, cn_setup = ?, roadmap = ?, support_needed = ?,
+        team_members = ?, team_stability = ?, pitch_deck = ?,
+        extra_links = ?, notes = ?, competition_ids = ?
+      WHERE id = ?
+    `).run(
+      data.team_name || reg.team_name, data.country || reg.country,
+      data.team_size || reg.team_size, data.stage || reg.stage,
+      data.oneliner || reg.oneliner, data.contact_name || reg.contact_name,
+      data.contact_role || reg.contact_role, data.contact_phone || reg.contact_phone,
+      data.contact_linkedin || reg.contact_linkedin, data.contact_wechat || reg.contact_wechat,
+      data.industry || reg.industry, data.keywords || reg.keywords,
+      data.product_desc || reg.product_desc, data.business_model || reg.business_model,
+      data.funded || reg.funded, data.funding_round || reg.funding_round,
+      data.funding_amount || reg.funding_amount, data.investors || reg.investors,
+      data.ip || reg.ip, data.cn_funding || reg.cn_funding,
+      data.cn_cities || reg.cn_cities, data.register_cn || reg.register_cn,
+      data.cn_setup || reg.cn_setup, data.roadmap || reg.roadmap,
+      data.support_needed || reg.support_needed, data.team_members || reg.team_members,
+      data.team_stability || reg.team_stability, data.pitch_deck || reg.pitch_deck,
+      data.extra_links || reg.extra_links, data.notes || reg.notes,
+      data.competition_ids || reg.competition_ids, req.params.id
+    );
+
+    // Return updated record
+    const updated = db.prepare('SELECT * FROM registrations WHERE id = ?').get(req.params.id);
+    db.close();
+
+    console.log(`[Reg] User #${req.user.userId} updated registration #${req.params.id}`);
+
+    res.json({ success: true, message: 'Registration updated.', registration: updated });
+
+  } catch (error) {
+    console.error('[reg/edit] Error:', error);
+    res.status(500).json({ success: false, message: 'Update failed.' });
+  }
+});
+
 // ════════════════════════════════════════════════════
 //  CONCIERGE APPLICATION API
 // ════════════════════════════════════════════════════
