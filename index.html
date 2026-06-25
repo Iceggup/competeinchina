@@ -89,6 +89,41 @@
   }
   .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,0.3); }
 
+  /* ── Nav User Menu (logged-in state) ── */
+  .nav-user {
+    position: relative; display: flex; align-items: center; gap: 8px;
+    cursor: pointer; padding: 6px 14px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    transition: all 0.2s; font-size: 13px; font-weight: 600; color: var(--text);
+    white-space: nowrap;
+  }
+  .nav-user:hover { border-color: var(--accent); background: var(--accent-light); }
+  .nav-user-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent-gradient); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .nav-user-arrow { font-size: 10px; transition: transform 0.2s; margin-left: 2px; }
+  .nav-user.open .nav-user-arrow { transform: rotate(180deg); }
+  .nav-user-menu {
+    display: none; position: absolute; top: calc(100% + 8px); right: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    min-width: 200px; padding: 6px; z-index: 1000;
+  }
+  .nav-user.open .nav-user-menu { display: block; }
+  .nav-user-menu-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    font-size: 13px; color: var(--text); border-radius: 8px;
+    cursor: pointer; transition: background 0.15s; font-weight: 500;
+    border: none; background: none; width: 100%; text-align: left;
+  }
+  .nav-user-menu-item:hover { background: var(--accent-light); color: var(--accent); }
+  .nav-user-menu-divider { height: 1px; background: var(--border); margin: 4px 8px; }
+  .nav-user-menu-item.signout { color: #ef4444; }
+  .nav-user-menu-item.signout:hover { background: #fef2f2; color: #dc2626; }
+
   /* ── Layout ── */
   .app { max-width: 1280px; margin: 0 auto; padding: 24px; }
   .page { display: none; }
@@ -573,6 +608,21 @@
   }
   .signup-error.show { display: block; }
 
+  /* ── Auth Tabs (Sign Up / Log In switch) ── */
+  .auth-tabs {
+    display: flex; gap: 4px; margin-bottom: 18px;
+    background: var(--border-light); border-radius: 10px; padding: 3px;
+  }
+  .auth-tab {
+    flex: 1; padding: 9px 16px; border: none; background: transparent;
+    border-radius: 8px; font-size: 13.5px; font-weight: 600;
+    color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+  }
+  .auth-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .auth-tab:hover:not(.active) { color: var(--text-secondary); }
+  .auth-form-panel { display: none; }
+  .auth-form-panel.active { display: block; }
+
   /* ── Footer ── */
   .footer {
     text-align: center; padding: 36px 20px; margin-top: 56px;
@@ -1020,7 +1070,10 @@
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
     </a>
     <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()" title="Switch Language / 切换语言">中文</button>
-    <button class="nav-cta" data-i18n="nav_signup" onclick="openSignup()">Sign Up Free</button>
+    <!-- Auth-aware nav area -->
+    <span id="navAuthArea">
+      <button class="nav-cta" data-i18n="nav_signup" onclick="openSignup()">Sign Up Free</button>
+    </span>
   </div>
 </nav>
 
@@ -1327,10 +1380,80 @@
   </div>
 </div>
 
+<!-- ═══════════ PAGE: Profile ═══════════ -->
+<div class="page" id="page-profile">
+  <div class="dash-header">
+    <h2>My Profile</h2>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="dash-card" style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+      <div id="profileAvatar" style="width:56px;height:56px;border-radius:50%;background:var(--accent-gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0;">?</div>
+      <div>
+        <div id="profileNameDisplay" style="font-size:18px;font-weight:700;color:var(--text);">—</div>
+        <div id="profileEmailDisplay" style="font-size:13px;color:var(--text-secondary);">—</div>
+      </div>
+      <button class="btn-secondary" style="margin-left:auto;font-size:12px;padding:7px 14px;" onclick="toggleProfileEdit()" id="profileEditBtn">✏️ Edit</button>
+    </div>
+
+    <!-- View Mode -->
+    <div id="profileView">
+      <table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <tr><td style="padding:8px 0;color:var(--text-muted);width:130px;">Full Name</td><td id="profileViewName" style="padding:8px 0;color:var(--text);">—</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text-muted);">Email</td><td id="profileViewEmail" style="padding:8px 0;color:var(--text);">—</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text-muted);">Role</td><td id="profileViewRole" style="padding:8px 0;color:var(--text);">—</td></tr>
+        <tr><td style="padding:8px 0;color:var(--text-muted);">Registered</td><td id="profileViewDate" style="padding:8px 0;color:var(--text);">—</td></tr>
+      </table>
+    </div>
+
+    <!-- Edit Mode (hidden by default) -->
+    <div id="profileEdit" style="display:none;">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="profileEditName" placeholder="Your full name">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="profileEditEmail" placeholder="your@email.com">
+      </div>
+      <div id="profileEditError" class="signup-error"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-secondary" onclick="toggleProfileEdit()" style="font-size:13px;padding:9px 18px;">Cancel</button>
+        <button class="btn-primary" onclick="saveProfile()" style="font-size:13px;padding:9px 18px;">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Password -->
+  <div class="dash-card" style="margin-bottom:20px;">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">🔒 Change Password</h3>
+    <div class="form-group">
+      <label>Current Password</label>
+      <input type="password" id="profileCurPw" placeholder="Enter current password">
+    </div>
+    <div class="form-group">
+      <label>New Password</label>
+      <input type="password" id="profileNewPw" placeholder="Min. 8 characters">
+    </div>
+    <div id="profilePwError" class="signup-error"></div>
+    <div id="profilePwSuccess" style="display:none;background:#ecfdf5;color:#065f46;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;"></div>
+    <button class="btn-primary" onclick="changePassword()" style="font-size:13px;padding:9px 18px;">Update Password</button>
+  </div>
+
+  <!-- My Applications -->
+  <div class="dash-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">📋 My Concierge Applications</h3>
+    <div id="profileAppsList">
+      <p style="font-size:13px;color:var(--text-muted);">Loading...</p>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════ PAGE: Dashboard ═══════════ -->
 <div class="page" id="page-dashboard">
   <div class="dash-header">
-    <h2 data-i18n="dash_title">My Concierge Applications</h2>
+    <h2 id="dashWelcome" data-i18n="dash_title">My Concierge Applications</h2>
   </div>
 
   <!-- Important Notice -->
@@ -1559,41 +1682,70 @@
 <div class="signup-overlay" id="signupOverlay" onclick="closeSignup(event)">
   <div class="signup-modal" id="signupModal" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeSignup()">&times;</button>
-    <h2 data-i18n="signup_title">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
-      Create Your Free Account
-    </h2>
-    <p class="subtitle" data-i18n="signup_sub">Just 3 fields. Takes 10 seconds. No credit card required.</p>
 
-    <div class="signup-error" id="signupError"></div>
-
-    <div class="form-group">
-      <label data-i18n="signup_name">Full Name</label>
-      <input type="text" id="signupName" data-i18n-ph="signup_name_ph" placeholder="e.g. Sarah Chen">
-    </div>
-    <div class="form-group">
-      <label data-i18n="signup_email">Email</label>
-      <input type="email" id="signupEmail" data-i18n-ph="signup_email_ph" placeholder="you@example.com">
-    </div>
-    <div class="form-group">
-      <label data-i18n="signup_pw">Password</label>
-      <input type="password" id="signupPassword" data-i18n-ph="signup_pw_ph" placeholder="Min. 8 characters">
+    <!-- Tab switcher: Sign Up / Log In -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authTabSignup" onclick="switchAuthTab('signup')">Sign Up</button>
+      <button class="auth-tab" id="authTabLogin" onclick="switchAuthTab('login')">Log In</button>
     </div>
 
-    <div class="auth-section" style="margin:16px 0;">
-      <div class="auth-item" style="padding:10px 0;">
-        <input type="checkbox" id="authTerms" onchange="checkSignupForm()">
-        <label for="authTerms" data-i18n="signup_auth_simple">
-          I agree to the <a href="#" onclick="event.preventDefault();alert('Terms of Service — Full document will be available at launch.')">Terms of Service</a> and <a href="#" onclick="event.preventDefault();alert('Privacy Policy — Full document will be available at launch.')">Privacy Policy</a>.
-        </label>
+    <!-- Sign Up form -->
+    <div class="auth-form-panel active" id="authPanelSignup">
+      <p class="subtitle" data-i18n="signup_sub">Just 3 fields. Takes 10 seconds. No credit card required.</p>
+
+      <div class="signup-error" id="signupError"></div>
+
+      <div class="form-group">
+        <label data-i18n="signup_name">Full Name</label>
+        <input type="text" id="signupName" data-i18n-ph="signup_name_ph" placeholder="e.g. Sarah Chen">
+      </div>
+      <div class="form-group">
+        <label data-i18n="signup_email">Email</label>
+        <input type="email" id="signupEmail" data-i18n-ph="signup_email_ph" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label data-i18n="signup_pw">Password</label>
+        <input type="password" id="signupPassword" data-i18n-ph="signup_pw_ph" placeholder="Min. 8 characters">
+      </div>
+
+      <div class="auth-section" style="margin:16px 0;">
+        <div class="auth-item" style="padding:10px 0;">
+          <input type="checkbox" id="authTerms" onchange="checkSignupForm()">
+          <label for="authTerms" data-i18n="signup_auth_simple">
+            I agree to the <a href="#" onclick="event.preventDefault();alert('Terms of Service — Full document will be available at launch.')">Terms of Service</a> and <a href="#" onclick="event.preventDefault();alert('Privacy Policy — Full document will be available at launch.')">Privacy Policy</a>.
+          </label>
+        </div>
+      </div>
+
+      <div class="signup-actions">
+        <button class="btn-secondary" onclick="closeSignup()" data-i18n="signup_cancel">Cancel</button>
+        <button class="btn-primary" id="signupSubmit" onclick="submitSignup()" disabled data-i18n="signup_submit">
+          Create Account &rarr;
+        </button>
       </div>
     </div>
 
-    <div class="signup-actions">
-      <button class="btn-secondary" onclick="closeSignup()" data-i18n="signup_cancel">Cancel</button>
-      <button class="btn-primary" id="signupSubmit" onclick="submitSignup()" disabled data-i18n="signup_submit">
-        Create Account &rarr;
-      </button>
+    <!-- Log In form -->
+    <div class="auth-form-panel" id="authPanelLogin">
+      <p class="subtitle">Welcome back. Enter your credentials to continue.</p>
+
+      <div class="signup-error" id="loginError"></div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter your password">
+      </div>
+
+      <div class="signup-actions">
+        <button class="btn-secondary" onclick="closeSignup()" data-i18n="signup_cancel">Cancel</button>
+        <button class="btn-primary" id="loginSubmit" onclick="submitLogin()">
+          Log In &rarr;
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -2020,6 +2172,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // Load CMS config for dynamic Hero content
   loadSiteConfig();
+  // Restore auth state
+  updateNavAuth();
 });
 
 async function loadSiteConfig() {
@@ -2656,8 +2810,92 @@ function filterByCity(cityName) {
   showPage('browse');
 }
 
+// ═══════════ AUTH — NAVIGATION STATE ═══════════
+
+function updateNavAuth() {
+  var token = localStorage.getItem('cic_token');
+  var userStr = localStorage.getItem('cic_user');
+  var user = null;
+  try { user = JSON.parse(userStr || '{}'); } catch(e) {}
+  var area = document.getElementById('navAuthArea');
+  if (!area) return;
+
+  if (token && user && user.email) {
+    // Logged in — show user dropdown
+    var initial = (user.full_name || user.name || user.email).charAt(0).toUpperCase();
+    area.innerHTML = `
+      <div class="nav-user" id="navUserDropdown" onclick="toggleUserMenu(event)">
+        <span class="nav-user-avatar">${initial}</span>
+        <span>${escapeHtml(user.full_name || user.name || user.email.split('@')[0])}</span>
+        <span class="nav-user-arrow">▾</span>
+        <div class="nav-user-menu">
+          <button class="nav-user-menu-item" onclick="showProfile();toggleUserMenu(event);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            My Profile
+          </button>
+          <button class="nav-user-menu-item" onclick="showPage('dashboard');toggleUserMenu(event);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </button>
+          <div class="nav-user-menu-divider"></div>
+          <button class="nav-user-menu-item signout" onclick="logout()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    `;
+  } else {
+    // Not logged in — show Sign Up Free button
+    area.innerHTML = '<button class="nav-cta" data-i18n="nav_signup" onclick="openSignup()">Sign Up Free</button>';
+  }
+}
+
+function toggleUserMenu(e) {
+  e.stopPropagation();
+  var dd = document.getElementById('navUserDropdown');
+  if (dd) dd.classList.toggle('open');
+}
+
+// Close user menu when clicking outside
+document.addEventListener('click', function(e) {
+  var dd = document.getElementById('navUserDropdown');
+  if (dd && !dd.contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
+
+function logout() {
+  localStorage.removeItem('cic_token');
+  localStorage.removeItem('cic_user');
+  updateNavAuth();
+  showPage('browse');
+  console.log('[Auth] Logged out');
+}
+
+function getToken() {
+  return localStorage.getItem('cic_token');
+}
+
+function getCurrentUser() {
+  try { return JSON.parse(localStorage.getItem('cic_user') || '{}'); } catch(e) { return {}; }
+}
+
+// ═══════════ AUTH — TAB SWITCH ═══════════
+
+function switchAuthTab(tab) {
+  document.getElementById('authTabSignup').classList.toggle('active', tab === 'signup');
+  document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('authPanelSignup').classList.toggle('active', tab === 'signup');
+  document.getElementById('authPanelLogin').classList.toggle('active', tab === 'login');
+
+  // Clear errors
+  document.getElementById('signupError').classList.remove('show');
+  document.getElementById('loginError').classList.remove('show');
+}
+
 // ═══════════ SIGN UP ═══════════
-function openSignup() {
+function openSignup(mode) {
   document.getElementById('signupOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   document.getElementById('signupName').value = '';
@@ -2666,6 +2904,12 @@ function openSignup() {
   document.getElementById('authTerms').checked = false;
   document.getElementById('signupSubmit').disabled = true;
   document.getElementById('signupError').classList.remove('show');
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').classList.remove('show');
+
+  // Default to signup, or switch to login if specified
+  switchAuthTab(mode === 'login' ? 'login' : 'signup');
 }
 
 function closeSignup(e) {
@@ -2711,47 +2955,95 @@ async function submitSignup() {
   }
 
   errorDiv.classList.remove('show');
+  var btn = document.getElementById('signupSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Creating account...';
 
-  // Try API signup
   try {
-    const resp = await fetch('/api/auth/signup', {
+    var resp = await fetch('/api/users/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ full_name: name, email: email, password: password })
     });
-    const data = await resp.json();
-    if (!resp.ok) throw new Error(data.error || 'Signup failed');
-    localStorage.setItem('cic_user', JSON.stringify({ name, email }));
-    closeSignup();
-    alert('Account created! Welcome, ' + name + '!');
-    return;
+    var data = await resp.json();
+
+    if (resp.ok && data.token) {
+      // Success! Store token and user info
+      localStorage.setItem('cic_token', data.token);
+      localStorage.setItem('cic_user', JSON.stringify(data.user));
+      updateNavAuth();
+      closeSignup();
+      alert('Account created! Welcome, ' + name + '!');
+      return;
+    }
+
+    if (resp.status === 409) {
+      // Email already exists — suggest login
+      errorDiv.textContent = 'This email is already registered. Please log in instead.';
+      errorDiv.classList.add('show');
+      switchAuthTab('login');
+      btn.disabled = false;
+      btn.textContent = 'Create Account →';
+      return;
+    }
+
+    throw new Error(data.message || 'Registration failed');
   } catch(e) {
-    // Fallback: try login if account exists
-    try {
-      const resp = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await resp.json();
-      if (resp.ok) {
-        localStorage.setItem('cic_user', JSON.stringify({ name: data.name, email }));
-        closeSignup();
-        alert('Welcome back, ' + data.name + '!');
-        return;
-      }
-    } catch(e2) {}
-    // Offline fallback
-    localStorage.setItem('cic_user', JSON.stringify({name: name, email: email}));
-    closeSignup();
-    alert('Account created! Welcome, ' + name + '!\n\n(Offline mode — data saved locally.)');
+    errorDiv.textContent = e.message || 'Registration failed. Please try again.';
+    errorDiv.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Create Account →';
+  }
+}
+
+// ═══════════ LOG IN ═══════════
+
+async function submitLogin() {
+  var email = document.getElementById('loginEmail').value.trim();
+  var password = document.getElementById('loginPassword').value;
+  var errorDiv = document.getElementById('loginError');
+
+  if (!email || !password) {
+    errorDiv.textContent = 'Please enter your email and password.';
+    errorDiv.classList.add('show');
+    return;
+  }
+
+  errorDiv.classList.remove('show');
+  var btn = document.getElementById('loginSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Logging in...';
+
+  try {
+    var resp = await fetch('/api/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    });
+    var data = await resp.json();
+
+    if (resp.ok && data.token) {
+      localStorage.setItem('cic_token', data.token);
+      localStorage.setItem('cic_user', JSON.stringify(data.user));
+      updateNavAuth();
+      closeSignup();
+      console.log('[Auth] Login successful: ' + data.user.email);
+      return;
+    }
+
+    throw new Error(data.message || 'Login failed');
+  } catch(e) {
+    errorDiv.textContent = e.message || 'Incorrect email or password. Please try again.';
+    errorDiv.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Log In →';
   }
 }
 
 // ═══════════ CONCIERGE FLOW ═══════════
 function startConcierge() {
-  var user = localStorage.getItem('cic_user');
-  if (!user) {
+  var token = getToken();
+  if (!token) {
     openSignup();
     return;
   }
@@ -2789,19 +3081,246 @@ function showPage(name) {
   }
 }
 
+// ═══════════ PROFILE PAGE ═══════════
+
+var _profileData = null;
+
+function showProfile() {
+  showPage('profile');
+  loadProfile();
+}
+
+async function loadProfile() {
+  var token = getToken();
+  if (!token) {
+    document.getElementById('profileViewName').textContent = 'Not logged in';
+    document.getElementById('profileViewEmail').textContent = '—';
+    document.getElementById('profileAppsList').innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Please log in to view your profile.</p>';
+    return;
+  }
+
+  // Fetch user info from API
+  try {
+    var resp = await fetch('/api/users/me', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    if (data.success && data.user) {
+      _profileData = data.user;
+      renderProfileView(data.user);
+    } else {
+      throw new Error('Failed to load');
+    }
+  } catch(e) {
+    console.error('[Profile] Failed to load user:', e);
+    // Fallback to localStorage
+    var localUser = getCurrentUser();
+    _profileData = localUser;
+    renderProfileView(localUser);
+  }
+
+  // Load applications
+  loadProfileApplications();
+}
+
+function renderProfileView(user) {
+  var name = user.full_name || user.name || '—';
+  var email = user.email || '—';
+  var initial = name.charAt(0).toUpperCase();
+
+  document.getElementById('profileAvatar').textContent = initial;
+  document.getElementById('profileNameDisplay').textContent = name;
+  document.getElementById('profileEmailDisplay').textContent = email;
+  document.getElementById('profileViewName').textContent = name;
+  document.getElementById('profileViewEmail').textContent = email;
+  document.getElementById('profileViewRole').textContent = user.role || 'user';
+  document.getElementById('profileViewDate').textContent = user.created_at
+    ? new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : '—';
+
+  // Pre-fill edit form
+  document.getElementById('profileEditName').value = name !== '—' ? name : '';
+  document.getElementById('profileEditEmail').value = email !== '—' ? email : '';
+}
+
+function toggleProfileEdit() {
+  var viewEl = document.getElementById('profileView');
+  var editEl = document.getElementById('profileEdit');
+  var btnEl = document.getElementById('profileEditBtn');
+  var isEditing = editEl.style.display !== 'none';
+
+  if (isEditing) {
+    viewEl.style.display = 'block';
+    editEl.style.display = 'none';
+    btnEl.textContent = '✏️ Edit';
+    document.getElementById('profileEditError').classList.remove('show');
+  } else {
+    viewEl.style.display = 'none';
+    editEl.style.display = 'block';
+    btnEl.textContent = '← Back';
+    // Pre-fill from current data
+    document.getElementById('profileEditName').value = _profileData?.full_name || _profileData?.name || '';
+    document.getElementById('profileEditEmail').value = _profileData?.email || '';
+  }
+}
+
+async function saveProfile() {
+  var name = document.getElementById('profileEditName').value.trim();
+  var email = document.getElementById('profileEditEmail').value.trim();
+  var errorDiv = document.getElementById('profileEditError');
+  var token = getToken();
+
+  if (!name && !email) {
+    errorDiv.textContent = 'Please fill in at least one field.';
+    errorDiv.classList.add('show');
+    return;
+  }
+
+  errorDiv.classList.remove('show');
+
+  try {
+    var resp = await fetch('/api/users/me', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ full_name: name, email: email })
+    });
+    var data = await resp.json();
+
+    if (data.success && data.user) {
+      _profileData = data.user;
+      // Update localStorage
+      localStorage.setItem('cic_user', JSON.stringify(data.user));
+      renderProfileView(data.user);
+      toggleProfileEdit(); // Back to view mode
+      updateNavAuth();
+      console.log('[Profile] Updated successfully');
+    } else {
+      throw new Error(data.message || 'Update failed');
+    }
+  } catch(e) {
+    errorDiv.textContent = e.message || 'Failed to update profile. Please try again.';
+    errorDiv.classList.add('show');
+  }
+}
+
+async function changePassword() {
+  var curPw = document.getElementById('profileCurPw').value;
+  var newPw = document.getElementById('profileNewPw').value;
+  var errorDiv = document.getElementById('profilePwError');
+  var successDiv = document.getElementById('profilePwSuccess');
+  var token = getToken();
+
+  errorDiv.classList.remove('show');
+  successDiv.style.display = 'none';
+
+  if (!curPw || !newPw) {
+    errorDiv.textContent = 'Please fill in both fields.';
+    errorDiv.classList.add('show');
+    return;
+  }
+  if (newPw.length < 8) {
+    errorDiv.textContent = 'New password must be at least 8 characters.';
+    errorDiv.classList.add('show');
+    return;
+  }
+
+  try {
+    var resp = await fetch('/api/users/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ currentPassword: curPw, newPassword: newPw })
+    });
+    var data = await resp.json();
+
+    if (data.success) {
+      successDiv.textContent = '✅ Password changed successfully!';
+      successDiv.style.display = 'block';
+      document.getElementById('profileCurPw').value = '';
+      document.getElementById('profileNewPw').value = '';
+    } else {
+      throw new Error(data.message || 'Failed to change password');
+    }
+  } catch(e) {
+    errorDiv.textContent = e.message || 'Failed to change password. Please try again.';
+    errorDiv.classList.add('show');
+  }
+}
+
+async function loadProfileApplications() {
+  var token = getToken();
+  var listEl = document.getElementById('profileAppsList');
+  if (!token) {
+    listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Please log in to view your applications.</p>';
+    return;
+  }
+
+  try {
+    var resp = await fetch('/api/users/my-applications', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var data = await resp.json();
+
+    if (data.success && data.applications && data.applications.length > 0) {
+      var statusLabels = {'pending':'Pending','reviewed':'Reviewed','approved':'✅ Approved','rejected':'❌ Rejected'};
+      var statusColors = {'pending':'#f59e0b','reviewed':'#3b82f6','approved':'#10b981','rejected':'#ef4444'};
+      var html = '<table style="width:100%;font-size:13px;border-collapse:collapse;">';
+      html += '<tr style="border-bottom:1px solid var(--border);">';
+      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Team</th>';
+      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Country</th>';
+      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Industry</th>';
+      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Status</th>';
+      html += '<th style="text-align:left;padding:10px 8px;color:var(--text-muted);font-weight:600;">Submitted</th>';
+      html += '</tr>';
+      data.applications.forEach(function(app) {
+        var status = app.status || 'pending';
+        html += '<tr style="border-bottom:1px solid var(--border-light);">';
+        html += '<td style="padding:10px 8px;font-weight:600;">' + escapeHtml(app.team_name || '—') + '</td>';
+        html += '<td style="padding:10px 8px;">' + escapeHtml(app.country || '—') + '</td>';
+        html += '<td style="padding:10px 8px;">' + escapeHtml(app.industry || '—') + '</td>';
+        html += '<td style="padding:10px 8px;"><span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:' + (statusColors[status] || '#94a3b8') + '15;color:' + (statusColors[status] || '#64748b') + ';">' + (statusLabels[status] || status) + '</span></td>';
+        html += '<td style="padding:10px 8px;color:var(--text-muted);">' + (app.submitted_at ? formatDate(app.submitted_at) : '—') + '</td>';
+        html += '</tr>';
+      });
+      html += '</table>';
+      listEl.innerHTML = html;
+    } else {
+      listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">No applications yet. <a href="#" onclick="showPage(\'how\')" style="color:var(--accent);">Start your first Concierge application →</a></p>';
+    }
+  } catch(e) {
+    console.error('[Profile] Failed to load applications:', e);
+    listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Failed to load applications. Please try again later.</p>';
+  }
+}
+
 // ═══════════ DASHBOARD RENDERING ═══════════
 async function renderDashboard() {
-  var user = localStorage.getItem('cic_user');
-  var userEmail = '';
-  try { var u = JSON.parse(user || '{}'); userEmail = u.email || ''; } catch(e) {}
+  var token = getToken();
+  var user = getCurrentUser();
+  var userEmail = user.email || '';
+  var userName = user.full_name || user.name || (user.email ? user.email.split('@')[0] : '');
+
+  // Update welcome message
+  var welcomeEl = document.getElementById('dashWelcome');
+  if (welcomeEl && userName) {
+    welcomeEl.innerHTML = 'Welcome back, <span style="color:var(--accent);">' + escapeHtml(userName) + '</span> 👋';
+  }
 
   var myApps = [];
-  // Try API first
-  try {
-    var resp = await fetch('/api/concierge/my?email=' + encodeURIComponent(userEmail));
-    if (resp.ok) myApps = await resp.json();
-  } catch(e) {
-    // Fallback to localStorage
+  // Try API with JWT token
+  if (token) {
+    try {
+      var resp = await fetch('/api/concierge/my', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (resp.ok) {
+        var data = await resp.json();
+        if (data.applications) myApps = data.applications;
+      }
+    } catch(e) {
+      console.error('[Dashboard] API failed:', e);
+    }
+  }
+
+  // Fallback to localStorage
+  if (myApps.length === 0 && userEmail) {
     try {
       var raw = localStorage.getItem('cic_concierge_applications');
       if (raw) {

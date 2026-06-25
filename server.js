@@ -475,6 +475,125 @@ app.get('/api/users/me', verifyToken, (req, res) => {
   }
 });
 
+// PATCH /api/users/me — Update current user profile
+app.patch('/api/users/me', verifyToken, (req, res) => {
+  try {
+    const { full_name, email } = req.body;
+
+    // At least one field must be provided
+    if (!full_name && !email) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one field (full_name or email) must be provided.'
+      });
+    }
+
+    const db = getDb();
+    const userId = req.user.userId;
+
+    // If email is being changed, check uniqueness
+    if (email) {
+      const normalizedEmail = email.trim().toLowerCase();
+      const existing = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?')
+        .get(normalizedEmail, userId);
+      if (existing) {
+        db.close();
+        return res.status(409).json({
+          success: false,
+          message: 'This email is already in use by another account.'
+        });
+      }
+
+      db.prepare('UPDATE users SET email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .run(normalizedEmail, userId);
+    }
+
+    if (full_name !== undefined) {
+      db.prepare('UPDATE users SET full_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+        .run(full_name.trim(), userId);
+    }
+
+    // Fetch updated user
+    const user = db.prepare(`
+      SELECT id, email, full_name, role, created_at, updated_at FROM users WHERE id = ?
+    `).get(userId);
+    db.close();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully.',
+      user
+    });
+
+  } catch (error) {
+    console.error('[users/me/patch] Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to update profile.' });
+  }
+});
+
+// POST /api/users/change-password — Change password
+app.post('/api/users/change-password', verifyToken, (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Current password and new password are required.'
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be at least 8 characters.'
+      });
+    }
+
+    const db = getDb();
+    const stored = db.prepare('SELECT password_hash FROM users WHERE id = ?')
+      .get(req.user.userId);
+
+    if (stored.password_hash !== hashPassword(currentPassword)) {
+      db.close();
+      return res.status(401).json({
+        success: false,
+        message: 'Current password is incorrect.'
+      });
+    }
+
+    db.prepare('UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+      .run(hashPassword(newPassword), req.user.userId);
+    db.close();
+
+    console.log(`[Auth] Password changed for user #${req.user.userId}`);
+
+    res.json({
+      success: true,
+      message: 'Password changed successfully.'
+    });
+
+  } catch (error) {
+    console.error('[change-password] Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to change password.' });
+  }
+});
+
+// GET /api/users/my-applications — Get current user's concierge registration applications
+app.get('/api/users/my-applications', verifyToken, (req, res) => {
+  try {
+    const db = getDb();
+    const apps = db.prepare(`
+      SELECT * FROM registrations WHERE user_id = ? ORDER BY submitted_at DESC
+    `).all(req.user.userId);
+    db.close();
+    res.json({ success: true, applications: apps });
+  } catch (error) {
+    console.error('[my-applications] Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to load applications.' });
+  }
+});
+
 // ════════════════════════════════════════════════════
 //  REGISTRATION SUBMISSION API
 // ════════════════════════════════════════════════════
@@ -668,6 +787,21 @@ app.get('/api/concierge', verifyToken, (req, res) => {
   } catch (error) {
     console.error('[concierge/list] Error:', error);
     res.status(500).json({ success: false, message: 'Load failed.' });
+  }
+});
+
+// GET /api/concierge/my — Get current user's concierge applications
+app.get('/api/concierge/my', verifyToken, (req, res) => {
+  try {
+    const db = getDb();
+    const apps = db.prepare(`
+      SELECT * FROM concierge_applications WHERE user_id = ? ORDER BY created_at DESC
+    `).all(req.user.userId);
+    db.close();
+    res.json({ success: true, applications: apps });
+  } catch (error) {
+    console.error('[concierge/my] Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to load your applications.' });
   }
 });
 
