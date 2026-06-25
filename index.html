@@ -1746,6 +1746,46 @@
           Log In &rarr;
         </button>
       </div>
+
+      <div style="text-align:center;margin-top:14px;">
+        <a href="#" onclick="showForgotPassword(event)" style="font-size:12.5px;color:var(--text-muted);text-decoration:underline;">Forgot your password?</a>
+      </div>
+
+      <!-- Hidden: Forgot Password Reset Form -->
+      <div id="forgotPwPanel" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
+          Enter your email and we'll send you a verification code to reset your password.
+        </p>
+        <div class="signup-error" id="resetPwError"></div>
+
+        <!-- Step 1: Email + Send Code -->
+        <div id="resetStep1">
+          <div class="form-group">
+            <label>Email</label>
+            <div style="display:flex;gap:8px;">
+              <input type="email" id="resetEmail" placeholder="you@example.com" style="flex:1;">
+              <button class="btn-secondary" id="resetSendCodeBtn" onclick="sendResetCode()" style="white-space:nowrap;font-size:12px;padding:10px 14px;">Send Code</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Code + New Password -->
+        <div id="resetStep2" style="display:none;">
+          <div class="form-group">
+            <label>Verification Code</label>
+            <input type="text" id="resetCode" placeholder="6-digit code" maxlength="6" style="letter-spacing:3px;font-size:15px;text-align:center;">
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="resetNewPassword" placeholder="Min. 8 characters">
+          </div>
+          <button class="btn-primary" onclick="doResetPassword()" style="width:100%;">Reset Password</button>
+        </div>
+
+        <div id="resetPwSuccess" style="display:none;background:#ecfdf5;color:#065f46;padding:12px 16px;border-radius:8px;font-size:13px;text-align:center;margin-top:12px;">
+          ✅ Password reset successfully! You can now <a href="#" onclick="backToLogin()" style="color:var(--accent);font-weight:600;">log in</a> with your new password.
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -3038,6 +3078,123 @@ async function submitLogin() {
     btn.disabled = false;
     btn.textContent = 'Log In →';
   }
+}
+
+// ═══════════ FORGOT PASSWORD / RESET ═══════════
+
+function showForgotPassword(e) {
+  e.preventDefault();
+  var panel = document.getElementById('forgotPwPanel');
+  if (panel.style.display === 'none') {
+    panel.style.display = 'block';
+    document.getElementById('resetStep1').style.display = 'block';
+    document.getElementById('resetStep2').style.display = 'none';
+    document.getElementById('resetPwSuccess').style.display = 'none';
+    document.getElementById('resetPwError').classList.remove('show');
+    // Pre-fill email from login form
+    var loginEmail = document.getElementById('loginEmail').value.trim();
+    if (loginEmail) document.getElementById('resetEmail').value = loginEmail;
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+async function sendResetCode() {
+  var email = document.getElementById('resetEmail').value.trim();
+  var errorDiv = document.getElementById('resetPwError');
+  var btn = document.getElementById('resetSendCodeBtn');
+
+  if (!email || !email.includes('@')) {
+    errorDiv.textContent = 'Please enter a valid email address.';
+    errorDiv.classList.add('show');
+    return;
+  }
+
+  errorDiv.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    var resp = await fetch('/api/send-verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await resp.json();
+
+    if (data.success) {
+      document.getElementById('resetStep1').style.display = 'none';
+      document.getElementById('resetStep2').style.display = 'block';
+      document.getElementById('resetPwError').classList.remove('show');
+    } else {
+      throw new Error(data.message || 'Failed to send code');
+    }
+  } catch(e) {
+    errorDiv.textContent = e.message || 'Failed to send verification code.';
+    errorDiv.classList.add('show');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Send Code';
+}
+
+async function doResetPassword() {
+  var email = document.getElementById('resetEmail').value.trim();
+  var code = document.getElementById('resetCode').value.trim();
+  var newPw = document.getElementById('resetNewPassword').value;
+  var errorDiv = document.getElementById('resetPwError');
+
+  if (!code || code.length !== 6) {
+    errorDiv.textContent = 'Please enter the 6-digit verification code.';
+    errorDiv.classList.add('show');
+    return;
+  }
+  if (!newPw || newPw.length < 8) {
+    errorDiv.textContent = 'New password must be at least 8 characters.';
+    errorDiv.classList.add('show');
+    return;
+  }
+
+  errorDiv.classList.remove('show');
+
+  try {
+    // Step 1: Verify code
+    var verifyResp = await fetch('/api/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, code: code })
+    });
+    var verifyData = await verifyResp.json();
+    if (!verifyData.success) throw new Error(verifyData.message || 'Invalid code');
+
+    // Step 2: Reset password
+    var resetResp = await fetch('/api/users/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, newPassword: newPw })
+    });
+    var resetData = await resetResp.json();
+    if (!resetData.success) throw new Error(resetData.message || 'Reset failed');
+
+    // Success
+    document.getElementById('resetStep2').style.display = 'none';
+    document.getElementById('resetPwSuccess').style.display = 'block';
+    errorDiv.classList.remove('show');
+
+    // Pre-fill login form
+    document.getElementById('loginEmail').value = email;
+    document.getElementById('loginPassword').value = '';
+
+  } catch(e) {
+    errorDiv.textContent = e.message || 'Password reset failed. Please try again.';
+    errorDiv.classList.add('show');
+  }
+}
+
+function backToLogin() {
+  // Hide forgot password panel, show login form
+  document.getElementById('forgotPwPanel').style.display = 'none';
+  document.getElementById('resetPwSuccess').style.display = 'none';
+  document.getElementById('resetPwError').classList.remove('show');
 }
 
 // ═══════════ CONCIERGE FLOW ═══════════

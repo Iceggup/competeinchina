@@ -579,6 +579,56 @@ app.post('/api/users/change-password', verifyToken, (req, res) => {
   }
 });
 
+// POST /api/users/reset-password — Reset password via email (after verification)
+app.post('/api/users/reset-password', (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and new password are required.'
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be at least 8 characters.'
+      });
+    }
+
+    const db = getDb();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Check user exists
+    const user = db.prepare('SELECT id FROM users WHERE email = ?').get(normalizedEmail);
+    if (!user) {
+      db.close();
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with this email address.'
+      });
+    }
+
+    // Update password
+    db.prepare('UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE email = ?')
+      .run(hashPassword(newPassword), normalizedEmail);
+    db.close();
+
+    console.log(`[Auth] Password reset for: ${normalizedEmail}`);
+
+    res.json({
+      success: true,
+      message: 'Password reset successfully. You can now log in with your new password.'
+    });
+
+  } catch (error) {
+    console.error('[reset-password] Error:', error);
+    res.status(500).json({ success: false, message: 'Failed to reset password.' });
+  }
+});
+
 // GET /api/users/my-applications — Get current user's concierge registration applications
 app.get('/api/users/my-applications', verifyToken, (req, res) => {
   try {
