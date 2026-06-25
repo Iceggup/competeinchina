@@ -22,6 +22,10 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Serve static files from project root
+app.use((req, res, next) => {
+  console.log(`[STATIC] ${req.method} ${req.url}  User-Agent: ${(req.headers['user-agent']||'').substring(0,60)}`);
+  next();
+});
 app.use(express.static(path.join(__dirname)));
 
 // ─── Database ───────────────────────────────────
@@ -391,6 +395,64 @@ app.post('/api/users/login', (req, res) => {
   }
 });
 
+// POST /api/users/auth-for-form — Get token for form submission (email already verified)
+// This endpoint is specifically for the registration form flow where the email
+// has already been verified via verification code, so no password is needed.
+app.post('/api/users/auth-for-form', (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required.'
+      });
+    }
+
+    const db = getDb();
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = db.prepare(`
+      SELECT id, email, full_name, role FROM users WHERE email = ?
+    `).get(normalizedEmail);
+
+    // Auto-register if user doesn't exist
+    let finalUser;
+    if (!user) {
+      const result = db.prepare(`
+        INSERT INTO users (email, password_hash, full_name, role)
+        VALUES (?, ?, ?, 'user')
+      `).run(normalizedEmail, hashPassword('auto_form_' + Date.now()), '');
+      finalUser = {
+        id: result.lastInsertRowid,
+        email: normalizedEmail,
+        full_name: '',
+        role: 'user'
+      };
+      console.log(`[Auth] User auto-created for form: ${normalizedEmail} (#${finalUser.id})`);
+    } else {
+      finalUser = user;
+      console.log(`[Auth] Form auth for existing user: ${normalizedEmail} (#${user.id})`);
+    }
+
+    const token = generateToken(finalUser);
+    db.close();
+
+    return res.json({
+      success: true,
+      message: 'Authentication successful.',
+      token,
+      user: finalUser
+    });
+
+  } catch (error) {
+    console.error('[auth-for-form] Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Authentication failed. Please try again.'
+    });
+  }
+});
+
 // GET /api/users/me — Get current user info
 app.get('/api/users/me', verifyToken, (req, res) => {
   try {
@@ -454,8 +516,8 @@ app.post('/api/registrations', verifyToken, (req, res) => {
         funding_amount, investors, ip, cn_funding, cn_cities,
         register_cn, cn_setup, roadmap, support_needed,
         team_members, team_stability, auth_agree, pitch_deck,
-        extra_links, notes, competition_ids
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        extra_links, notes, competition_ids, status, submitted_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
     `).run(
       req.user.userId, data.team_name, data.country || '', data.team_size || '',
       data.stage || '', data.oneliner || '', data.contact_name || '',
@@ -472,7 +534,8 @@ app.post('/api/registrations', verifyToken, (req, res) => {
       data.team_members || '', data.team_stability || '',
       data.auth_agree ? 1 : 0, data.pitch_deck || '',
       data.extra_links || '', data.notes || '',
-      Array.isArray(data.competition_ids) ? data.competition_ids.join(', ') : (data.competition_ids || '')
+      Array.isArray(data.competition_ids) ? data.competition_ids.join(', ') : (data.competition_ids || ''),
+      'pending'
     );
 
     db.close();
@@ -609,6 +672,99 @@ app.get('/api/concierge', verifyToken, (req, res) => {
 });
 
 // ════════════════════════════════════════════════════
+//  ORGANIZER SUBMISSIONS (For "List Your Competition" form)
+// ════════════════════════════════════════════════════
+
+app.post('/api/organizer-submission', optionalAuth, (req, res) => {
+  try {
+    const data = req.body;
+    if (!data.name || !data.city || !data.website || !data.contact || !data.email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Competition name, city, website, contact name, and email are required.'
+      });
+    }
+
+    // Ensure table exists
+    const db = getDb();
+    db.exec(`CREATE TABLE IF NOT EXISTS organizer_submissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      comp_name TEXT NOT NULL,
+      city TEXT,
+      prize TEXT,
+      deadline TEXT,
+      industry TEXT,
+      website TEXT,
+      description TEXT,
+      contact_name TEXT,
+      contact_email TEXT,
+      phone TEXT,
+      wechat TEXT,
+      status TEXT DEFAULT 'pending',
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    const result = db.prepare(`
+      INSERT INTO organizer_submissions (
+        comp_name, city, prize, deadline, industry, website, description,
+        contact_name, contact_email, phone, wechat
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      data.name, data.city || '', data.prize || '', data.deadline || '',
+      data.industry || '', data.website, data.description || '',
+      data.contact, data.email, data.phone || '', data.wechat || ''
+    );
+
+    console.log(`[Organizer] Submission #${result.lastInsertRowid}: ${data.name} by ${data.email}`);
+    db.close();
+
+    res.status(201).json({
+      success: true,
+      message: 'Thank you! Your competition has been submitted for review. We will get back to you within 48 hours.',
+      submissionId: result.lastInsertRowid
+    });
+
+  } catch (error) {
+    console.error('[organizer/submit] Error:', error);
+    res.status(500).json({ success: false, message: 'Submission failed.' });
+  }
+});
+
+// GET /api/admin/organizer-submissions — Admin list
+app.get('/api/admin/organizer-submissions', verifyToken, (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Admin access required.' });
+    }
+    const db = getDb();
+    db.exec(`CREATE TABLE IF NOT EXISTS organizer_submissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      comp_name TEXT NOT NULL, city TEXT, prize TEXT, deadline TEXT,
+      industry TEXT, website TEXT, description TEXT, contact_name TEXT,
+      contact_email TEXT, phone TEXT, wechat TEXT, status TEXT DEFAULT 'pending',
+      notes TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+    const subs = db.prepare(`SELECT * FROM organizer_submissions ORDER BY created_at DESC`).all();
+    db.close();
+    res.json({ success: true, submissions: subs });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// PATCH /api/admin/organizer-submissions/:id/status — Update status
+app.patch('/api/admin/organizer-submissions/:id/status', verifyToken, (req, res) => {
+  try {
+    if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+    const { status } = req.body;
+    if (!['pending','reviewed','approved','rejected'].includes(status)) return res.status(400).json({ success: false, message: 'Invalid status.' });
+    const db = getDb();
+    db.prepare("UPDATE organizer_submissions SET status = ? WHERE id = ?").run(status, req.params.id);
+    db.close();
+    res.json({ success: true, message: 'Status updated.' });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// ════════════════════════════════════════════════════
 //  COMPETITIONS API
 // ════════════════════════════════════════════════════
 
@@ -645,6 +801,22 @@ app.get('/api/competitions', (req, res) => {
     console.error('[competitions] Error:', error);
     res.status(500).json({ success: false, message: 'Load failed.' });
   }
+});
+
+// GET /api/admin/competitions — alias for admin panel
+app.get('/api/admin/competitions', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const db = getDb();
+    const comps = db.prepare(`SELECT * FROM competitions ORDER BY sort_order ASC, id ASC`).all();
+    db.close();
+    const results = comps.map(c => ({
+      ...c,
+      industries: typeof c.industries === 'string' ? JSON.parse(c.industries || '[]') : c.industries,
+      highlights: typeof c.highlights === 'string' ? JSON.parse(c.highlights || '[]') : c.highlights
+    }));
+    res.json({ success: true, competitions: results });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.get('/api/competitions/:id', (req, res) => {
@@ -840,6 +1012,54 @@ app.get('/api/admin/stats', verifyToken, (req, res) => {
   }
 });
 
+// ── Admin Alias Routes (used by admin.html apiFetch which prefixes /api/admin) ──
+
+// GET /api/admin/users — List all registered users
+app.get('/api/admin/users', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const db = getDb();
+    const users = db.prepare(`SELECT id, email, full_name, role, created_at, updated_at FROM users ORDER BY created_at DESC`).all();
+    db.close();
+    res.json({ success: true, users });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// GET /api/admin/registrations — alias for admin panel (Concierge form submissions)
+app.get('/api/admin/registrations', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const db = getDb();
+    const regs = db.prepare(`SELECT r.*, u.full_name as user_full_name FROM registrations r LEFT JOIN users u ON r.user_id = u.id ORDER BY r.submitted_at DESC`).all();
+    db.close();
+    res.json({ success: true, registrations: regs });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// GET /api/admin/concierge — alias for admin panel
+app.get('/api/admin/concierge', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const db = getDb();
+    const apps = db.prepare(`SELECT * FROM concierge_applications ORDER BY created_at DESC`).all();
+    db.close();
+    res.json({ success: true, applications: apps });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// PATCH /api/admin/registrations/:id/status — alias
+app.patch('/api/admin/registrations/:id/status', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const { status } = req.body;
+    if (!['pending','reviewed','approved','rejected'].includes(status)) return res.status(400).json({ success: false, message: 'Invalid status.' });
+    const db = getDb();
+    db.prepare("UPDATE registrations SET status = ? WHERE id = ?").run(status, req.params.id);
+    db.close();
+    res.json({ success: true, message: 'Status updated.' });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 // ════════════════════════════════════════════════════
 //  EXPORT CSV (Admin)
 // ════════════════════════════════════════════════════
@@ -877,6 +1097,38 @@ app.get('/api/admin/export/registrations', verifyToken, (req, res) => {
   } catch (e) {
     res.status(500).json({ success: false, message: e.message });
   }
+});
+
+// ════════════════════════════════════════════════════
+//  WECOM NOTIFICATION & AUTO-MAINTENANCE
+// ════════════════════════════════════════════════════
+
+// GET /api/admin/expiring — List competitions expiring within 7 days
+app.get('/api/admin/expiring', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false });
+  try {
+    const db = getDb();
+    const sevenDays = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().substring(0,10);
+    const today = new Date().toISOString().substring(0,10);
+    const expiring = db.prepare(`SELECT id, title, city, deadline, prize, stage FROM competitions WHERE deadline >= ? AND deadline <= ? AND stage != 'Closed' ORDER BY deadline ASC`).all(today, sevenDays);
+    const expired = db.prepare(`SELECT id, title, city, deadline, prize, stage FROM competitions WHERE deadline < ? AND stage != 'Closed' ORDER BY deadline DESC`).all(today);
+    db.close();
+    res.json({ success: true, expiring, expired, today });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// POST /api/admin/auto-close-expired — Auto-mark expired competitions as Closed
+app.post('/api/admin/auto-close-expired', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false });
+  try {
+    const db = getDb();
+    const today = new Date().toISOString().substring(0,10);
+    const result = db.prepare(`UPDATE competitions SET stage = 'Closed' WHERE deadline < ? AND stage != 'Closed'`).run(today);
+    const count = result.changes;
+    db.close();
+    console.log(`[Maintenance] Auto-closed ${count} expired competitions`);
+    res.json({ success: true, closed: count, date: today });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 // ════════════════════════════════════════════════════

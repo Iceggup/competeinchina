@@ -771,40 +771,24 @@ function submitForm() {
   btn.disabled = true;
   btn.textContent = 'Submitting...';
 
-  // Step 1: Register/Login user
-  fetch('/api/users/register', {
+  // Step 1: Authenticate (register or login) using form-specific auth endpoint
+  // This endpoint auto-creates user if not exists, or returns token if already registered.
+  fetch('/api/users/auth-for-form', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       email: data.contact_email,
-      password: 'auto_' + Date.now(), // auto-generated, user can set later
       full_name: data.contact_name
     })
   })
   .then(function(res) {
-    if (!res.ok && res.status !== 409) throw new Error('Register failed');
+    if (!res.ok) throw new Error('Authentication failed (HTTP ' + res.status + ')');
     return res.json();
-  })
-  .then(function(result) {
-    // Step 2: Submit registration with token
-    var token;
-    if (result.success && result.token) {
-      token = result.token;
-    } else {
-      // Already registered — login
-      return fetch('/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.contact_email, password: '' })
-      }).then(function(r) { return r.json(); });
-    }
-
-    return { success: true, token: token };
   })
   .then(function(authResult) {
     if (!authResult.success || !authResult.token) throw new Error('Auth failed');
 
-    // Submit registration data
+    // Step 2: Submit registration data with token
     return fetch('/api/registrations', {
       method: 'POST',
       headers: {

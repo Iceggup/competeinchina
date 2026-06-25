@@ -950,6 +950,28 @@
   }
   .wa-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(37,211,102,0.5); }
 
+  /* ═══════════ WECOM FLOATING BUTTON ═══════════ */
+  .wecom-float {
+    position: fixed; bottom: 24px; right: 150px; z-index: 300;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  }
+  .wecom-tooltip {
+    background: var(--surface); box-shadow: var(--shadow-md); border-radius: var(--radius-sm);
+    padding: 10px 14px; font-size: 12px; color: var(--text); display: none;
+    max-width: 200px; line-height: 1.5; white-space: nowrap;
+  }
+  .wecom-tooltip.show { display: block; }
+  .wecom-btn {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+  }
+  .wecom-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
+  .wecom-btn img { border-radius: 50%; object-fit: cover; }
+
   /* ═══════════ CARD ICON HEADER ═══════════ */
   .comp-card-icon {
     width: 44px; height: 44px; border-radius: 12px;
@@ -994,7 +1016,7 @@
     <a class="nav-link" data-page="organizers" data-i18n="nav_org" onclick="showPage('organizers')">For Organizers</a>
     <a class="nav-link" data-page="how" data-i18n="nav_how" onclick="showPage('how')">How It Works</a>
     <a class="nav-link" data-page="dashboard" data-i18n="nav_dash" onclick="showPage('dashboard')">Dashboard</a>
-    <a class="social-link" href="https://www.linkedin.com/company/techinbridge" target="_blank" title="Techinbridge on LinkedIn">
+    <a class="social-link" href="https://www.linkedin.com/company/tech-in-bridge/?viewAsMember=true" target="_blank" title="Techinbridge on LinkedIn">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
     </a>
     <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()" title="Switch Language / 切换语言">中文</button>
@@ -1493,6 +1515,12 @@
     <div class="org-form-row">
       <input type="email" id="orgEmail" data-i18n-ph="org_email_ph" placeholder="Contact Email *">
     </div>
+    <div class="org-form-row">
+      <input type="tel" id="orgPhone" data-i18n-ph="org_phone_ph" placeholder="Phone Number (e.g. +86 138-xxxx-xxxx)">
+    </div>
+    <div class="org-form-row">
+      <input type="text" id="orgWechat" data-i18n-ph="org_wechat_ph" placeholder="WeChat ID (optional)">
+    </div>
     <button class="btn-primary org-form-submit" onclick="submitOrganizerForm()" data-i18n="org_submit">Submit for Review &rarr;</button>
     <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:10px;" data-i18n="org_footer">By submitting, you confirm you are authorized to represent this competition. We'll email you within 48 hours.</p>
 
@@ -1512,7 +1540,7 @@
       Prefer to talk directly? Reach us at
       <strong><a href="mailto:competitions@techinbridge.com">competitions@techinbridge.com</a></strong>
       or connect on
-      <a href="https://www.linkedin.com/company/techinbridge" target="_blank" class="social-link" style="display:inline-flex;">
+      <a href="https://www.linkedin.com/company/tech-in-bridge/?viewAsMember=true" target="_blank" class="social-link" style="display:inline-flex;">
         <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
         LinkedIn
       </a>
@@ -1578,6 +1606,14 @@
   </button>
 </div>
 
+<!-- ═══════════ WECOM FLOATING BUTTON ═══════════ -->
+<div class="wecom-float">
+  <div class="wecom-tooltip" id="wecomTooltip">企业微信客服 →</div>
+  <button class="wecom-btn" onclick="window.open('https://work.weixin.qq.com/ca/cawcde85797a82b4f9','_blank')" onmouseenter="document.getElementById('wecomTooltip').classList.add('show')" onmouseleave="document.getElementById('wecomTooltip').classList.remove('show')" title="企业微信客服">
+    <img src="images/wecom-icon.png" width="28" height="28" alt="企业微信客服">
+  </button>
+</div>
+
 <!-- ═══════════ AI CHAT WIDGET ═══════════ -->
 <div class="chat-widget" id="chatWidget">
   <button class="chat-bubble" id="chatBubble" onclick="toggleChat()" title="Chat with us">💬</button>
@@ -1617,7 +1653,7 @@
 <div class="footer">
   <span data-i18n="footer_1">Compete in China is a public service platform powered by</span> <a href="https://www.techinbridge.com" target="_blank">Techinbridge</a>
   &nbsp;·&nbsp;
-  <a href="https://www.linkedin.com/company/techinbridge" target="_blank" style="display:inline-flex;align-items:center;gap:3px;vertical-align:middle;">
+  <a href="https://www.linkedin.com/company/tech-in-bridge/?viewAsMember=true" target="_blank" style="display:inline-flex;align-items:center;gap:3px;vertical-align:middle;">
     <svg viewBox="0 0 24 24" fill="currentColor" style="width:13px;height:13px;"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
     LinkedIn
   </a><br>
@@ -1906,11 +1942,12 @@ function renderCarousel() {
   const wrap = document.getElementById('carouselWrap');
   if (!track) return;
 
-  const featured = (window.competitions || []).slice(0, 5);
+  const featured = (window.competitions || []).filter(c => c.featured === 1).slice(0, 8);
   if (featured.length === 0) {
     if (wrap) wrap.style.display = 'none';
     return;
   }
+  if (wrap) wrap.style.display = '';
 
   const isZh = document.documentElement.lang === 'zh';
   track.innerHTML = featured.map((c, i) => {
@@ -1942,7 +1979,7 @@ function renderCarousel() {
 function startCarouselAutoplay() {
   stopCarouselAutoplay();
   carouselTimer = setInterval(() => {
-    const featured = (window.competitions || []).slice(0, 5);
+    const featured = (window.competitions || []).filter(c => c.featured === 1);
     if (featured.length <= 1) return;
     carouselMove(1);
   }, CAROUSEL_AUTOPLAY_MS);
@@ -2946,6 +2983,8 @@ var I18N = {
     org_desc_ph: '赛事简介……',
     org_contact_ph: '你的姓名 / 机构名称 *',
     org_email_ph: '联系邮箱 *',
+    org_phone_ph: '手机号（例如：+86 138-xxxx-xxxx）',
+    org_wechat_ph: '微信号（选填）',
     org_submit: '提交审核 →',
     org_footer: '提交即表示你确认有权代表本赛事。我们将在48小时内给你发邮件。',
     org_contact: ' prefer 直接沟通？联系我们：',
@@ -3158,16 +3197,38 @@ function submitOrganizerForm() {
     website: website,
     description: document.getElementById('orgDesc').value.trim(),
     contact: contact,
-    email: email
+    email: email,
+    phone: document.getElementById('orgPhone').value.trim(),
+    wechat: document.getElementById('orgWechat').value.trim()
   };
 
   console.log('Organizer submission:', formData);
 
-  alert('Thank you, ' + contact + '!\n\nYour competition "' + name + '" has been submitted for review.\n\nWe will review and translate your listing within 48 hours and contact you at ' + email + '.\n\n(This is a demo \u2014 in production, this would create a ticket and notify our team.)');
+  var btn = event.target;
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
 
-  ['orgCompName','orgCity','orgPrize','orgDeadline','orgIndustry','orgWebsite','orgDesc','orgContact','orgEmail'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.value = '';
+  fetch('/api/organizer-submission', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(result) {
+    if (result.success) {
+      alert('Thank you, ' + contact + '!\\n\\nYour competition "' + name + '" has been submitted for review.\\n\\nWe will review and translate your listing within 48 hours and contact you at ' + email + '.');
+      ['orgCompName','orgCity','orgPrize','orgDeadline','orgIndustry','orgWebsite','orgDesc','orgContact','orgEmail','orgPhone','orgWechat'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+    } else {
+      alert('Submission failed: ' + (result.message || 'Please try again.'));
+    }
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit for Review →'; }
+  })
+  .catch(function(err) {
+    console.error('[organizer] Error:', err);
+    alert('Network error. Please try again.');
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit for Review →'; }
   });
 }
 
@@ -3228,7 +3289,7 @@ function getChatReply(msg) {
     return `You can list your competition for <b>free</b> on our <a href="javascript:showPage('organizers')" style="color:var(--accent);">For Organizers</a> page. Just fill out the form with your competition details, and we'll review, translate, and publish within 48 hours!`;
   }
   if (lower.includes('contact') || lower.includes('human') || lower.includes('real person') || lower.includes('talk')) {
-    return 'You can reach our team directly at <b>competitions@techinbridge.com</b>. We typically respond within 24 hours. You can also connect with us on <a href="https://www.linkedin.com/company/techinbridge" target="_blank" style="color:var(--accent);">LinkedIn</a>.';
+    return 'You can reach our team directly at <b>competitions@techinbridge.com</b>. We typically respond within 24 hours. You can also connect with us on <a href="https://www.linkedin.com/company/tech-in-bridge/?viewAsMember=true" target="_blank" style="color:var(--accent);">LinkedIn</a>.';
   }
   return `Thanks for your message! I'm a demo assistant, so my knowledge is limited. For detailed questions, the best way is to email us at <b>competitions@techinbridge.com</b> — our team responds quickly and can give you specific guidance. 😊`;
 }

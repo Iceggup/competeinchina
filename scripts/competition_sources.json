@@ -1,0 +1,95 @@
+{
+  "description": "CompeteInChina 赛事信息抓取来源列表。每周三自动从这些来源检查新赛事。",
+  "lastUpdated": "2026-06-25",
+  "sources": [
+    {
+      "name": "HICOOL 2026",
+      "url": "https://www.hicool.com",
+      "type": "official",
+      "note": "全球创业大赛，允许海外人才参加"
+    },
+    {
+      "name": "ITEC 2026 朝阳国际人才创业大会",
+      "url": "https://itec.bjchy.gov.cn",
+      "type": "official",
+      "note": "北京朝阳区，国际人才赛事"
+    },
+    {
+      "name": "中国海外人才创新创业大赛",
+      "url": "https://www.china-rencai.com",
+      "type": "official",
+      "note": "面向海外人才"
+    }
+  ],
+  "wechatSources": [
+    {
+      "name": "创业大赛指南",
+      "type": "wechat",
+      "searchQuery": "创业大赛 国际 海外 报名",
+      "note": "综合性创业大赛信息发布"
+    },
+    {
+      "name": "海归创新创业",
+      "type": "wechat",
+      "searchQuery": "海归 创业大赛 国际",
+      "note": "海归/海外人才创业赛事"
+    },
+    {
+      "name": "创业邦",
+      "type": "wechat",
+      "searchQuery": "创业大赛 全球 国际 报名",
+      "note": "知名创业媒体，定期发布大赛信息"
+    },
+    {
+      "name": "归心谷",
+      "type": "wechat",
+      "searchQuery": "归心谷 创业大赛 海外",
+      "note": "海归创业服务平台"
+    },
+    {
+      "name": "创在上海",
+      "type": "wechat",
+      "searchQuery": "创在上海 创业大赛 国际",
+      "note": "上海地区创业赛事官方平台"
+    },
+    {
+      "name": "华冠产业发展",
+      "type": "wechat",
+      "searchQuery": "华冠产业 创业大赛 海外 国际",
+      "note": "产业发展与创业赛事信息"
+    }
+  ],
+  "filterRules": {
+    "excludeIf": [
+      "仅限中国籍",
+      "仅限中国大陆居民",
+      "中国公民",
+      "国内创业者",
+      "不面向海外"
+    ],
+    "includeIf": [
+      "国际",
+      "海外",
+      "外籍",
+      "全球",
+      "international",
+      "overseas",
+      "foreign",
+      "global",
+      "worldwide"
+    ]
+  },
+  "weeklySchedule": {
+    "day": "周三",
+    "time": "10:00",
+    "timezone": "Asia/Shanghai",
+    "actions": [
+      "searchWechatSources",
+      "fetchOfficialWebsites",
+      "detectExpired",
+      "notifyAdmin",
+      "waitForApproval",
+      "executeUpdate"
+    ]
+  }
+}
