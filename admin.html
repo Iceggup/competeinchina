@@ -22,7 +22,7 @@
     --red-light: #fef2f2;
     --amber: #f59e0b;
     --amber-light: #fffbeb;
-    --radius: 10px;
+    --radius: 12px;
     --radius-sm: 8px;
     --shadow: 0 1px 3px rgba(0,0,0,0.06);
     --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
@@ -53,13 +53,13 @@
     border-bottom: 1px solid var(--border);
   }
   .tab-btn {
-    padding: 12px 20px; font-size: 13px; font-weight: 600; border: none;
+    padding: 14px 24px; font-size: 13px; font-weight: 600; border: none;
     background: transparent; color: var(--text-muted); cursor: pointer;
-    border-bottom: 2px solid transparent; transition: all 0.15s;
+    border-bottom: 3px solid transparent; transition: all 0.15s;
     display: flex; align-items: center; gap: 6px;
   }
-  .tab-btn:hover { color: var(--text); }
-  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover { color: var(--text); background: #f8fafb; }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--accent-light); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
 
@@ -86,17 +86,17 @@
 
   /* Sidebar */
   .sidebar {
-    width: 380px; min-width: 380px; border-right: 1px solid var(--border);
+    width: 360px; min-width: 360px; border-right: 1px solid var(--border);
     background: var(--surface); display: flex; flex-direction: column; overflow: hidden;
   }
   .sidebar-header {
-    padding: 14px 18px; border-bottom: 1px solid var(--border-light);
+    padding: 16px 20px; border-bottom: 1px solid var(--border-light);
     display: flex; align-items: center; justify-content: space-between;
   }
   .sidebar-header h2 { font-size: 14px; font-weight: 600; }
   .sidebar-count { font-size: 11px; color: var(--text-muted); }
   .sidebar-search {
-    padding: 8px 18px; border-bottom: 1px solid var(--border-light);
+    padding: 10px 20px; border-bottom: 1px solid var(--border-light);
   }
   .sidebar-search input {
     width: 100%; padding: 7px 12px; border: 1.5px solid var(--border);
@@ -106,13 +106,13 @@
   .sidebar-search input:focus { outline: none; border-color: var(--accent); }
   .sidebar-list { flex: 1; overflow-y: auto; }
   .list-item {
-    padding: 12px 18px; border-bottom: 1px solid var(--border-light);
+    padding: 14px 20px; border-bottom: 1px solid var(--border-light);
     cursor: pointer; transition: background 0.1s;
     display: flex; align-items: flex-start; gap: 10px;
   }
   .list-item:nth-child(even) { background: #fafbfc; }
   .list-item:hover { background: var(--accent-light); }
-  .list-item.active { background: var(--accent-light); border-left: 3px solid var(--accent); padding-left: 15px; }
+  .list-item.active { background: var(--accent-light); border-left: 4px solid var(--accent); padding-left: 16px; }
   .list-item-num {
     width: 26px; height: 26px; border-radius: 7px; background: var(--border);
     display: flex; align-items: center; justify-content: center;
@@ -132,13 +132,13 @@
   .list-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
 
   /* Main Panel */
-  .main-panel { flex: 1; overflow-y: auto; padding: 24px 32px; }
+  .main-panel { flex: 1; overflow-y: auto; padding: 32px 40px; }
   .main-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
   .form-empty { text-align: center; padding: 80px 20px; color: var(--text-muted); }
   .form-empty h3 { margin: 12px 0 4px; color: var(--text); }
 
   /* Form */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .form-grid-full { grid-column: 1 / -1; }
   .form-group { display: flex; flex-direction: column; }
   .form-group label {
@@ -158,6 +158,19 @@
   .form-group textarea { resize: vertical; min-height: 70px; }
   .form-group .help { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
   .form-group input.input-error { border-color: var(--red); }
+  .form-group input.input-valid { border-color: var(--green); background: #f8fdf9; }
+
+  /* Fieldset sections */
+  .form-section {
+    background: var(--surface); border: 1px solid var(--border-light);
+    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .form-section-title {
+    font-size: 13px; font-weight: 700; color: var(--accent);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border-light);
+  }
 
   /* Industry checkboxes */
   .industry-checks { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -182,7 +195,7 @@
 
   /* Form footer */
   .form-footer {
-    margin-top: 28px; padding-top: 18px;
+    margin-top: 32px; padding-top: 20px;
     border-top: 1px solid var(--border-light);
     display: flex; gap: 12px; align-items: center;
   }
@@ -192,8 +205,23 @@
   .status-saved { background: var(--green-light); color: var(--green); }
   .status-error { background: var(--red-light); color: var(--red); }
 
+  .save-banner {
+    position: sticky; top: 0; z-index: 10; margin-bottom: 16px;
+    padding: 10px 16px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600; display: none;
+  }
+  .save-banner.show { display: block; animation: fadeInOut 2s ease forwards; }
+  .save-banner.success { background: var(--green-light); color: var(--green); border: 1px solid var(--green); }
+  .save-banner.error { background: var(--red-light); color: var(--red); border: 1px solid var(--red); }
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-8px); }
+    15% { opacity: 1; transform: translateY(0); }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
   /* Stats cards */
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; margin-bottom: 28px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; margin-bottom: 32px; }
   .stat-card {
     background: var(--surface); border-radius: var(--radius); padding: 20px;
     border: 1px solid var(--border-light); box-shadow: var(--shadow);
@@ -218,14 +246,16 @@
   }
   .table-row:nth-child(even) { background: #fafbfc; }
   .table-row:hover { background: var(--accent-light); }
-  .col-1 { width: 50px; flex-shrink: 0; }
-  .col-2 { flex: 1.2; min-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .col-3 { flex: 0.8; min-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .col-4 { flex: 1; min-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .col-5 { width: 100px; flex-shrink: 0; }
-  .col-6 { width: 100px; flex-shrink: 0; }
+  /* Unified column widths */
+  .col-id { width: 50px; flex-shrink: 0; }
+  .col-name { flex: 1.5; min-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .col-email { flex: 1.2; min-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .col-status { width: 100px; flex-shrink: 0; }
+  .col-date { width: 110px; flex-shrink: 0; }
+  .col-action { width: 140px; flex-shrink: 0; }
+  .col-detail { flex: 1; min-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .col-wide { flex: 2; min-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .col-agreements { flex: 1.5; min-width: 220px; }
-  .col-action { width: 130px; flex-shrink: 0; }
   .status-badge {
     padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;
   }
@@ -235,7 +265,7 @@
   .status-rejected { background: var(--red-light); color: var(--red); }
 
   /* Site Content cards */
-  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
   .config-card {
     background: var(--surface); border-radius: var(--radius);
     border: 1px solid var(--border-light); padding: 24px;
@@ -344,12 +374,13 @@
       <div style="font-size:11px;color:var(--text-muted);">Total Users</div>
     </div>
   </div>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <input type="text" id="userSearchInput" placeholder="Search users by email or name..." oninput="filterUsers()" style="width:260px;padding:7px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text);background:var(--surface);font-family:inherit;">
     <button class="btn btn-outline btn-sm" onclick="exportUsersCSV()">📊 Export CSV</button>
   </div>
   <div class="table-wrap">
     <div class="table-header">
-      <span class="col-1">#</span><span class="col-2">Email</span><span class="col-3">Name</span><span class="col-4">Role</span><span class="col-5">Registered</span><span style="width:90px;">Action</span>
+      <span class="col-id">#</span><span class="col-email">Email</span><span class="col-name">Name</span><span class="col-detail">Role</span><span class="col-date">Registered</span><span class="col-action">Action</span>
     </div>
     <div class="table-body" id="userTableBody">
       <div style="padding:48px;text-align:center;color:var(--text-muted);">Loading...</div>
@@ -366,7 +397,7 @@
   </div>
   <div class="table-wrap">
     <div class="table-header">
-      <span class="col-1">#</span><span class="col-2">Team</span><span class="col-3">User</span><span class="col-4">Contact</span><span class="col-5">Status</span><span class="col-agreements">Agreements</span><span class="col-6">Date</span><span class="col-action">Action</span>
+      <span class="col-id">#</span><span class="col-name">Team</span><span class="col-detail">User</span><span class="col-email">Contact</span><span class="col-status">Status</span><span class="col-agreements">Agreements</span><span class="col-date">Date</span><span class="col-action">Action</span>
     </div>
     <div class="table-body" id="regTableBody">
       <div style="padding:48px;text-align:center;color:var(--text-muted);">Loading...</div>
@@ -391,7 +422,7 @@
   </div>
   <div class="table-wrap">
     <div class="table-header">
-      <span class="col-1">#</span><span class="col-2" style="flex:2;">Competition</span><span class="col-3" style="flex:1;">City</span><span class="col-3">Contact</span><span class="col-4">Status</span><span class="col-5">Date</span><span style="width:90px;">Action</span>
+      <span class="col-id">#</span><span class="col-wide">Competition</span><span class="col-detail">City</span><span class="col-detail">Contact</span><span class="col-status">Status</span><span class="col-date">Date</span><span class="col-action">Action</span>
     </div>
     <div class="table-body" id="orgTableBody">
       <div style="padding:48px;text-align:center;color:var(--text-muted);">Loading...</div>
@@ -408,12 +439,12 @@
   </div>
   <div class="table-wrap">
     <div class="table-header">
-      <span class="col-1">#</span>
-      <span class="col-2" style="flex:2;">用户</span>
-      <span class="col-3" style="flex:2;">赛事名称</span>
-      <span class="col-4">当前阶段</span>
-      <span class="col-5">更新时间</span>
-      <span style="width:180px;">操作</span>
+      <span class="col-id">#</span>
+      <span class="col-email">用户</span>
+      <span class="col-wide">赛事名称</span>
+      <span class="col-detail">当前阶段</span>
+      <span class="col-date">更新时间</span>
+      <span class="col-action">操作</span>
     </div>
     <div class="table-body" id="trackingTableBody">
       <div style="padding:48px;text-align:center;color:var(--text-muted);">Loading...</div>
@@ -634,6 +665,7 @@ function renderForm(c) {
       <input type="checkbox" ${c.industries.includes(ind)?'checked':''}> ${ind}</label>`).join('');
   const hRows = c.highlights.map((h,i)=>`
     <div class="highlight-row">
+      <span style="font-size:11px;color:var(--text-muted);min-width:20px;text-align:right;">#${i+1}</span>
       <input type="text" value="${escapeHtml(h)}" placeholder="Highlight ${i+1}" onchange="updateHighlight(${i},this.value)">
       ${c.highlights.length>1?`<button onclick="removeHighlight(${i})">×</button>`:''}</div>`).join('');
 
@@ -645,45 +677,59 @@ function renderForm(c) {
         <input type="number" id="fSortOrder" value="${c.sort_order||0}" onchange="updateField('sort_order',parseInt(this.value)||0)" style="width:50px;padding:2px 6px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center;">
       </label>
     </h2>
-    <div class="form-grid">
-      <div class="form-group form-grid-full">
-        <label><span class="required">*</span> Title</label>
-        <input type="text" id="fTitle" value="${escapeHtml(c.title)}" placeholder="Competition title in English" onchange="updateField('title',this.value)">
-        <span class="help">Full name. Include year and city.</span>
+    <div id="saveBanner" class="save-banner success">💾 Saved successfully!</div>
+    <div class="form-section">
+      <div class="form-section-title">📋 Basic Information</div>
+      <div class="form-grid">
+        <div class="form-group form-grid-full">
+          <label><span class="required">*</span> Title</label>
+          <input type="text" id="fTitle" value="${escapeHtml(c.title)}" placeholder="Competition title in English" oninput="validateField('fTitle',this.value)" onchange="updateField('title',this.value)">
+          <span class="help">Full name. Include year and city.</span>
+        </div>
+        <div class="form-group"><label><span class="required">*</span> City</label>
+          <select id="fCity" onchange="updateField('city',this.value)">${CITIES.map(ci=>`<option ${c.city===ci?'selected':''}>${ci}</option>`).join('')}</select>
+        </div>
+        <div class="form-group"><label>Stage</label>
+          <select id="fStage" onchange="updateField('stage',this.value)">${STAGES.map(s=>`<option ${c.stage===s?'selected':''}>${s}</option>`).join('')}</select>
+        </div>
+        <div class="form-group"><label>Deadline</label>
+          <input type="text" id="fDeadline" value="${c.deadline}" placeholder="YYYY-MM-DD" onchange="updateField('deadline',this.value)">
+        </div>
       </div>
-      <div class="form-group"><label><span class="required">*</span> City</label>
-        <select id="fCity" onchange="updateField('city',this.value)">${CITIES.map(ci=>`<option ${c.city===ci?'selected':''}>${ci}</option>`).join('')}</select>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">🏆 Prize & Category</div>
+      <div class="form-grid">
+        <div class="form-group"><label><span class="required">*</span> Prize Category</label>
+          <select id="fPrizeCat" onchange="updateField('prizeCategory',this.value)">${PRIZE_CATS.map(pc=>`<option value="${pc.value}" ${c.prizeCategory===pc.value?'selected':''}>${pc.label}</option>`).join('')}</select>
+        </div>
+        <div class="form-group"><label><span class="required">*</span> Prize Description</label>
+          <input type="text" id="fPrize" value="${escapeHtml(c.prize)}" placeholder="e.g. ¥5M grand prize" oninput="validateField('fPrize',this.value)" onchange="updateField('prize',this.value)">
+        </div>
+        <div class="form-group"><label>Level</label>
+          <select id="fLevel" onchange="updateField('level',this.value)">${LEVELS.map(l=>`<option ${c.level===l?'selected':''}>${l}</option>`).join('')}</select>
+        </div>
+        <div class="form-group form-grid-full"><label><span class="required">*</span> Industries</label>
+          <div class="industry-checks" id="industryChecks">${industryChecks}</div>
+        </div>
       </div>
-      <div class="form-group"><label>Stage</label>
-        <select id="fStage" onchange="updateField('stage',this.value)">${STAGES.map(s=>`<option ${c.stage===s?'selected':''}>${s}</option>`).join('')}</select>
-      </div>
-      <div class="form-group"><label>Deadline</label>
-        <input type="text" id="fDeadline" value="${c.deadline}" placeholder="YYYY-MM-DD" onchange="updateField('deadline',this.value)">
-      </div>
-      <div class="form-group"><label><span class="required">*</span> Prize Category</label>
-        <select id="fPrizeCat" onchange="updateField('prizeCategory',this.value)">${PRIZE_CATS.map(pc=>`<option value="${pc.value}" ${c.prizeCategory===pc.value?'selected':''}>${pc.label}</option>`).join('')}</select>
-      </div>
-      <div class="form-group"><label><span class="required">*</span> Prize Description</label>
-        <input type="text" id="fPrize" value="${escapeHtml(c.prize)}" placeholder="e.g. ¥5M grand prize" onchange="updateField('prize',this.value)">
-      </div>
-      <div class="form-group"><label>Level</label>
-        <select id="fLevel" onchange="updateField('level',this.value)">${LEVELS.map(l=>`<option ${c.level===l?'selected':''}>${l}</option>`).join('')}</select>
-      </div>
-      <div class="form-group form-grid-full"><label><span class="required">*</span> Industries</label>
-        <div class="industry-checks" id="industryChecks">${industryChecks}</div>
-      </div>
-      <div class="form-group form-grid-full"><label>Short Description</label>
-        <textarea id="fDesc" onchange="updateField('desc',this.value)">${escapeHtml(c.desc)}</textarea>
-      </div>
-      <div class="form-group form-grid-full"><label>Highlights</label>
-        <div class="highlights-list" id="highlightsList">${hRows}</div>
-        <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addHighlight()">+ Add</button>
-      </div>
-      <div class="form-group"><label><span class="required">*</span> Apply URL</label>
-        <input type="text" id="fApplyUrl" value="${escapeHtml(c.applyUrl)}" placeholder="https://..." onchange="updateField('applyUrl',this.value)">
-      </div>
-      <div class="form-group"><label>English Info URL</label>
-        <input type="text" id="fEnglishUrl" value="${escapeHtml(c.englishUrl||'')}" placeholder="https://..." onchange="updateField('englishUrl',this.value)">
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">📝 Content & Links</div>
+      <div class="form-grid">
+        <div class="form-group form-grid-full"><label>Short Description</label>
+          <textarea id="fDesc" onchange="updateField('desc',this.value)">${escapeHtml(c.desc)}</textarea>
+        </div>
+        <div class="form-group form-grid-full"><label>Highlights</label>
+          <div class="highlights-list" id="highlightsList">${hRows}</div>
+          <button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="addHighlight()">+ Add Highlight</button>
+        </div>
+        <div class="form-group"><label><span class="required">*</span> Apply URL</label>
+          <input type="text" id="fApplyUrl" value="${escapeHtml(c.applyUrl)}" placeholder="https://..." oninput="validateField('fApplyUrl',this.value)" onchange="updateField('applyUrl',this.value)">
+        </div>
+        <div class="form-group"><label>English Info URL</label>
+          <input type="text" id="fEnglishUrl" value="${escapeHtml(c.englishUrl||'')}" placeholder="https://..." onchange="updateField('englishUrl',this.value)">
+        </div>
       </div>
     </div>
     <div class="form-footer">
@@ -695,6 +741,17 @@ function renderForm(c) {
 
 function escapeHtml(s) { return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'):''; }
 function updateField(f,v) { const c=competitions.find(x=>x.id===editingId); if(c) c[f]=v; }
+function validateField(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (value && value.trim()) {
+    el.classList.remove('input-error');
+    el.classList.add('input-valid');
+  } else {
+    el.classList.remove('input-valid');
+    el.classList.add('input-error');
+  }
+}
 function toggleIndustry(ind) {
   const c=competitions.find(x=>x.id===editingId); if(!c) return;
   const i=c.industries.indexOf(ind); if(i>=0) c.industries.splice(i,1); else c.industries.push(ind);
@@ -720,6 +777,9 @@ function saveForm() {
   if (!c.applyUrl.trim()) { showToast('Apply URL required','error'); return; }
   apiFetch('/competitions/'+c.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)}).then(()=>{
     renderSidebar(); const s=document.getElementById('statusMsg'); if(s){s.style.display='inline';setTimeout(()=>s.style.display='none',2000);}
+    // Show save banner
+    const banner = document.getElementById('saveBanner');
+    if (banner) { banner.className = 'save-banner success show'; setTimeout(() => { banner.className = 'save-banner success'; }, 2200); }
     showToast('Saved ✓','success');
   }).catch(()=>{ renderSidebar(); showToast('Saved (offline)','error'); });
 }
@@ -798,13 +858,13 @@ function renderRegTable() {
     
     return `
     <div class="table-row">
-      <span class="col-1">#${r.id}</span>
-      <span class="col-2"><strong>${escapeHtml(r.team_name||'')}</strong></span>
-      <span class="col-3">${escapeHtml(r.user_full_name||'—')}</span>
-      <span class="col-4">${escapeHtml(r.contact_email||'—')}</span>
-      <span class="col-5"><span class="status-badge status-${r.status}">${r.status}</span></span>
+      <span class="col-id">#${r.id}</span>
+      <span class="col-name"><strong>${escapeHtml(r.team_name||'')}</strong></span>
+      <span class="col-detail">${escapeHtml(r.user_full_name||'—')}</span>
+      <span class="col-email">${escapeHtml(r.contact_email||'—')}</span>
+      <span class="col-status"><span class="status-badge status-${r.status}">${r.status}</span></span>
       <span class="col-agreements" style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">${agHtml}${pdfBtns}</span>
-      <span class="col-6">${(r.submitted_at||'').substring(0,10)}</span>
+      <span class="col-date">${(r.submitted_at||'').substring(0,10)}</span>
       <span class="col-action" style="display:flex;gap:4px;align-items:center;">
         <button class="btn btn-sm btn-outline" onclick="showRegDetail(${r.id})">👁</button>
         <select onchange="updateRegStatus(${r.id},this.value)" style="font-size:10px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--surface);">
@@ -933,16 +993,24 @@ async function loadUsers() {
     users = data.users || [];
   } catch(e) { users = []; }
   document.getElementById('userTotal').textContent = users.length;
+  if (users.length===0) { document.getElementById('userTableBody').innerHTML='<div style="padding:48px;text-align:center;color:var(--text-muted);">No registered users yet.</div>'; return; }
+  filterUsers();
+}
+
+function filterUsers() {
+  const q = (document.getElementById('userSearchInput')?.value || '').toLowerCase();
   const body = document.getElementById('userTableBody');
-  if (users.length===0) { body.innerHTML='<div style="padding:48px;text-align:center;color:var(--text-muted);">No registered users yet.</div>'; return; }
-  body.innerHTML = users.map(u => `
+  let filtered = users;
+  if (q) filtered = users.filter(u => (u.email||'').toLowerCase().includes(q) || (u.full_name||'').toLowerCase().includes(q));
+  if (filtered.length===0) { body.innerHTML='<div style="padding:40px;text-align:center;color:var(--text-muted);">No users match your search.</div>'; return; }
+  body.innerHTML = filtered.map(u => `
     <div class="table-row">
-      <span class="col-1">#${u.id}</span>
-      <span class="col-2"><strong>${escapeHtml(u.email||'')}</strong></span>
-      <span class="col-3">${escapeHtml(u.full_name||'—')}</span>
-      <span class="col-4"><span class="status-badge status-${u.role==='admin'?'approved':'pending'}">${u.role||'user'}</span></span>
-      <span class="col-5">${(u.created_at||'').substring(0,10)}</span>
-      <span style="width:90px;"><button class="btn btn-sm btn-outline" onclick="showUserDetail(${u.id})">👁 View</button></span>
+      <span class="col-id">#${u.id}</span>
+      <span class="col-email"><strong>${escapeHtml(u.email||'')}</strong></span>
+      <span class="col-name">${escapeHtml(u.full_name||'—')}</span>
+      <span class="col-detail"><span class="status-badge status-${u.role==='admin'?'approved':'pending'}">${u.role||'user'}</span></span>
+      <span class="col-date">${(u.created_at||'').substring(0,10)}</span>
+      <span class="col-action"><button class="btn btn-sm btn-outline" onclick="showUserDetail(${u.id})">👁 View</button></span>
     </div>`).join('');
 }
 
@@ -1002,18 +1070,18 @@ async function loadOrganizers() {
   if (orgSubmissions.length===0) { body.innerHTML='<div style="padding:48px;text-align:center;color:var(--text-muted);">No organizer submissions yet.</div>'; return; }
   body.innerHTML = orgSubmissions.map(s => `
     <div class="table-row">
-      <span class="col-1">#${s.id}</span>
-      <span class="col-2" style="flex:2;"><strong>${escapeHtml(s.comp_name||'')}</strong><br><small style="color:var(--text-muted);">${escapeHtml(s.city||'')} | ${escapeHtml(s.industry||'')}</small></span>
-      <span class="col-3" style="flex:1;">${escapeHtml(s.city||'')}</span>
-      <span class="col-3">${escapeHtml(s.contact_name||'')}<br><small style="color:var(--text-muted);">${escapeHtml(s.contact_email||'')}${s.phone ? ' | '+escapeHtml(s.phone):''}</small></span>
-      <span class="col-4"><select onchange="updateOrgStatus(${s.id},this.value)" style="font-size:11px;padding:2px 6px;border-radius:6px;border:1px solid var(--border);background:var(--surface);">
+      <span class="col-id">#${s.id}</span>
+      <span class="col-wide"><strong>${escapeHtml(s.comp_name||'')}</strong><br><small style="color:var(--text-muted);">${escapeHtml(s.city||'')} | ${escapeHtml(s.industry||'')}</small></span>
+      <span class="col-detail">${escapeHtml(s.city||'')}</span>
+      <span class="col-detail">${escapeHtml(s.contact_name||'')}<br><small style="color:var(--text-muted);">${escapeHtml(s.contact_email||'')}${s.phone ? ' | '+escapeHtml(s.phone):''}</small></span>
+      <span class="col-status"><select onchange="updateOrgStatus(${s.id},this.value)" style="font-size:11px;padding:2px 6px;border-radius:6px;border:1px solid var(--border);background:var(--surface);">
         <option value="pending" ${s.status==='pending'?'selected':''}>Pending</option>
         <option value="reviewed" ${s.status==='reviewed'?'selected':''}>Reviewed</option>
         <option value="approved" ${s.status==='approved'?'selected':''}>Approved</option>
         <option value="rejected" ${s.status==='rejected'?'selected':''}>Rejected</option>
       </select></span>
-      <span class="col-5">${(s.created_at||'').substring(0,10)}</span>
-      <span style="width:90px;"><button class="btn btn-sm btn-outline" onclick="showOrgDetail(${s.id})">👁 View</button></span>
+      <span class="col-date">${(s.created_at||'').substring(0,10)}</span>
+      <span class="col-action"><button class="btn btn-sm btn-outline" onclick="showOrgDetail(${s.id})">👁 View</button></span>
     </div>`).join('');
 }
 async function updateOrgStatus(id,status) {
@@ -1229,16 +1297,16 @@ function renderTrackingTable() {
     const userLabel = (r.user_name || r.user_email || 'User #'+r.user_id);
     return `
     <div class="table-row">
-      <span class="col-1">#${r.id}</span>
-      <span class="col-2" style="flex:2;font-weight:500;">${escapeHtml(userLabel)}</span>
-      <span class="col-3" style="flex:2;">${escapeHtml(r.competition_name)}</span>
-      <span class="col-4">
+      <span class="col-id">#${r.id}</span>
+      <span class="col-email" style="font-weight:500;">${escapeHtml(userLabel)}</span>
+      <span class="col-wide">${escapeHtml(r.competition_name)}</span>
+      <span class="col-detail">
         <select onchange="updateTrackingStage(${r.id},this.value)" style="padding:4px 8px;border-radius:6px;font-size:11px;border:1px solid ${stage.color};color:${stage.color};font-weight:600;background:${stage.color}10;">
           ${TRACKING_STAGES.map(s => `<option value="${s.key}" ${r.current_stage===s.key?'selected':''}>${s.label}</option>`).join('')}
         </select>
       </span>
-      <span class="col-5" style="font-size:11px;color:var(--text-muted);">${(r.stage_updated_at||'').substring(0,10)}</span>
-      <span style="width:180px;display:flex;gap:4px;">
+      <span class="col-date" style="font-size:11px;color:var(--text-muted);">${(r.stage_updated_at||'').substring(0,10)}</span>
+      <span class="col-action" style="display:flex;gap:4px;">
         <button class="btn btn-outline btn-sm" onclick="showEditTrackingModal(${r.id})">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="deleteTracking(${r.id})">🗑</button>
       </span>
