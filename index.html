@@ -1562,7 +1562,42 @@
     </div>
     <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">No Competitions Being Tracked Yet</h3>
     <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">After you submit the Concierge registration form, our team will add competitions to your tracking board. You can also request specific competitions.</p>
-    <button class="btn-primary" onclick="startConcierge()" style="font-size:14px;padding:10px 24px;">Start Concierge <span class="arrow">→</span></button>
+    <button class="btn-primary" id="dashStartConciergeBtn" onclick="startConcierge()" style="font-size:14px;padding:10px 24px;">Start Concierge <span class="arrow">→</span></button>
+  </div>
+</div>
+
+<!-- ═══════════ Request Tracking Modal ═══════════ -->
+<div class="modal-overlay" id="trackingRequestOverlay" style="display:none;" onclick="closeTrackingRequest(event)">
+  <div class="modal tracking-request-modal" id="trackingRequestModal" onclick="event.stopPropagation()" style="max-width:520px;width:95%;">
+    <button class="modal-close" onclick="closeTrackingRequest()">&times;</button>
+    <h3 style="font-size:18px;font-weight:700;margin-bottom:4px;">+ Request Tracking</h3>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">Select a competition from our database or add one manually.</p>
+
+    <!-- Tab: From Database -->
+    <div style="margin-bottom:16px;">
+      <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">📋 From Competition Database</label>
+      <select id="trackingRequestCompId" style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;color:var(--text);background:#fafbfc;cursor:pointer;appearance:none;">
+        <option value="">— Select a competition —</option>
+      </select>
+      <div class="hint" style="font-size:11px;color:var(--text-muted);margin-top:4px;">Real-time synced with our competition database.</div>
+    </div>
+
+    <div style="text-align:center;margin:14px 0;color:var(--text-muted);font-size:12px;">— or —</div>
+
+    <!-- Manual Entry -->
+    <div style="background:#f8fafb;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;">
+      <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px;">✏️ Add Manually (not in database)</label>
+      <input type="text" id="trackingRequestCustomName" placeholder="Competition Name *" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;margin-bottom:8px;">
+      <input type="url" id="trackingRequestCustomUrl" placeholder="Official Website / Registration Link *" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;">
+      <div class="hint" style="font-size:11px;color:var(--text-muted);margin-top:4px;">Please provide the official link so our team can verify the competition.</div>
+    </div>
+
+    <div id="trackingRequestError" style="display:none;background:#fef2f2;color:#dc2626;padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;margin-bottom:12px;"></div>
+
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn-secondary" onclick="closeTrackingRequest()" style="padding:10px 20px;">Cancel</button>
+      <button class="btn-primary" onclick="submitTrackingRequest()" style="padding:10px 24px;">Submit Request →</button>
+    </div>
   </div>
 </div>
 
@@ -1695,21 +1730,21 @@
       <input type="email" id="orgEmail" data-i18n-ph="org_email_ph" placeholder="Contact Email *">
     </div>
     <div class="org-form-row">
-      <input type="tel" id="orgPhone" data-i18n-ph="org_phone_ph" placeholder="Phone Number (e.g. +86 138-xxxx-xxxx)">
+      <input type="tel" id="orgPhone" data-i18n-ph="org_phone_ph" placeholder="Phone Number * (e.g. +86 138-xxxx-xxxx)">
     </div>
     <div class="org-form-row">
-      <input type="text" id="orgWechat" data-i18n-ph="org_wechat_ph" placeholder="WeChat ID (optional)">
+      <input type="text" id="orgWechat" data-i18n-ph="org_wechat_ph" placeholder="WeChat ID *">
     </div>
     <button class="btn-primary org-form-submit" onclick="submitOrganizerForm()" data-i18n="org_submit">Submit for Review &rarr;</button>
     <p style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:10px;" data-i18n="org_footer">By submitting, you confirm you are authorized to represent this competition. We'll email you within 48 hours.</p>
 
     <!-- Disclaimer -->
     <div class="org-disclaimer">
-      <strong data-i18n="org_disc_title">⚠️ 入驻须知与免责声明 / Listing Disclaimer</strong><br>
-      <span data-i18n="org_disc_1">1. <strong>信息真实性：</strong>提交方须确保所有赛事信息真实、准确、完整。如因信息不实导致的任何后果，由提交方承担。</span><br>
-      <span data-i18n="org_disc_2">2. <strong>非虚假宣传：</strong>提交方承诺赛事宣传内容不含虚假、夸大或误导性信息。所有奖金金额、参赛条件、评审标准均以实际情况为准。</span><br>
-      <span data-i18n="org_disc_3">3. <strong>人工审核发布：</strong>所有赛事资料提交后需经 Compete in China 团队人工审核。审核通过后方可展示发布。我们保留拒绝或要求修改不符合规范内容的权利。</span><br>
-      <span data-i18n="org_disc_4">4. <strong>审核时效：</strong>通常在 48 小时内完成审核并上线。如需加急，请联系 competitions@techinbridge.com。</span>
+      <strong data-i18n="org_disc_title">⚠️ Listing Disclaimer</strong><br>
+      <span data-i18n="org_disc_1">1. <strong>Information Accuracy:</strong> The submitting party must ensure all competition information is true, accurate, and complete. Any consequences arising from false information shall be borne by the submitting party.</span><br>
+      <span data-i18n="org_disc_2">2. <strong>No False Advertising:</strong> The submitting party warrants that competition promotional content contains no false, exaggerated, or misleading information. All prize amounts, eligibility criteria, and evaluation standards reflect actual conditions.</span><br>
+      <span data-i18n="org_disc_3">3. <strong>Manual Review:</strong> All competition materials are subject to manual review by the Compete in China team before publication. We reserve the right to reject or request modifications to content that does not meet our standards.</span><br>
+      <span data-i18n="org_disc_4">4. <strong>Review Timeline:</strong> Typically reviewed and published within 48 hours. For urgent requests, please contact customer service.</span>
     </div>
   </div>
 
@@ -3668,6 +3703,22 @@ async function renderDashboard() {
     return;
   }
 
+  // Check if user has concierge applications
+  var hasConcierge = false;
+  try {
+    var appResp = await fetch('/api/users/my-applications', { headers: { 'Authorization': 'Bearer ' + token } });
+    var appData = await appResp.json();
+    if (appData.success && appData.applications && appData.applications.length > 0) {
+      hasConcierge = true;
+    }
+  } catch(e) { console.error('[Dashboard] App check failed:', e); }
+
+  // Hide Start Concierge button if user already has an application
+  var conciergeBtn = document.getElementById('dashStartConciergeBtn');
+  if (conciergeBtn) {
+    conciergeBtn.style.display = hasConcierge ? 'none' : '';
+  }
+
   // Fetch tracking records
   var records = [];
   try {
@@ -3679,7 +3730,12 @@ async function renderDashboard() {
   if (records.length === 0) {
     document.getElementById('dashEmpty').style.display = 'block';
     document.getElementById('trackingList').innerHTML = '';
-    document.getElementById('trackingStats').innerHTML = '';
+    // Show stats with zeros for better UX even when empty
+    document.getElementById('trackingStats').innerHTML =
+      '<div class="tracking-stat-card"><div class="tracking-stat-num" style="color:var(--accent);">0</div><div class="tracking-stat-label">Total Tracking</div></div>' +
+      '<div class="tracking-stat-card"><div class="tracking-stat-num" style="color:#f59e0b;">0</div><div class="tracking-stat-label">In Progress</div></div>' +
+      '<div class="tracking-stat-card"><div class="tracking-stat-num" style="color:var(--green);">0</div><div class="tracking-stat-label">Prize Received</div></div>' +
+      '<div class="tracking-stat-card"><div class="tracking-stat-num" style="color:#8b5cf6;font-size:16px;">—</div><div class="tracking-stat-label">Latest Update</div></div>';
     return;
   }
 
@@ -3733,26 +3789,88 @@ async function renderDashboard() {
 }
 
 // User requests a new competition to be tracked
-async function requestTracking() {
+function requestTracking() {
   var token = getToken();
   if (!token) { openSignup(); return; }
-  var name = prompt('Which competition would you like us to track for you?\n\nEnter the competition name, and our team will add it to your tracking board.');
-  if (!name || !name.trim()) return;
+  // Load competition list and open modal
+  loadTrackingRequestCompetitions();
+  document.getElementById('trackingRequestOverlay').style.display = 'flex';
+}
+
+async function loadTrackingRequestCompetitions() {
+  var sel = document.getElementById('trackingRequestCompId');
+  // Keep first option
+  sel.innerHTML = '<option value="">— Select a competition —</option>';
+  try {
+    var resp = await fetch('/api/competitions');
+    var data = await resp.json();
+    var comps = data.competitions || data || [];
+    comps.forEach(function(c, i) {
+      var opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = (c.title || c.name || 'Competition #' + c.id) + (c.city ? ' (' + c.city + ')' : '');
+      sel.appendChild(opt);
+    });
+  } catch(e) {
+    console.error('[Tracking] Failed to load competitions:', e);
+  }
+}
+
+function closeTrackingRequest(e) {
+  if (e && e.target !== document.getElementById('trackingRequestOverlay')) return;
+  document.getElementById('trackingRequestOverlay').style.display = 'none';
+  document.getElementById('trackingRequestError').style.display = 'none';
+  document.getElementById('trackingRequestCompId').value = '';
+  document.getElementById('trackingRequestCustomName').value = '';
+  document.getElementById('trackingRequestCustomUrl').value = '';
+}
+
+async function submitTrackingRequest() {
+  var token = getToken();
+  var compId = document.getElementById('trackingRequestCompId').value;
+  var customName = document.getElementById('trackingRequestCustomName').value.trim();
+  var customUrl = document.getElementById('trackingRequestCustomUrl').value.trim();
+  var errEl = document.getElementById('trackingRequestError');
+
+  // Validate: must select from DB OR fill manual entry
+  if (!compId && !customName) {
+    errEl.textContent = 'Please either select a competition from the database or enter one manually.';
+    errEl.style.display = 'block';
+    return;
+  }
+  // If manual entry, URL is required
+  if (!compId && customName && !customUrl) {
+    errEl.textContent = 'Please provide the official website link for the competition.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  var body = {};
+  if (compId) {
+    body.competition_id = parseInt(compId);
+  } else {
+    body.competition_name = customName;
+    body.competition_url = customUrl;
+  }
+
   try {
     var resp = await fetch('/api/tracking/request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ competition_name: name.trim() })
+      body: JSON.stringify(body)
     });
     var data = await resp.json();
     if (data.success) {
+      closeTrackingRequest();
       alert('✅ Request submitted! Our team will review and add it to your tracking board.');
       renderDashboard();
     } else {
-      alert('Failed to submit request: ' + (data.message || 'Unknown error'));
+      errEl.textContent = data.message || 'Failed to submit request.';
+      errEl.style.display = 'block';
     }
   } catch(e) {
-    alert('Network error. Please try again.');
+    errEl.textContent = 'Network error. Please try again.';
+    errEl.style.display = 'block';
   }
 }
 
@@ -3761,6 +3879,7 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
     closeModal();
     closeSignup();
+    closeTrackingRequest();
   }
 });
 
@@ -3867,18 +3986,18 @@ var I18N = {
     org_desc_ph: '赛事简介……',
     org_contact_ph: '你的姓名 / 机构名称 *',
     org_email_ph: '联系邮箱 *',
-    org_phone_ph: '手机号（例如：+86 138-xxxx-xxxx）',
-    org_wechat_ph: '微信号（选填）',
+    org_phone_ph: '手机号 *（例如：+86 138-xxxx-xxxx）',
+    org_wechat_ph: '微信号 *',
     org_submit: '提交审核 →',
     org_footer: '提交即表示你确认有权代表本赛事。我们将在48小时内给你发邮件。',
     org_contact: ' prefer 直接沟通？联系我们：',
 
     // Organizer disclaimer
-    org_disc_title: '⚠️ 入驻须知与免责声明 / Listing Disclaimer',
-    org_disc_1: '1. <strong>信息真实性：</strong>提交方须确保所有赛事信息真实、准确、完整。如因信息不实导致的任何后果，由提交方承担。',
-    org_disc_2: '2. <strong>非虚假宣传：</strong>提交方承诺赛事宣传内容不含虚假、夸大或误导性信息。所有奖金金额、参赛条件、评审标准均以实际情况为准。',
-    org_disc_3: '3. <strong>人工审核发布：</strong>所有赛事资料提交后需经 Compete in China 团队人工审核。审核通过后方可展示发布。我们保留拒绝或要求修改不符合规范内容的权利。',
-    org_disc_4: '4. <strong>审核时效：</strong>通常在 48 小时内完成审核并上线。如需加急，请联系 competitions@techinbridge.com。',
+    org_disc_title: '⚠️ Listing Disclaimer',
+    org_disc_1: '1. <strong>Information Accuracy:</strong> The submitting party must ensure all competition information is true, accurate, and complete. Any consequences arising from false information shall be borne by the submitting party.',
+    org_disc_2: '2. <strong>No False Advertising:</strong> The submitting party warrants that competition promotional content contains no false, exaggerated, or misleading information. All prize amounts, eligibility criteria, and evaluation standards reflect actual conditions.',
+    org_disc_3: '3. <strong>Manual Review:</strong> All competition materials are subject to manual review by the Compete in China team before publication. We reserve the right to reject or request modifications to content that does not meet our standards.',
+    org_disc_4: '4. <strong>Review Timeline:</strong> Typically reviewed and published within 48 hours. For urgent requests, please contact customer service.',
 
     // Concierge page
     conc_title: '🎯 一次提交，多赛投递，零前期费用。',
@@ -4062,9 +4181,11 @@ function submitOrganizerForm() {
   var website = document.getElementById('orgWebsite').value.trim();
   var contact = document.getElementById('orgContact').value.trim();
   var email = document.getElementById('orgEmail').value.trim();
+  var phone = document.getElementById('orgPhone').value.trim();
+  var wechat = document.getElementById('orgWechat').value.trim();
 
-  if (!name || !city || !website || !contact || !email) {
-    alert('Please fill in all required fields (marked with *).');
+  if (!name || !city || !website || !contact || !email || !phone || !wechat) {
+    alert('Please fill in all required fields (marked with *). Phone and WeChat are required.');
     return;
   }
   if (!email.includes('@') || !email.includes('.')) {

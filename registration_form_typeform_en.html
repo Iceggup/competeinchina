@@ -278,7 +278,7 @@
 
       <div class="row">
         <div class="field">
-          <label>Team Size</label>
+          <label>Team Size <span class="req">*</span></label>
           <select id="f_team_size">
             <option value="">Select</option>
             <option>1–3 people</option>
@@ -288,7 +288,7 @@
           </select>
         </div>
         <div class="field">
-          <label>Project Stage</label>
+          <label>Project Stage <span class="req">*</span></label>
           <select id="f_stage">
             <option value="">Select</option>
             <option>R&D</option>
@@ -342,14 +342,14 @@
           <div class="hint" id="hintVerifyCode">We've sent a 6-digit code to your email. Enter it below to verify.</div>
         </div>
         <div class="field">
-          <label>WhatsApp / Phone</label>
+          <label>WhatsApp / Phone <span class="req">*</span></label>
           <input type="tel" id="f_contact_phone" placeholder="+ country code">
         </div>
       </div>
 
       <div class="row">
         <div class="field">
-          <label>LinkedIn Profile</label>
+          <label>LinkedIn Profile <span class="req">*</span></label>
           <input type="url" id="f_contact_linkedin" placeholder="https://linkedin.com/in/...">
         </div>
         <div class="field">
@@ -395,17 +395,17 @@
       </div>
 
       <div class="field">
-        <label>Keyword Tags</label>
+        <label>Keyword Tags <span class="req">*</span></label>
         <input type="text" id="f_keywords" placeholder="e.g. NLP, Machine Learning, B2B SaaS, Computer Vision">
       </div>
 
       <div class="field">
-        <label>Product / Service Description</label>
+        <label>Product / Service Description <span class="req">*</span></label>
         <textarea id="f_product_desc" placeholder="Briefly introduce your product, application areas, innovation highlights, and competitive differentiation. Keep it concise."></textarea>
       </div>
 
       <div class="field">
-        <label>Business Model & Market Potential</label>
+        <label>Business Model & Market Potential <span class="req">*</span></label>
         <textarea id="f_business_model" placeholder="Target customers, market size, competitive advantages, growth opportunities. Brief is fine."></textarea>
       </div>
 
@@ -421,7 +421,7 @@
       <div class="card-subtitle">Funding history and intellectual property</div>
 
       <div class="field">
-        <label>Have you raised funding?</label>
+        <label>Have you raised funding? <span class="req">*</span></label>
         <div class="chip-group" id="chipFunded">
           <span class="chip" data-val="yes">Yes</span>
           <span class="chip" data-val="no">No</span>
@@ -473,17 +473,17 @@
 
       <div class="row">
         <div class="field">
-          <label>Target Funding in China</label>
+          <label>Target Funding in China <span class="req">*</span></label>
           <input type="text" id="f_cn_funding" placeholder="e.g. RMB 5,000,000 or USD 700,000">
         </div>
         <div class="field">
-          <label>Preferred Cities in China</label>
+          <label>Preferred Cities in China <span class="req">*</span></label>
           <input type="text" id="f_cn_cities" placeholder="e.g. Shenzhen, Shanghai, Hangzhou">
         </div>
       </div>
 
       <div class="field">
-        <label>Interest in setting up a China entity?</label>
+        <label>Interest in setting up a China entity? <span class="req">*</span></label>
         <div class="chip-group" id="chipRegister">
           <span class="chip" data-val="definitely">Definitely</span>
           <span class="chip" data-val="considering">Considering</span>
@@ -497,7 +497,7 @@
       </div>
 
       <div class="field">
-        <label>Next 6–12 Months Roadmap</label>
+        <label>Next 6–12 Months Roadmap <span class="req">*</span></label>
         <textarea id="f_roadmap" placeholder="Key goals, milestones, support needed in the next 6–12 months." rows="3"></textarea>
       </div>
 
@@ -530,14 +530,14 @@
       </div>
 
       <div class="field">
-        <label>Team Stability & Collaboration History</label>
+        <label>Team Stability & Collaboration History <span class="req">*</span></label>
         <input type="text" id="f_team_stability" placeholder="e.g. Co-founders worked together at MIT for 5 years / Team has been together 3+ years. Keep it brief.">
       </div>
 
       <div class="field">
-        <label>CV / Resume <span class="req">*</span> <span class="opt">(PDF only)</span></label>
-        <div class="hint" style="margin-bottom:6px;">Upload your CV/resume in PDF format. This is required for competition applications.</div>
-        <input type="text" id="f_resume" placeholder="Google Drive / Dropbox / other link to your PDF resume">
+        <label>CV / Resume <span class="req">*</span> <span class="opt">(cloud drive link)</span></label>
+        <div class="hint" style="margin-bottom:6px;">Please upload your CV/resume to Google Drive, Dropbox, or any cloud drive, and paste the shareable link below. This is required for competition applications.</div>
+        <input type="text" id="f_resume" placeholder="Google Drive / Dropbox / other cloud drive link to your PDF resume">
       </div>
 
       <div class="field">
@@ -599,8 +599,8 @@
 
       <div class="field">
         <label>Pitch Deck / Business Plan <span class="req">*</span></label>
-        <div class="hint" style="margin-bottom:6px;">PDF or PPT format, max 20 MB recommended. You can paste a Google Drive / Dropbox link below.</div>
-        <input type="text" id="f_pitch_deck" placeholder="Google Drive / Dropbox / other link — required">
+        <div class="hint" style="margin-bottom:6px;">Please upload your pitch deck to Google Drive, Dropbox, or any cloud drive, and paste the shareable link below. PDF or PPT format recommended.</div>
+        <input type="text" id="f_pitch_deck" placeholder="Google Drive / Dropbox / other cloud drive link — required">
       </div>
 
       <div class="field">
@@ -810,21 +810,55 @@ function submitForm() {
     notes:          document.getElementById('f_notes')?.value || ''
   };
 
-  // Validation: required fields
-  if (!data.team_name || !data.oneliner || !data.contact_name || !data.contact_email) {
-    showToast('Please fill in all required fields (marked with *).', 4000);
+  // Validation: required fields (all except those marked "if any" or "optional")
+  var requiredFields = [
+    { id: 'f_team_name', label: 'Project / Team Name' },
+    { id: 'f_country', label: 'Country / Region' },
+    { id: 'f_team_size', label: 'Team Size' },
+    { id: 'f_stage', label: 'Project Stage' },
+    { id: 'f_oneliner', label: 'One-Liner' },
+    { id: 'f_contact_name', label: 'Full Name' },
+    { id: 'f_contact_role', label: 'Role in Team' },
+    { id: 'f_contact_email', label: 'Email' },
+    { id: 'f_contact_phone', label: 'WhatsApp / Phone' },
+    { id: 'f_contact_linkedin', label: 'LinkedIn Profile' },
+    { id: 'f_keywords', label: 'Keyword Tags' },
+    { id: 'f_product_desc', label: 'Product / Service Description' },
+    { id: 'f_business_model', label: 'Business Model & Market Potential' },
+    { id: 'f_cn_funding', label: 'Target Funding in China' },
+    { id: 'f_cn_cities', label: 'Preferred Cities in China' },
+    { id: 'f_roadmap', label: 'Next 6–12 Months Roadmap' },
+    { id: 'f_team_members', label: 'Core Members' },
+    { id: 'f_team_stability', label: 'Team Stability & Collaboration History' },
+    { id: 'f_resume', label: 'CV / Resume' },
+    { id: 'f_pitch_deck', label: 'Pitch Deck / Business Plan' }
+  ];
+
+  for (var i = 0; i < requiredFields.length; i++) {
+    var el = document.getElementById(requiredFields[i].id);
+    if (!el || !el.value || !el.value.trim()) {
+      showToast('Please fill in: ' + requiredFields[i].label + ' (required field).', 4000);
+      btn.disabled = false;
+      btn.textContent = 'Submit Registration';
+      return;
+    }
+  }
+
+  // Check chip-based required fields
+  if (!chipSelections['chipIndustry'] || chipSelections['chipIndustry'].length === 0) {
+    showToast('Please select at least one Industry Track.', 4000);
     btn.disabled = false;
     btn.textContent = 'Submit Registration';
     return;
   }
-  if (!data.pitch_deck) {
-    showToast('Pitch Deck / Business Plan is required. Please provide a link.', 4000);
+  if (!chipSelections['chipFunded'] || chipSelections['chipFunded'].length === 0) {
+    showToast('Please select whether you have raised funding.', 4000);
     btn.disabled = false;
     btn.textContent = 'Submit Registration';
     return;
   }
-  if (!data.resume) {
-    showToast('CV / Resume is required. Please provide a PDF link.', 4000);
+  if (!chipSelections['chipRegister'] || chipSelections['chipRegister'].length === 0) {
+    showToast('Please select your interest in setting up a China entity.', 4000);
     btn.disabled = false;
     btn.textContent = 'Submit Registration';
     return;

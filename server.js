@@ -1413,17 +1413,32 @@ app.get('/api/tracking/my', verifyToken, (req, res) => {
 // POST /api/tracking/request — User requests a new competition to track
 app.post('/api/tracking/request', verifyToken, (req, res) => {
   try {
-    const { competition_name, competition_id, notes } = req.body;
-    if (!competition_name) {
+    const { competition_name, competition_id, competition_url, notes } = req.body;
+
+    // Resolve competition name: from competition_id or manual entry
+    let finalName = competition_name;
+    if (competition_id) {
+      const db = getDb();
+      const comp = db.prepare('SELECT title FROM competitions WHERE id = ?').get(competition_id);
+      db.close();
+      if (comp) {
+        finalName = comp.title;
+      } else {
+        return res.status(400).json({ success: false, message: 'Competition not found in database.' });
+      }
+    }
+
+    if (!finalName) {
       return res.status(400).json({ success: false, message: 'Competition name is required.' });
     }
+
     const db = getDb();
     const result = db.prepare(`
       INSERT INTO competition_tracking (user_id, competition_name, competition_id, current_stage, notes)
       VALUES (?, ?, ?, 'registering', ?)
-    `).run(req.user.userId, competition_name, competition_id || null, notes || '');
+    `).run(req.user.userId, finalName, competition_id || null, notes || (competition_url ? 'Official URL: ' + competition_url : ''));
     db.close();
-    console.log(`[Tracking] User #${req.user.userId} requested: ${competition_name}`);
+    console.log(`[Tracking] User #${req.user.userId} requested: ${finalName}`);
     res.status(201).json({ success: true, id: result.lastInsertRowid, message: 'Tracking request submitted.' });
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
