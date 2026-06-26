@@ -1538,6 +1538,74 @@ app.get('/api/admin/tracking/stats', verifyToken, (req, res) => {
 });
 
 // ════════════════════════════════════════════════════
+//  AGREEMENT SIGNATURES
+// ════════════════════════════════════════════════════
+
+// GET /api/agreements/status — Check user's signature status
+app.get('/api/agreements/status', verifyToken, (req, res) => {
+  try {
+    const db = getDb();
+    db.exec(`CREATE TABLE IF NOT EXISTS agreement_signatures (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      agreement_type TEXT NOT NULL,
+      full_name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      signed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      ip_address TEXT,
+      user_agent TEXT,
+      UNIQUE(user_id, agreement_type)
+    )`);
+    const signatures = db.prepare(
+      'SELECT agreement_type, full_name, signed_at FROM agreement_signatures WHERE user_id = ?'
+    ).all(req.user.userId);
+    db.close();
+    const status = {
+      service_agreement: signatures.find(s => s.agreement_type === 'service_agreement') || null,
+      nda: signatures.find(s => s.agreement_type === 'nda') || null
+    };
+    res.json({ success: true, status });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// POST /api/agreements/sign — Sign an agreement
+app.post('/api/agreements/sign', verifyToken, (req, res) => {
+  try {
+    const { agreement_type, full_name } = req.body;
+    if (!agreement_type || !['service_agreement', 'nda'].includes(agreement_type)) {
+      return res.status(400).json({ success: false, message: 'Invalid agreement type.' });
+    }
+    if (!full_name || !full_name.trim()) {
+      return res.status(400).json({ success: false, message: 'Full name is required for signature.' });
+    }
+    const db = getDb();
+    db.exec(`CREATE TABLE IF NOT EXISTS agreement_signatures (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      agreement_type TEXT NOT NULL,
+      full_name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      signed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      ip_address TEXT,
+      user_agent TEXT,
+      UNIQUE(user_id, agreement_type)
+    )`);
+    const user = db.prepare('SELECT email FROM users WHERE id = ?').get(req.user.userId);
+    const result = db.prepare(`
+      INSERT OR REPLACE INTO agreement_signatures (user_id, agreement_type, full_name, email, ip_address, user_agent, signed_at)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `).run(
+      req.user.userId, agreement_type, full_name.trim(),
+      user ? user.email : req.user.email || '',
+      req.ip || '', req.get('User-Agent') || ''
+    );
+    db.close();
+    console.log(`[Agreement] User #${req.user.userId} signed: ${agreement_type}`);
+    res.json({ success: true, id: result.lastInsertRowid, message: 'Agreement signed successfully.' });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// ════════════════════════════════════════════════════
 //  FALLBACK — serve index.html for all routes
 // ════════════════════════════════════════════════════
 

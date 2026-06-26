@@ -1562,10 +1562,83 @@
   </div>
 
   <!-- My Applications -->
-  <div class="dash-card">
+  <div class="dash-card" style="margin-bottom:20px;">
     <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">📋 My Concierge Applications</h3>
     <div id="profileAppsList">
       <p style="font-size:13px;color:var(--text-muted);">Loading...</p>
+    </div>
+  </div>
+
+  <!-- ═══════ Agreement Signing ═══════ -->
+  <div class="dash-card" style="margin-bottom:20px;" id="agreementCard">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:6px;">📝 Agreements & Signatures</h3>
+    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">Review and sign the required agreements to activate full Concierge services. Both agreements use industry-standard e-signature.</p>
+
+    <!-- Agreement 1: Service Agreement -->
+    <div class="agreement-item" id="agreementService" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">🤝</span>
+          <div>
+            <div style="font-weight:700;font-size:14px;">Innovation Competition Facilitation Agreement</div>
+            <div style="font-size:11.5px;color:var(--text-muted);">Platform Service Agreement — defines services, responsibilities, prize split (50/50), IP rights, and terms.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <span class="agreement-status" id="agreementServiceStatus" style="font-size:11px;padding:4px 10px;border-radius:10px;background:#fef3c7;color:#92400e;">Not Signed</span>
+          <button class="btn-secondary" onclick="openAgreement('service_agreement')" style="font-size:11px;padding:6px 12px;">📄 Read & Sign</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agreement 2: NDA -->
+    <div class="agreement-item" id="agreementNDA" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">🔒</span>
+          <div>
+            <div style="font-weight:700;font-size:14px;">Non-Disclosure Agreement (NDA)</div>
+            <div style="font-size:11.5px;color:var(--text-muted);">Confidentiality Agreement — protects your project details, business plans, financial data, and IP.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <span class="agreement-status" id="agreementNDAStatus" style="font-size:11px;padding:4px 10px;border-radius:10px;background:#fef3c7;color:#92400e;">Not Signed</span>
+          <button class="btn-secondary" onclick="openAgreement('nda')" style="font-size:11px;padding:6px 12px;">📄 Read & Sign</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ Agreement Modal ═══════════ -->
+<div class="modal-overlay" id="agreementOverlay" style="display:none;" onclick="closeAgreementModal(event)">
+  <div class="modal" id="agreementModal" onclick="event.stopPropagation()" style="max-width:800px;width:95%;max-height:90vh;overflow-y:auto;padding:0;">
+    <div style="position:sticky;top:0;background:var(--surface);padding:20px 24px 14px;border-bottom:1px solid var(--border);z-index:2;">
+      <button class="modal-close" onclick="closeAgreementModal()" style="position:absolute;top:14px;right:20px;">&times;</button>
+      <h3 id="agreementModalTitle" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
+      <p style="font-size:12px;color:var(--text-muted);">Scroll down to read the full agreement, then sign at the bottom.</p>
+    </div>
+
+    <!-- Agreement Content -->
+    <div id="agreementContent" style="padding:24px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;"></div>
+
+    <!-- Signature Area -->
+    <div style="padding:20px 24px;border-top:1px solid var(--border);background:var(--bg);">
+      <div id="agreementAlreadySigned" style="display:none;background:#ecfdf5;color:#065f46;padding:14px 18px;border-radius:10px;font-size:13px;margin-bottom:14px;">
+        ✅ You have already signed this agreement on <strong id="agreementSignedDate"></strong>.
+      </div>
+      <div id="agreementSignForm">
+        <p style="font-size:13px;font-weight:600;margin-bottom:12px;">✍️ Sign this agreement</p>
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+            <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">Your Full Legal Name</label>
+            <input type="text" id="agreementSignName" placeholder="Type your full name to sign" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;">
+            <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;">Typing your name constitutes an electronic signature, legally equivalent to a handwritten one.</div>
+          </div>
+          <button class="btn-primary" id="agreementSignBtn" onclick="signAgreement()" style="padding:12px 28px;font-size:14px;white-space:nowrap;">Sign Agreement ✍️</button>
+        </div>
+        <div id="agreementSignError" style="display:none;background:#fef2f2;color:#dc2626;padding:10px 14px;border-radius:8px;font-size:12px;margin-top:10px;"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -3413,6 +3486,8 @@ async function loadProfile() {
 
   // Load applications
   loadProfileApplications();
+  // Load agreement status
+  loadAgreementStatus();
 }
 
 function renderProfileView(user) {
@@ -3590,6 +3665,353 @@ async function loadProfileApplications() {
   } catch(e) {
     console.error('[Profile] Failed to load applications:', e);
     listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Failed to load applications. Please try again later.</p>';
+  }
+}
+
+// ═══════════ AGREEMENT SIGNING ═══════════
+var CURRENT_AGREEMENT_TYPE = null;
+
+// Agreement full texts
+var AGREEMENT_TEXTS = {
+  'service_agreement': {
+    title: 'Innovation Competition Facilitation Agreement',
+    content: `INNOVATION COMPETITION FACILITATION AGREEMENT
+Between Techinbridge and Participating Startup Team
+
+This Agreement is made on the date of signing, by and between:
+
+Party A: Techinbridge
+Contact: Ice Geng (耿冰洁)
+Email: ice@techinbridge.com
+Website: www.techinbridge.com
+
+Party B: [Startup / Team Name — you, the signatory]
+
+Collectively referred to as the "Parties" and individually as a "Party".
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. BACKGROUND & PURPOSE
+
+Party A operates an international innovation platform that connects overseas startup teams with Chinese innovation competitions, government programs, and landing opportunities.
+
+Party B is an overseas startup or innovation team interested in exploring Chinese competition opportunities for prize funding, market visibility, and potential landing in China.
+
+The Parties wish to collaborate under a clear, transparent framework that defines each Party's responsibilities, rights, and obligations — so that neither Party wastes the other's time and both can move forward efficiently.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. SCOPE OF SERVICES — WHAT TECHINBRIDGE DOES
+
+2.1 Competition Screening & Matching
+Party A will:
+• Maintain a database of active innovation and startup competitions across China that accept international teams
+• Review Party B's project materials against competition eligibility, sector fit, stage requirements, and award structures
+• Provide Party B with a shortlist of recommended competitions, including key information: organizer, prize pool, timeline, eligibility, and strategic fit assessment
+
+2.2 Application Management ("One Project, Multiple Competitions")
+Upon Party B's written confirmation of which competitions to pursue, Party A will:
+• Adapt and prepare application materials in Chinese, based on Party B's original project documentation
+• Complete and submit registration forms, supporting documents, and any additional materials required by each competition
+• Track submission deadlines, notify Party B of any supplementary requirements, and handle follow-up communications with competition organizers
+
+2.3 Final-Stage & Pitch Support
+If Party B's project advances to the final round of any submitted competition, Party A will:
+• Coordinate logistics — travel arrangements, accommodation, and on-site scheduling
+• Assist with pitch preparation — slide review, Q&A rehearsal, and presentation strategy
+• Provide on-the-ground coordination during the event
+
+2.4 Post-Win Landing Support
+If Party B wins a competition and wishes to establish a business presence in China, Party A will provide landing support services, including but not limited to:
+• Facilitate introductions to local government agencies, industrial parks, and service providers
+• Assist with navigating company registration, office/factory space, tax incentive applications, and talent housing
+• Coordinate the activation of competition-awarded benefits (typically valid for 1–2 years after the award date)
+Additional Service Fee for Landing Support: If Party B requests landing support services, an additional service fee will apply. The specific fee amount and payment structure shall be determined after Party A and Party B jointly define the scope and desired outcomes of the landing engagement.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. RESPONSIBILITIES — WHAT THE STARTUP TEAM PROVIDES
+
+3.1 Project Materials
+Party B shall provide:
+• A comprehensive project deck or detailed introduction covering: team background, technology/product description, development stage, market analysis, competitive landscape, and funding history (if any)
+• A one-page executive summary in English
+• Any patents, publications, or supporting documentation relevant to the project
+
+3.2 Accuracy & Timeliness
+Party B warrants that:
+• All information and materials provided are truthful, accurate, and not misleading
+• Party B holds or has the right to use all intellectual property referenced in the project materials
+• Party B will respond to Party A's communications within a reasonable timeframe (typically within 3–5 business days)
+
+3.3 Participation
+Party B agrees to:
+• Review and confirm competition shortlists in a timely manner
+• Appear in person or remotely for any final-round presentations, pitch events, or award ceremonies, if shortlisted
+• Notify Party A promptly if Party B's circumstances change in any way that materially affects competition eligibility
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. RIGHTS & BENEFITS — WHAT THE STARTUP TEAM GETS
+
+4.1 Prize Money & Awards
+All monetary prizes awarded under this Agreement belong to Party B, subject to the service fee arrangement set forth below.
+Service Fee: Party A's service fee shall be fifty percent (50%) of the net prize amount. The remaining fifty percent (50%) shall be retained by Party B.
+
+Prize Disbursement Flow: Depending on the competition organizer's requirements, prize funds may be disbursed either to Party A or directly to Party B. The receiving Party shall, within fifteen (15) working days of receipt, transfer the remaining prize share to the other Party in accordance with the agreed split.
+
+Tax Treatment: All prize amounts stated by competition organizers are gross (pre-tax) amounts. The service fee split shall be calculated on the net (post-tax) prize amount. Any remittance fees, bank charges, currency conversion costs, or further taxes arising from the transfer of funds between the Parties shall be borne by the Party receiving the transfer.
+
+Non-monetary benefits (office space, tax incentives, relocation subsidies, incubation services, etc.) granted by competition organizers belong exclusively to Party B.
+
+4.2 Intellectual Property
+• All intellectual property rights in Party B's technology, products, and project materials remain the sole and exclusive property of Party B
+• Party A is granted a limited, non-exclusive right to use Party B's project name and summary description solely for the purpose of competition applications under this Agreement
+• Party A will not disclose Party B's proprietary information to any third party beyond what is required for competition submission, without Party B's prior written consent
+
+4.3 No Guarantees
+Party A provides facilitation and support services. Party A does not and cannot guarantee that Party B will be shortlisted, win any prize, or receive any specific benefit from any competition. Judging decisions are made solely by each competition's judging panel.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. TERM & TERMINATION
+• This Agreement becomes effective on the date of signing and remains in effect for twelve (12) months, unless terminated earlier
+• Either Party may terminate this Agreement with thirty (30) days' written notice
+• Termination does not affect applications already submitted
+
+6. GENERAL PROVISIONS
+• Independent Contractor: Party A is an independent contractor, not an agent, partner, or employee of Party B.
+• Non-Exclusivity: This Agreement is non-exclusive.
+• Governing Law: This Agreement shall be governed by the laws of the People's Republic of China.
+• Dispute Resolution: Any dispute shall first be resolved through friendly negotiation.
+
+By signing below, you acknowledge that you have read, understood, and agree to be bound by the terms of this Agreement.`
+  },
+  'nda': {
+    title: 'Non-Disclosure Agreement (NDA)',
+    content: `NON-DISCLOSURE AGREEMENT (NDA)
+Between Techinbridge and Participating Startup Team
+
+This Non-Disclosure Agreement ("NDA") is made on the date of signing, by and between:
+
+Disclosing Party: [Startup / Team Name — you, the signatory]
+Receiving Party: Techinbridge
+
+Collectively referred to as the "Parties".
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. PURPOSE
+
+The Parties wish to explore a potential business relationship whereby the Disclosing Party may share certain proprietary and confidential information with the Receiving Party for the purpose of evaluating and facilitating participation in Chinese innovation competitions ("the Purpose"). This NDA sets forth the terms under which such confidential information shall be protected.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. DEFINITION OF CONFIDENTIAL INFORMATION
+
+"Confidential Information" means any and all non-public information disclosed by the Disclosing Party to the Receiving Party, whether in writing, orally, or in any other form, including but not limited to:
+
+• Project details, technical specifications, product roadmaps, and development plans
+• Business plans, financial data, revenue models, and pricing strategies
+• Source code, algorithms, formulas, processes, and technical documentation
+• Customer lists, partner information, and market research data
+• Competition strategies, application materials, and communication records
+• Intellectual property, patents (filed or pending), trademarks, and trade secrets
+• Team member information, organizational structure, and internal communications
+• Any other information designated as confidential or that a reasonable person would understand to be confidential
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. OBLIGATIONS OF THE RECEIVING PARTY
+
+The Receiving Party agrees to:
+• Use Confidential Information solely for the Purpose and for no other purpose
+• Not disclose Confidential Information to any third party without the Disclosing Party's prior written consent
+• Protect Confidential Information with at least the same degree of care used to protect its own confidential information (but no less than reasonable care)
+• Limit access to Confidential Information to employees and contractors who have a legitimate need to know and are bound by confidentiality obligations at least as restrictive as this NDA
+• Not reverse engineer, decompile, or disassemble any software or technical materials provided
+• Not copy or reproduce Confidential Information except as necessary for the Purpose
+• Immediately notify the Disclosing Party of any unauthorized disclosure or use
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. EXCLUSIONS
+
+Confidential Information does not include information that:
+• Is or becomes publicly available through no breach of this NDA by the Receiving Party
+• Was rightfully in the Receiving Party's possession before disclosure by the Disclosing Party
+• Is independently developed by the Receiving Party without use of Confidential Information
+• Is rightfully obtained from a third party without restriction on disclosure
+• Is required to be disclosed by law, regulation, or court order (provided the Receiving Party gives prompt notice to the Disclosing Party to allow protective measures)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. PERMITTED DISCLOSURES
+
+The Receiving Party may disclose Confidential Information:
+• To competition organizers as required for application submission (limited to what is necessary)
+• To legal and financial advisors who are bound by professional confidentiality obligations
+• As required by applicable law, regulation, or legal process
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6. INTELLECTUAL PROPERTY
+
+• All Confidential Information remains the sole and exclusive property of the Disclosing Party
+• No license, assignment, or transfer of any intellectual property rights is granted under this NDA
+• The Receiving Party acquires no rights to any Confidential Information, patents, trademarks, copyrights, or other IP
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+7. TERM & SURVIVAL
+
+• This NDA becomes effective on the date of signing
+• Confidentiality obligations survive for a period of two (2) years from the date of disclosure
+• Trade secret information shall be protected indefinitely
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+8. RETURN OF MATERIALS
+
+Upon termination of the business relationship or upon written request of the Disclosing Party, the Receiving Party shall:
+• Return or destroy (at the Disclosing Party's election) all materials containing Confidential Information
+• Certify in writing that all such materials have been returned or destroyed
+• This does not apply to copies required by law or for regulatory compliance
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+9. REMEDIES
+
+The Parties acknowledge that breach of this NDA may cause irreparable harm. The Disclosing Party is entitled to seek injunctive relief in addition to any other remedies available at law or in equity.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+10. GENERAL PROVISIONS
+
+• Governing Law: This NDA shall be governed by the laws of the People's Republic of China
+• Dispute Resolution: Any dispute shall first be resolved through friendly negotiation
+• Severability: If any provision is held invalid, the remaining provisions remain in full effect
+
+By signing below, you acknowledge that you have read, understood, and agree to be bound by the terms of this Non-Disclosure Agreement.`
+  }
+};
+
+async function loadAgreementStatus() {
+  var token = getToken();
+  if (!token) return;
+
+  try {
+    var resp = await fetch('/api/agreements/status', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    if (!data.success) return;
+
+    // Service Agreement status
+    if (data.status.service_agreement) {
+      var saStatus = document.getElementById('agreementServiceStatus');
+      saStatus.textContent = '✅ Signed';
+      saStatus.style.background = '#d1fae5';
+      saStatus.style.color = '#065f46';
+      var saBtn = document.querySelector('#agreementService .btn-secondary');
+      if (saBtn) saBtn.textContent = '📄 View Signed';
+    }
+
+    // NDA status
+    if (data.status.nda) {
+      var ndaStatus = document.getElementById('agreementNDAStatus');
+      ndaStatus.textContent = '✅ Signed';
+      ndaStatus.style.background = '#d1fae5';
+      ndaStatus.style.color = '#065f46';
+      var ndaBtn = document.querySelector('#agreementNDA .btn-secondary');
+      if (ndaBtn) ndaBtn.textContent = '📄 View Signed';
+    }
+  } catch(e) { console.error('[Agreement] Status check failed:', e); }
+}
+
+function openAgreement(type) {
+  CURRENT_AGREEMENT_TYPE = type;
+  var ag = AGREEMENT_TEXTS[type];
+  document.getElementById('agreementModalTitle').textContent = ag.title;
+  document.getElementById('agreementContent').textContent = ag.content;
+  document.getElementById('agreementSignName').value = '';
+  document.getElementById('agreementSignError').style.display = 'none';
+
+  // Check if already signed
+  var token = getToken();
+  fetch('/api/agreements/status', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var signed = type === 'service_agreement' ? data.status.service_agreement : data.status.nda;
+      if (signed) {
+        document.getElementById('agreementAlreadySigned').style.display = 'block';
+        document.getElementById('agreementSignedDate').textContent = signed.signed_at ? signed.signed_at.substring(0, 10) : 'unknown date';
+        document.getElementById('agreementSignForm').style.display = 'none';
+      } else {
+        document.getElementById('agreementAlreadySigned').style.display = 'none';
+        document.getElementById('agreementSignForm').style.display = 'block';
+      }
+    });
+
+  document.getElementById('agreementOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAgreementModal(e) {
+  if (e && e.target !== document.getElementById('agreementOverlay')) return;
+  document.getElementById('agreementOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+  CURRENT_AGREEMENT_TYPE = null;
+}
+
+async function signAgreement() {
+  var token = getToken();
+  if (!token) return;
+  var name = document.getElementById('agreementSignName').value.trim();
+  var errEl = document.getElementById('agreementSignError');
+  errEl.style.display = 'none';
+
+  if (!name) {
+    errEl.textContent = 'Please enter your full legal name to sign.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (name.length < 2) {
+    errEl.textContent = 'Please enter your complete legal name.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  var btn = document.getElementById('agreementSignBtn');
+  btn.disabled = true;
+  btn.textContent = 'Signing...';
+
+  try {
+    var resp = await fetch('/api/agreements/sign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ agreement_type: CURRENT_AGREEMENT_TYPE, full_name: name })
+    });
+    var data = await resp.json();
+    if (data.success) {
+      document.getElementById('agreementAlreadySigned').style.display = 'block';
+      document.getElementById('agreementSignedDate').textContent = new Date().toISOString().substring(0, 10);
+      document.getElementById('agreementSignForm').style.display = 'none';
+      // Update the card status
+      loadAgreementStatus();
+      // Close modal after short delay
+      setTimeout(function() {
+        closeAgreementModal();
+      }, 2000);
+    } else {
+      errEl.textContent = data.message || 'Failed to sign. Please try again.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Sign Agreement ✍️';
+    }
+  } catch(e) {
+    errEl.textContent = 'Network error. Please try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign Agreement ✍️';
   }
 }
 
@@ -4007,6 +4429,7 @@ document.addEventListener('keydown', function(e) {
     closeModal();
     closeSignup();
     closeTrackingRequest();
+    closeAgreementModal();
   }
 });
 
