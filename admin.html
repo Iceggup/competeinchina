@@ -1145,7 +1145,7 @@ async function saveAllConfig() {
     if (!el) continue;
     let value = el.type==='checkbox' ? (el.checked?'1':'0') : el.value;
     try {
-      await fetch('/api/admin/config/'+key,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value,type:el.type==='checkbox'?'boolean':'text'})});
+      await apiFetch('/config/'+key,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({value,type:el.type==='checkbox'?'boolean':'text'})});
       saved++;
     } catch(e) {}
   }

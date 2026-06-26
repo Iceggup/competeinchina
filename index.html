@@ -2119,7 +2119,7 @@ const ICONS = {
 };
 
 // ═══════════ CITY COLOR MAP ═══════════
-const cityColors = {
+let cityColors = {
   'Beijing': '#dc2626', 'Shanghai': '#2563eb', 'Shenzhen': '#059669',
   'Guangzhou': '#d97706', 'Hangzhou': '#7c3aed', 'Suzhou': '#0891b2',
   'Hefei': '#4f46e5', 'Nanjing': '#be185d', 'Xiamen': '#0d9488',
@@ -2372,7 +2372,7 @@ function renderCarousel() {
   const wrap = document.getElementById('carouselWrap');
   if (!track) return;
 
-  const featured = (window.competitions || []).filter(c => c.featured === 1).slice(0, 8);
+  const featured = (window.competitions || []).filter(c => c.featured === 1).sort((a,b) => (a.sort_order||0) - (b.sort_order||0)).slice(0, 8);
   if (featured.length === 0) {
     if (wrap) wrap.style.display = 'none';
     return;
@@ -2556,8 +2556,33 @@ async function loadSiteConfig() {
           metaDesc.setAttribute('content', titleText.replace(/<[^>]*>/g, '') + '. ' + subText);
         }
       }
+
+      // === Dynamic City Filter from CMS ===
+      updateCityFilter();
     }
   } catch(e) { /* silently fail */ }
+}
+
+// === Dynamic City Filter & Color Map ===
+function updateCityFilter() {
+  var cmsCities = window._cmsCities;
+  if (!cmsCities || !Array.isArray(cmsCities) || cmsCities.length === 0) return;
+
+  // Update city filter dropdown
+  var sel = document.getElementById('filterCity');
+  if (sel) {
+    var currentVal = sel.value;
+    sel.innerHTML = '<option value="" data-i18n="filter_all_cities">All Cities</option>';
+    cmsCities.forEach(function(c) {
+      sel.innerHTML += '<option>' + c.name + '</option>';
+    });
+    sel.value = currentVal; // restore selection if still valid
+  }
+
+  // Update cityColors map (merge CMS colors, don't remove defaults)
+  cmsCities.forEach(function(c) {
+    if (c.color) cityColors[c.name] = c.color;
+  });
 }
 
 // ═══════════ CITY DATA ═══════════
