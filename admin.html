@@ -8,10 +8,11 @@
 <script>
 (function() {
   var host = window.location.hostname;
-  if (host === 'competeinchina.com' || host === 'www.competeinchina.com') {
-    window.API_BASE = 'https://api.competeinchina.com';
-  } else {
+  // Always use the production API when not on localhost
+  if (host === 'localhost' || host === '127.0.0.1') {
     window.API_BASE = ''; // relative paths for local dev
+  } else {
+    window.API_BASE = 'https://api.competeinchina.com';
   }
   // Patch fetch to auto-prepend API_BASE for /api/ calls
   var _fetch = window.fetch;
