@@ -4059,6 +4059,15 @@ function openAgreement(type) {
   document.getElementById('agreementSignName').value = '';
   document.getElementById('agreementSignError').style.display = 'none';
 
+  // Reset sign button state (prevent stale "Signing..." from previous sign)
+  var signBtn = document.getElementById('agreementSignBtn');
+  signBtn.disabled = false;
+  signBtn.textContent = 'Sign Agreement ✍️';
+
+  // Reset form visibility to default (show sign form, hide already-signed)
+  document.getElementById('agreementSignForm').style.display = 'block';
+  document.getElementById('agreementAlreadySigned').style.display = 'none';
+
   // Check if already signed
   var token = getToken();
   fetch('/api/agreements/status', { headers: { 'Authorization': 'Bearer ' + token } })
@@ -4069,9 +4078,6 @@ function openAgreement(type) {
         document.getElementById('agreementAlreadySigned').style.display = 'block';
         document.getElementById('agreementSignedDate').textContent = signed.signed_at ? signed.signed_at.substring(0, 10) : 'unknown date';
         document.getElementById('agreementSignForm').style.display = 'none';
-      } else {
-        document.getElementById('agreementAlreadySigned').style.display = 'none';
-        document.getElementById('agreementSignForm').style.display = 'block';
       }
     });
 

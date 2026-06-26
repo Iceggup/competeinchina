@@ -772,14 +772,14 @@ function renderRegTable() {
       var color = t.signed ? 'var(--green)' : 'var(--text-muted)';
       var bg = t.signed ? '#ecfdf5' : '#f8fafb';
       var border = t.signed ? 'var(--green)' : 'var(--border)';
-      agHtml += '<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;color:'+color+';background:'+bg+';border:1px solid '+border+';margin-right:4px;" title="'+t.label+'">'+t.label+'</span>';
+      agHtml += '<span style="display:inline-block;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;color:'+color+';background:'+bg+';border:1px solid '+border+';margin-right:4px;line-height:1.4;" title="'+t.label+'">'+t.label+'</span>';
     });
     
     // PDF download buttons for signed agreements
     var pdfBtns = '';
-    if (ag.service) pdfBtns += '<button onclick="downloadAgreementPDF('+r.user_id+',\'service_agreement\')" style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;margin-left:2px;" title="Download Service Agreement PDF">📥Svc</button>';
-    if (ag.nda) pdfBtns += '<button onclick="downloadAgreementPDF('+r.user_id+',\'nda\')" style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;margin-left:2px;" title="Download NDA PDF">📥NDA</button>';
-    if (ag.marketing) pdfBtns += '<button onclick="downloadAgreementPDF('+r.user_id+',\'marketing_auth\')" style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;margin-left:2px;" title="Download Marketing Auth PDF">📥Mkt</button>';
+    if (ag.service) pdfBtns += '<button onclick="event.stopPropagation();downloadAgreementPDF('+r.user_id+',\'service_agreement\')" style="font-size:11px;padding:4px 10px;border:1px solid var(--green);border-radius:6px;background:#ecfdf5;color:var(--green);cursor:pointer;margin-left:4px;font-weight:600;" title="Download Service Agreement PDF">📥 Svc PDF</button>';
+    if (ag.nda) pdfBtns += '<button onclick="event.stopPropagation();downloadAgreementPDF('+r.user_id+',\'nda\')" style="font-size:11px;padding:4px 10px;border:1px solid var(--green);border-radius:6px;background:#ecfdf5;color:var(--green);cursor:pointer;margin-left:4px;font-weight:600;" title="Download NDA PDF">📥 NDA PDF</button>';
+    if (ag.marketing) pdfBtns += '<button onclick="event.stopPropagation();downloadAgreementPDF('+r.user_id+',\'marketing_auth\')" style="font-size:11px;padding:4px 10px;border:1px solid var(--green);border-radius:6px;background:#ecfdf5;color:var(--green);cursor:pointer;margin-left:4px;font-weight:600;" title="Download Marketing Auth PDF">📥 Mkt PDF</button>';
     
     return `
     <div class="table-row">
@@ -803,7 +803,30 @@ function renderRegTable() {
 }
 
 function downloadAgreementPDF(userId, type) {
-  window.open('/api/admin/agreements/' + userId + '/' + type + '/pdf', '_blank');
+  var token = localStorage.getItem('cic_admin_token');
+  if (!token) { showToast('Please log in first', 'error'); return; }
+  showToast('Downloading agreement...', 'success');
+  fetch('/api/admin/agreements/' + userId + '/' + type + '/pdf', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+    .then(function(resp) {
+      if (!resp.ok) throw new Error('Download failed');
+      return resp.blob();
+    })
+    .then(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = type + '_agreement.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    })
+    .catch(function(e) {
+      // Fallback: open in new tab
+      window.open('/api/admin/agreements/' + userId + '/' + type + '/pdf', '_blank');
+    });
 }
 
 function renderRegStats() {
