@@ -1562,7 +1562,8 @@ app.get('/api/agreements/status', verifyToken, (req, res) => {
     db.close();
     const status = {
       service_agreement: signatures.find(s => s.agreement_type === 'service_agreement') || null,
-      nda: signatures.find(s => s.agreement_type === 'nda') || null
+      nda: signatures.find(s => s.agreement_type === 'nda') || null,
+      marketing_auth: signatures.find(s => s.agreement_type === 'marketing_auth') || null
     };
     res.json({ success: true, status });
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
@@ -1572,7 +1573,7 @@ app.get('/api/agreements/status', verifyToken, (req, res) => {
 app.post('/api/agreements/sign', verifyToken, (req, res) => {
   try {
     const { agreement_type, full_name } = req.body;
-    if (!agreement_type || !['service_agreement', 'nda'].includes(agreement_type)) {
+    if (!agreement_type || !['service_agreement', 'nda', 'marketing_auth'].includes(agreement_type)) {
       return res.status(400).json({ success: false, message: 'Invalid agreement type.' });
     }
     if (!full_name || !full_name.trim()) {

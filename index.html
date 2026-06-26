@@ -1607,6 +1607,23 @@
         </div>
       </div>
     </div>
+
+    <!-- Agreement 3: Marketing Authorization -->
+    <div class="agreement-item" id="agreementMarketing" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">📢</span>
+          <div>
+            <div style="font-weight:700;font-size:14px;">Marketing Authorization</div>
+            <div style="font-size:11.5px;color:var(--text-muted);">Authorize TechinBridge to promote your project — spotlight articles, videos, LinkedIn posts. You control what we share.</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <span class="agreement-status" id="agreementMarketingStatus" style="font-size:11px;padding:4px 10px;border-radius:10px;background:#fef3c7;color:#92400e;">Not Signed</span>
+          <button class="btn-secondary" onclick="openAgreement('marketing_auth')" style="font-size:11px;padding:6px 12px;">📄 Read & Sign</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3893,6 +3910,74 @@ The Parties acknowledge that breach of this NDA may cause irreparable harm. The 
 • Severability: If any provision is held invalid, the remaining provisions remain in full effect
 
 By signing below, you acknowledge that you have read, understood, and agree to be bound by the terms of this Non-Disclosure Agreement.`
+  },
+  'marketing_auth': {
+    title: 'Marketing Authorization',
+    content: `MARKETING AUTHORIZATION
+Granting TechinBridge Promotional Rights for Your Project
+
+This Marketing Authorization ("Authorization") is made on the date of signing, by and between:
+
+Grantor: [Startup / Team Name — you, the signatory]
+Grantee: Techinbridge
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. PURPOSE
+
+The Grantor wishes to increase their project's visibility in the Chinese market. The Grantee (TechinBridge) operates an international innovation platform with reach across LinkedIn, the TechinBridge website, and other professional channels targeting Chinese investors, industrial parks, and corporate partners.
+
+This Authorization defines what the Grantee MAY and MAY NOT share publicly.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2. WHAT WE MAY SHARE
+
+With your authorization, TechinBridge may:
+
+• Project overview — industry, product category, technology highlights (non-confidential summary level)
+• Competition participation — which competitions you entered, round advancements, and awards won
+• Team public background — founder names, roles, educational background, and professional experience (NO personal contact info)
+• Non-confidential pages from your pitch deck — only pages you designate as shareable
+• Project spotlight articles and short videos — created by TechinBridge to feature your project
+• Posts on TechinBridge website, LinkedIn, and other professional platforms
+
+Goal: Increase your project's exposure among Chinese investors, industrial parks, and partners — attracting more opportunities.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3. WHAT WE WILL NEVER SHARE
+
+TechinBridge commits to NEVER share:
+
+• Confidential IP details — core algorithms, source code, proprietary formulas, unpublished patent applications
+• Personal contact information — email addresses, phone numbers, WeChat IDs, physical addresses
+• Financial data — revenue figures, funding amounts, cap tables, customer lists, or sensitive business information
+• Any material you explicitly mark as "confidential — do not share"
+• Full pitch deck — only non-confidential summary pages as agreed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4. YOUR CONTROL
+
+• You may revoke this authorization at any time by emailing ice@techinbridge.com
+• Upon revocation, TechinBridge will remove your project materials from ongoing promotional activities within fourteen (14) business days
+• Already-published content (articles, posts) cannot be retracted from third-party platforms, but we will cease further distribution
+• You may request a preview of any promotional material before publication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5. NO COMPENSATION
+
+This is a promotional authorization only. The Grantor grants these rights free of charge. No compensation is owed by either Party under this Authorization. This Authorization is separate from and does not affect any other agreements between the Parties.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6. TERM
+
+This Authorization remains in effect until revoked by the Grantor in writing. Either Party may terminate with written notice.
+
+By signing below, you authorize TechinBridge to promote your project within the scope described above. You may revoke this authorization at any time via email.`
   }
 };
 
@@ -3923,6 +4008,16 @@ async function loadAgreementStatus() {
       ndaStatus.style.color = '#065f46';
       var ndaBtn = document.querySelector('#agreementNDA .btn-secondary');
       if (ndaBtn) ndaBtn.textContent = '📄 View Signed';
+    }
+
+    // Marketing Authorization status
+    if (data.status.marketing_auth) {
+      var maStatus = document.getElementById('agreementMarketingStatus');
+      maStatus.textContent = '✅ Signed';
+      maStatus.style.background = '#d1fae5';
+      maStatus.style.color = '#065f46';
+      var maBtn = document.querySelector('#agreementMarketing .btn-secondary');
+      if (maBtn) maBtn.textContent = '📄 View Signed';
     }
   } catch(e) { console.error('[Agreement] Status check failed:', e); }
 }
