@@ -576,6 +576,7 @@ function renderSidebar() {
         </div>
       </div>
       <div class="list-item-actions">
+        <button class="btn btn-sm" onclick="event.stopPropagation();toggleFeatured(${c.id})" title="Toggle Featured" style="font-size:16px;padding:2px 6px;border:none;background:transparent;cursor:pointer;${c.featured?'':'opacity:0.3'}">⭐</button>
         <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();editCompetition(${c.id})" title="Edit">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteCompetition(${c.id})" title="Delete">🗑</button>
       </div>
@@ -604,6 +605,17 @@ async function reloadFromServer() {
 }
 
 function editCompetition(id) { editingId = id; const c = competitions.find(x=>x.id===id); if (!c) return; renderSidebar(); renderForm(c); }
+
+async function toggleFeatured(id) {
+  var comp = competitions.find(c => c.id === id);
+  if (!comp) return;
+  comp.featured = comp.featured ? 0 : 1;
+  try {
+    await apiFetch('/competitions/' + id, { method: 'PUT', body: JSON.stringify({ featured: comp.featured }) });
+    renderSidebar();
+    showToast(comp.featured ? '⭐ Featured' : 'Unfeatured', 'success');
+  } catch(e) { showToast('Update failed', 'error'); }
+}
 
 async function deleteCompetition(id) {
   if (!confirm('Delete #'+id+'?')) return;
@@ -1061,36 +1073,72 @@ async function loadSiteConfig() {
     const data = await fetch('/api/config').then(r=>r.json());
     siteConfig = data.config || {};
   } catch(e) { siteConfig = {}; }
+  const esc = (v) => v ? v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '';
   const grid = document.getElementById('configGrid');
   grid.innerHTML = `
     <div class="config-card" style="grid-column:1/-1;">
       <h3>🏠 Hero Section</h3>
       <div class="form-grid">
-        <div class="form-group form-grid-full"><label>Hero Title</label>
-          <input type="text" id="cfg_hero_title" value="${escapeHtml(siteConfig.hero_title||'')}" placeholder="Compete in China. Grow with China."></div>
-        <div class="form-group form-grid-full"><label>Hero Subtitle</label>
-          <textarea id="cfg_hero_subtitle">${escapeHtml(siteConfig.hero_subtitle||'')}</textarea></div>
+        <div class="form-group form-grid-full"><label>Hero Title (English)</label>
+          <input type="text" id="cfg_hero_title" value="${esc(siteConfig.hero_title||'')}" placeholder="Compete in China. Grow with China."></div>
+        <div class="form-group form-grid-full"><label>Hero Subtitle (English)</label>
+          <textarea id="cfg_hero_subtitle">${esc(siteConfig.hero_subtitle||'')}</textarea></div>
       </div>
     </div>
-    <div class="config-card"><h3>📊 Stats</h3>
-      <div class="form-group"><label>Competitions Stat</label><input type="text" id="cfg_stat_competitions" value="${escapeHtml(siteConfig.stat_competitions||'')}" placeholder="200+"></div>
-      <div class="form-group"><label>Cities Stat</label><input type="text" id="cfg_stat_cities" value="${escapeHtml(siteConfig.stat_cities||'')}" placeholder="20+"></div>
+    <div class="config-card" style="grid-column:1/-1;">
+      <h3>🌐 Hero — 中文翻译</h3>
+      <div class="form-grid">
+        <div class="form-group form-grid-full"><label>Hero Title (中文)</label>
+          <input type="text" id="cfg_hero_title_zh" value="${esc(siteConfig.hero_title_zh||'')}" placeholder="在中国竞技，与中国共成长。"></div>
+        <div class="form-group form-grid-full"><label>Hero Subtitle (中文)</label>
+          <textarea id="cfg_hero_sub_zh">${esc(siteConfig.hero_sub_zh||'')}</textarea></div>
+      </div>
     </div>
-    <div class="config-card"><h3>📊 More Stats</h3>
-      <div class="form-group"><label>Startups Stat</label><input type="text" id="cfg_stat_startups" value="${escapeHtml(siteConfig.stat_startups||'')}" placeholder="5,000+"></div>
-      <div class="form-group"><label>Prize Pool Stat</label><input type="text" id="cfg_stat_prize_pool" value="${escapeHtml(siteConfig.stat_prize_pool||'')}" placeholder="$50M+"></div>
+    <div class="config-card" style="grid-column:1/-1;">
+      <h3>🔘 Hero CTA Buttons</h3>
+      <div class="form-grid">
+        <div class="form-group"><label>Primary CTA Text</label><input type="text" id="cfg_hero_cta_text" value="${esc(siteConfig.hero_cta_text||'')}" placeholder="Get Started"></div>
+        <div class="form-group"><label>Secondary CTA Text</label><input type="text" id="cfg_hero_cta_secondary" value="${esc(siteConfig.hero_cta_secondary||'')}" placeholder="How It Works"></div>
+      </div>
+    </div>
+    <div class="config-card"><h3>📊 Stats — Row 1</h3>
+      <div class="form-group"><label>Competitions Stat</label><input type="text" id="cfg_stat_competitions" value="${esc(siteConfig.stat_competitions||'')}" placeholder="200+"></div>
+      <div class="form-group"><label>Cities Stat</label><input type="text" id="cfg_stat_cities" value="${esc(siteConfig.stat_cities||'')}" placeholder="20+"></div>
+    </div>
+    <div class="config-card"><h3>📊 Stats — Row 2</h3>
+      <div class="form-group"><label>Prize Pool Stat</label><input type="text" id="cfg_stat_prize_pool" value="${esc(siteConfig.stat_prize_pool||'')}" placeholder="¥100M+"></div>
+      <div class="form-group"><label>Industry Tracks Stat</label><input type="text" id="cfg_stat_industry_tracks" value="${esc(siteConfig.stat_industry_tracks||'')}" placeholder="12"></div>
+    </div>
+    <div class="config-card"><h3>📊 Organizers Page Stats</h3>
+      <div class="form-group"><label>Org Stat 1 (Startups)</label><input type="text" id="cfg_org_stat1" value="${esc(siteConfig.org_stat1||'')}" placeholder="10K+"></div>
+      <div class="form-group"><label>Org Stat 2 (Countries)</label><input type="text" id="cfg_org_stat2" value="${esc(siteConfig.org_stat2||'')}" placeholder="50+"></div>
+      <div class="form-group"><label>Org Stat 3 (Languages)</label><input type="text" id="cfg_org_stat3" value="${esc(siteConfig.org_stat3||'')}" placeholder="8"></div>
+      <div class="form-group"><label>Org Stat 4 (Pricing)</label><input type="text" id="cfg_org_stat4" value="${esc(siteConfig.org_stat4||'')}" placeholder="Free"></div>
+    </div>
+    <div class="config-card"><h3>🏙️ Cities Page</h3>
+      <div class="form-group"><label>Hero Title</label><input type="text" id="cfg_cities_hero_title" value="${esc(siteConfig.cities_hero_title||'')}" placeholder="Not Just Beijing & Shanghai"></div>
+      <div class="form-group"><label>Hero Subtitle</label><input type="text" id="cfg_cities_hero_sub" value="${esc(siteConfig.cities_hero_sub||'')}" placeholder="China has 20+ cities with thriving innovation ecosystems..."></div>
+    </div>
+    <div class="config-card"><h3>⭐ Featured Carousel</h3>
+      <div class="form-group"><label>Carousel Title</label><input type="text" id="cfg_carousel_title" value="${esc(siteConfig.carousel_title||'')}" placeholder="Featured Competitions"></div>
+      <div class="form-group"><label>Carousel Title (中文)</label><input type="text" id="cfg_carousel_title_zh" value="${esc(siteConfig.carousel_title_zh||'')}" placeholder="推荐赛事"></div>
+    </div>
+    <div class="config-card"><h3>🏷️ City Tags (JSON)</h3>
+      <div class="form-group"><label>City List</label>
+        <textarea id="cfg_city_tags" rows="4" style="font-family:monospace;font-size:11px;">${esc(siteConfig.city_tags||'')}</textarea>
+        <small style="color:var(--text-muted);">JSON array: [{"name":"Beijing","color":"#dc2626"},...] — leave empty for defaults</small></div>
     </div>
     <div class="config-card" style="grid-column:1/-1;">
       <h3>📢 Announcement Bar</h3>
       <div class="form-group"><label>Active</label>
         <label style="font-weight:400;cursor:pointer;"><input type="checkbox" id="cfg_announcement_active" ${siteConfig.announcement_active?'checked':''} style="accent-color:var(--accent);"> Show announcement bar</label></div>
       <div class="form-group"><label>Announcement Text</label>
-        <input type="text" id="cfg_announcement_text" value="${escapeHtml(siteConfig.announcement_text||'')}" placeholder="New competitions added! Check out the latest events →"></div>
+        <input type="text" id="cfg_announcement_text" value="${esc(siteConfig.announcement_text||'')}" placeholder="New competitions added! Check out the latest events →"></div>
     </div>`;
 }
 
 async function saveAllConfig() {
-  const keys = ['hero_title','hero_subtitle','stat_competitions','stat_cities','stat_startups','stat_prize_pool','announcement_active','announcement_text'];
+  const keys = ['hero_title','hero_subtitle','hero_title_zh','hero_sub_zh','hero_cta_text','hero_cta_secondary','stat_competitions','stat_cities','stat_prize_pool','stat_industry_tracks','org_stat1','org_stat2','org_stat3','org_stat4','cities_hero_title','cities_hero_sub','carousel_title','carousel_title_zh','city_tags','announcement_active','announcement_text'];
   let saved = 0;
   for (const key of keys) {
     const el = document.getElementById('cfg_' + key);

@@ -2471,30 +2471,93 @@ async function loadSiteConfig() {
     const data = await resp.json();
     if (data.success && data.config) {
       const cfg = data.config;
-      // Update Hero title
+      
+      // === Hero Title ===
       if (cfg.hero_title) {
         const el = document.querySelector('[data-i18n="hero_title"]');
         if (el) el.innerHTML = cfg.hero_title;
       }
-      if (cfg.hero_subtitle) {
+      
+      // === Hero Subtitle ===
+      var heroSub = cfg.hero_subtitle || cfg.hero_sub;
+      if (heroSub) {
         const el = document.querySelector('[data-i18n="hero_sub"]');
-        if (el) el.textContent = cfg.hero_subtitle;
+        if (el) el.textContent = heroSub;
       }
-      // Update stats
-      if (cfg.stat_competitions) document.querySelector('.hero-stat:nth-child(1) .hero-stat-num').textContent = cfg.stat_competitions;
+      
+      // === Hero CTA Buttons ===
+      if (cfg.hero_cta_text) {
+        var ctaBtn = document.querySelector('.hero-cta .btn-primary');
+        if (ctaBtn) ctaBtn.innerHTML = cfg.hero_cta_text + ' <span class="arrow">→</span>';
+      }
+      if (cfg.hero_cta_secondary) {
+        var secBtn = document.querySelector('.hero-cta .btn-secondary');
+        if (secBtn) secBtn.textContent = cfg.hero_cta_secondary;
+      }
+      
+      // === Stats ===
+      if (cfg.stat_competitions) {
+        document.querySelector('.hero-stat:nth-child(1) .hero-stat-num').textContent = cfg.stat_competitions;
+        window._cmsStatOverride = true;
+      }
       if (cfg.stat_cities) document.querySelector('.hero-stat:nth-child(2) .hero-stat-num').textContent = cfg.stat_cities;
-      if (cfg.stat_startups) document.querySelector('.hero-stat:nth-child(3) .hero-stat-num').textContent = cfg.stat_startups;
-      if (cfg.stat_prize_pool) document.querySelector('.hero-stat:nth-child(4) .hero-stat-num').textContent = cfg.stat_prize_pool;
-      // Announcement bar
+      if (cfg.stat_prize_pool) document.querySelector('.hero-stat:nth-child(3) .hero-stat-num').textContent = cfg.stat_prize_pool;
+      if (cfg.stat_industry_tracks) document.querySelector('.hero-stat:nth-child(4) .hero-stat-num').textContent = cfg.stat_industry_tracks;
+      
+      // === Organizers Page Stats ===
+      var orgNums = document.querySelectorAll('.org-stat-card .num');
+      if (cfg.org_stat1 && orgNums[0]) orgNums[0].textContent = cfg.org_stat1;
+      if (cfg.org_stat2 && orgNums[1]) orgNums[1].textContent = cfg.org_stat2;
+      if (cfg.org_stat3 && orgNums[2]) orgNums[2].textContent = cfg.org_stat3;
+      if (cfg.org_stat4 && orgNums[3]) orgNums[3].textContent = cfg.org_stat4;
+      
+      // === Cities Page ===
+      if (cfg.cities_hero_title) {
+        var chTitle = document.querySelector('.cities-hero h2');
+        if (chTitle) chTitle.textContent = cfg.cities_hero_title;
+      }
+      if (cfg.cities_hero_sub) {
+        var chSub = document.querySelector('.cities-hero p');
+        if (chSub) chSub.textContent = cfg.cities_hero_sub;
+      }
+      
+      // === Carousel Title ===
+      if (cfg.carousel_title) {
+        var carEl = document.querySelector('[data-i18n="carousel_title"]');
+        if (carEl) carEl.textContent = cfg.carousel_title;
+      }
+      
+      // === Chinese Translations ===
+      window._cmsI18n = window._cmsI18n || {};
+      if (cfg.hero_title_zh) window._cmsI18n.hero_title = cfg.hero_title_zh;
+      if (cfg.hero_sub_zh) window._cmsI18n.hero_sub = cfg.hero_sub_zh;
+      if (cfg.carousel_title_zh) window._cmsI18n.carousel_title = cfg.carousel_title_zh;
+      
+      // === City Tags ===
+      if (cfg.city_tags) {
+        try { window._cmsCities = JSON.parse(cfg.city_tags); } catch(e) { window._cmsCities = null; }
+      }
+      
+      // === Announcement Bar ===
       if (cfg.announcement_active && cfg.announcement_text) {
-        const bar = document.createElement('div');
+        var bar = document.createElement('div');
         bar.id = 'announcementBar';
         bar.style.cssText = 'background:linear-gradient(135deg,#2563eb,#6366f1);color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-weight:500;';
         bar.innerHTML = cfg.announcement_text;
         document.body.insertBefore(bar, document.body.firstChild);
       }
+      
+      // === Meta Description ===
+      if (cfg.hero_title || heroSub) {
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          var titleText = cfg.hero_title || 'Compete in China. Grow with China.';
+          var subText = heroSub || 'Discover 200+ innovation competitions across China.';
+          metaDesc.setAttribute('content', titleText.replace(/<[^>]*>/g, '') + '. ' + subText);
+        }
+      }
     }
-  } catch(e) { /* silently fail — use HTML defaults */ }
+  } catch(e) { /* silently fail */ }
 }
 
 // ═══════════ CITY DATA ═══════════
@@ -2850,7 +2913,11 @@ function renderCards(comps) {
   const grid = document.getElementById('compGrid');
   const empty = document.getElementById('emptyState');
   document.getElementById('resultCount').textContent = comps.length;
-  document.getElementById('stat-total').textContent = comps.length;
+  // Only update stat-total if CMS hasn't set a custom value
+  var statTotal = document.getElementById('stat-total');
+  if (statTotal && !window._cmsStatOverride) {
+    statTotal.textContent = comps.length;
+  }
 
   if (comps.length === 0) {
     grid.innerHTML = '';
@@ -4819,7 +4886,8 @@ function applyLanguage(lang) {
     : 'Compete in China — All Innovation Competitions, One Platform';
   document.querySelectorAll('[data-i18n]').forEach(function(el) {
     var key = el.getAttribute('data-i18n');
-    var t = I18N[lang] && I18N[lang][key];
+    // CMS zh translations take priority over hardcoded I18N
+    var t = (isZh && window._cmsI18n && window._cmsI18n[key]) || (I18N[lang] && I18N[lang][key]);
     if (!t) return;
     var pureText = true;
     for (var i = 0; i < el.childNodes.length; i++) {
