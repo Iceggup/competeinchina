@@ -3959,12 +3959,17 @@ function closeAgreementModal(e) {
   if (e && e.target !== document.getElementById('agreementOverlay')) return;
   document.getElementById('agreementOverlay').style.display = 'none';
   document.body.style.overflow = '';
-  CURRENT_AGREEMENT_TYPE = null;
+  // Only reset type on explicit close (not auto-close after signing)
+  if (e) CURRENT_AGREEMENT_TYPE = null;
 }
 
 async function signAgreement() {
   var token = getToken();
-  if (!token) return;
+  if (!token) {
+    document.getElementById('agreementSignError').textContent = 'Please log in first.';
+    document.getElementById('agreementSignError').style.display = 'block';
+    return;
+  }
   var name = document.getElementById('agreementSignName').value.trim();
   var errEl = document.getElementById('agreementSignError');
   errEl.style.display = 'none';
@@ -3981,6 +3986,7 @@ async function signAgreement() {
   }
 
   var btn = document.getElementById('agreementSignBtn');
+  var origText = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Signing...';
 
@@ -3995,23 +4001,23 @@ async function signAgreement() {
       document.getElementById('agreementAlreadySigned').style.display = 'block';
       document.getElementById('agreementSignedDate').textContent = new Date().toISOString().substring(0, 10);
       document.getElementById('agreementSignForm').style.display = 'none';
-      // Update the card status
       loadAgreementStatus();
-      // Close modal after short delay
+      // Auto-close after showing success
       setTimeout(function() {
-        closeAgreementModal();
+        document.getElementById('agreementOverlay').style.display = 'none';
+        document.body.style.overflow = '';
       }, 2000);
     } else {
       errEl.textContent = data.message || 'Failed to sign. Please try again.';
       errEl.style.display = 'block';
       btn.disabled = false;
-      btn.textContent = 'Sign Agreement ✍️';
+      btn.textContent = origText;
     }
   } catch(e) {
     errEl.textContent = 'Network error. Please try again.';
     errEl.style.display = 'block';
     btn.disabled = false;
-    btn.textContent = 'Sign Agreement ✍️';
+    btn.textContent = origText;
   }
 }
 
