@@ -1,0 +1,29 @@
+# ═══════════════════════════════════════════════════════════
+#  CompeteInChina — Cloudflare Workers 部署配置
+# ═══════════════════════════════════════════════════════════
+
+name = "competeinchina-api"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# ─── 环境变量 ──────────────────────────────────
+[vars]
+RESEND_API_KEY = "re_dw1bVA9M_9z2T2hoN5h82W1UnScaF77r6"
+JWT_SECRET = "competeinchina_jwt_secret_key_2026"
+
+# ─── D1 数据库绑定 ──────────────────────────────
+# 部署后需要手动创建 D1 数据库:
+#   npx wrangler d1 create competeinchina-db
+# 然后更新这里的 database_id
+[[d1_databases]]
+binding = "DB"
+database_name = "competeinchina-db"
+database_id = "YOUR_DATABASE_ID_HERE"
+
+# ─── 路由 ──────────────────────────────────────
+# Workers 将绑定到 api.competeinchina.com
+# 部署后需要在 Cloudflare Dashboard 添加 DNS 记录:
+#   api.competeinchina.com  CNAME  competeinchina-api.YOUR_SUBDOMAIN.workers.dev
+[[routes]]
+pattern = "api.competeinchina.com"
+zone_name = "competeinchina.com"

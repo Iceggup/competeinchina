@@ -1,0 +1,20 @@
+{
+  "name": "competeinchina-worker",
+  "version": "1.0.0",
+  "description": "CompeteInChina API — Cloudflare Workers",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "db:create": "wrangler d1 create competeinchina-db",
+    "db:migrate": "wrangler d1 execute competeinchina-db --file=migrations/0001_schema.sql",
+    "db:migrate:prod": "wrangler d1 execute competeinchina-db --env production --file=migrations/0001_schema.sql"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "resend": "^3.2.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

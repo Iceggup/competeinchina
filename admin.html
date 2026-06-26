@@ -4,6 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Compete in China — Admin Panel</title>
+<!-- API Base URL — auto-detect production vs local -->
+<script>
+(function() {
+  var host = window.location.hostname;
+  if (host === 'competeinchina.com' || host === 'www.competeinchina.com') {
+    window.API_BASE = 'https://api.competeinchina.com';
+  } else {
+    window.API_BASE = ''; // relative paths for local dev
+  }
+  // Patch fetch to auto-prepend API_BASE for /api/ calls
+  var _fetch = window.fetch;
+  window.fetch = function(url, opts) {
+    if (typeof url === 'string' && url.startsWith('/api/') && window.API_BASE) {
+      url = window.API_BASE + url;
+    }
+    return _fetch.call(window, url, opts);
+  };
+})();
+</script>
 <style>
   :root {
     --bg: #f8fafb;
