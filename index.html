@@ -2452,6 +2452,17 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSiteConfig();
   // Restore auth state
   updateNavAuth();
+  // Handle ?page= URL parameter (e.g. from registration form)
+  var params = new URLSearchParams(window.location.search);
+  var pageParam = params.get('page');
+  if (pageParam) {
+    setTimeout(function() {
+      showPage(pageParam);
+      // Trigger data loading for pages that need it
+      if (pageParam === 'profile') loadProfile();
+      if (pageParam === 'dashboard') renderDashboard();
+    }, 500);
+  }
 });
 
 async function loadSiteConfig() {
@@ -3999,6 +4010,32 @@ By signing below, you authorize TechinBridge to promote your project within the 
   }
 };
 
+function setAgreementCardState(agreementType, signed) {
+  var elMap = {
+    service_agreement: { card: 'agreementService', status: 'agreementServiceStatus' },
+    nda: { card: 'agreementNDA', status: 'agreementNDAStatus' },
+    marketing_auth: { card: 'agreementMarketing', status: 'agreementMarketingStatus' }
+  };
+  var ids = elMap[agreementType];
+  if (!ids) return;
+
+  var statusEl = document.getElementById(ids.status);
+  var btn = document.querySelector('#' + ids.card + ' .btn-secondary');
+  if (!statusEl || !btn) return;
+
+  if (signed) {
+    statusEl.textContent = '✅ Signed';
+    statusEl.style.background = '#d1fae5';
+    statusEl.style.color = '#065f46';
+    btn.textContent = '📄 View Signed';
+  } else {
+    statusEl.textContent = 'Not Signed';
+    statusEl.style.background = '#fef3c7';
+    statusEl.style.color = '#92400e';
+    btn.textContent = '📄 Read & Sign';
+  }
+}
+
 async function loadAgreementStatus() {
   var token = getToken();
   if (!token) return;
@@ -4008,35 +4045,9 @@ async function loadAgreementStatus() {
     var data = await resp.json();
     if (!data.success) return;
 
-    // Service Agreement status
-    if (data.status.service_agreement) {
-      var saStatus = document.getElementById('agreementServiceStatus');
-      saStatus.textContent = '✅ Signed';
-      saStatus.style.background = '#d1fae5';
-      saStatus.style.color = '#065f46';
-      var saBtn = document.querySelector('#agreementService .btn-secondary');
-      if (saBtn) saBtn.textContent = '📄 View Signed';
-    }
-
-    // NDA status
-    if (data.status.nda) {
-      var ndaStatus = document.getElementById('agreementNDAStatus');
-      ndaStatus.textContent = '✅ Signed';
-      ndaStatus.style.background = '#d1fae5';
-      ndaStatus.style.color = '#065f46';
-      var ndaBtn = document.querySelector('#agreementNDA .btn-secondary');
-      if (ndaBtn) ndaBtn.textContent = '📄 View Signed';
-    }
-
-    // Marketing Authorization status
-    if (data.status.marketing_auth) {
-      var maStatus = document.getElementById('agreementMarketingStatus');
-      maStatus.textContent = '✅ Signed';
-      maStatus.style.background = '#d1fae5';
-      maStatus.style.color = '#065f46';
-      var maBtn = document.querySelector('#agreementMarketing .btn-secondary');
-      if (maBtn) maBtn.textContent = '📄 View Signed';
-    }
+    setAgreementCardState('service_agreement', !!data.status.service_agreement);
+    setAgreementCardState('nda', !!data.status.nda);
+    setAgreementCardState('marketing_auth', !!data.status.marketing_auth);
   } catch(e) { console.error('[Agreement] Status check failed:', e); }
 }
 
@@ -4053,7 +4064,7 @@ function openAgreement(type) {
   fetch('/api/agreements/status', { headers: { 'Authorization': 'Bearer ' + token } })
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      var signed = type === 'service_agreement' ? data.status.service_agreement : data.status.nda;
+      var signed = data.status[type];
       if (signed) {
         document.getElementById('agreementAlreadySigned').style.display = 'block';
         document.getElementById('agreementSignedDate').textContent = signed.signed_at ? signed.signed_at.substring(0, 10) : 'unknown date';

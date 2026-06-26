@@ -302,7 +302,6 @@
   <button class="tab-btn" onclick="switchTab('organizers')">📝 Organizers</button>
   <button class="tab-btn" onclick="switchTab('tracking')">📋 赛事追踪</button>
   <button class="tab-btn" onclick="switchTab('content')">🎨 Site Content</button>
-  <button class="tab-btn" onclick="switchTab('agreements')">📝 协议签署</button>
 </div>
 
 <!-- ═══ Tab: Competitions ═══ -->
@@ -355,15 +354,16 @@
   </div>
 </div>
 
-<!-- ═══ Tab: Concierge ═══ (formerly Registrations — form submissions) -->
+<!-- ═══ Tab: Concierge ═══ (Registrations + Agreement Signatures) -->
 <div class="tab-content" id="tab-concierge" style="padding:24px;">
   <div class="stats-grid" id="regStats"></div>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px;">
     <button class="btn btn-outline btn-sm" onclick="exportRegistrationsCSV()">📊 Export CSV</button>
+    <button class="btn btn-outline btn-sm" onclick="loadConcierge()">🔄 Refresh</button>
   </div>
   <div class="table-wrap">
     <div class="table-header">
-      <span class="col-1">#</span><span class="col-2">Team</span><span class="col-3">Contact</span><span class="col-4">Status</span><span class="col-5">Date</span><span style="width:140px;">Action</span>
+      <span class="col-1">#</span><span class="col-2">Team</span><span class="col-3">User</span><span class="col-4">Contact</span><span class="col-5">Status</span><span style="width:240px;">Agreements</span><span class="col-6">Date</span><span style="width:120px;">Action</span>
     </div>
     <div class="table-body" id="regTableBody">
       <div style="padding:48px;text-align:center;color:var(--text-muted);">Loading...</div>
@@ -427,33 +427,14 @@
   </div>
 </div>
 
-<!-- ═══ Tab: Agreements (协议签署) ═══ -->
-<div class="tab-content" id="tab-agreements" style="padding:24px 32px;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-    <h2 style="font-size:16px;font-weight:700;">📝 协议签署状态</h2>
-    <button class="btn btn-outline btn-sm" onclick="loadAgreements()">🔄 刷新</button>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;" id="agreementStats"></div>
-  <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;font-size:13px;" id="agreementTable">
-      <thead>
-        <tr style="border-bottom:2px solid var(--border);text-align:left;">
-          <th style="padding:10px 12px;">用户</th><th style="padding:10px 12px;">邮箱</th>
-          <th style="padding:10px 12px;">🤝 服务协议</th><th style="padding:10px 12px;">🔒 保密协议</th><th style="padding:10px 12px;">📢 营销授权</th>
-          <th style="padding:10px 12px;">操作</th>
-        </tr>
-      </thead>
-      <tbody id="agreementTbody"></tbody>
-    </table>
-  </div>
-  <div class="modal-overlay" id="revokeModal" style="display:none;" onclick="closeRevokeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;">
-      <h3 style="margin-bottom:12px;">取消签署确认</h3>
-      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;" id="revokeInfo"></p>
-      <div style="display:flex;gap:10px;justify-content:flex-end;">
-        <button class="btn btn-outline btn-sm" onclick="closeRevokeModal()">取消</button>
-        <button class="btn btn-sm" style="background:#dc2626;color:#fff;border:none;border-radius:6px;" id="revokeConfirmBtn" onclick="confirmRevoke()">确认取消签署</button>
-      </div>
+<!-- Revoke Agreement Modal -->
+<div class="modal-overlay" id="revokeModal" style="display:none;" onclick="closeRevokeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;">
+    <h3 style="margin-bottom:12px;">取消签署确认</h3>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;" id="revokeInfo"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline btn-sm" onclick="closeRevokeModal()">取消</button>
+      <button class="btn btn-sm" style="background:#dc2626;color:#fff;border:none;border-radius:6px;" onclick="confirmRevoke()">确认取消签署</button>
     </div>
   </div>
 </div>
@@ -751,14 +732,78 @@ async function exportJSON() {
   showToast('Exported ✓','success');
 }
 
-// ═══════════ CONCIERGE TAB (Concierge form submissions = registrations table) ═══════════
+// ═══════════ CONCIERGE TAB (Registrations + Agreement Signatures) ═══════════
 async function loadConcierge() {
   try {
     const data = await apiFetch('/registrations');
     registrations = data.registrations || [];
   } catch(e) { registrations = []; }
+  // Load agreement statuses for all users
+  try {
+    const agData = await apiFetch('/agreements/all');
+    window._allAgreements = agData.agreements || [];
+  } catch(e) { window._allAgreements = []; }
   renderRegStats();
   renderRegTable();
+}
+
+function getAgreementStatus(userId) {
+  var ags = window._allAgreements || [];
+  var userAgs = ags.filter(function(a) { return a.user_id === userId; });
+  return {
+    service: userAgs.find(function(a) { return a.agreement_type === 'service_agreement'; }),
+    nda: userAgs.find(function(a) { return a.agreement_type === 'nda'; }),
+    marketing: userAgs.find(function(a) { return a.agreement_type === 'marketing_auth'; })
+  };
+}
+
+function renderRegTable() {
+  const body = document.getElementById('regTableBody');
+  if (registrations.length===0) { body.innerHTML='<div style="padding:48px;text-align:center;color:var(--text-muted);">No registrations yet.</div>'; return; }
+  body.innerHTML = registrations.map(r => {
+    var ag = getAgreementStatus(r.user_id);
+    var agHtml = '';
+    var types = [
+      {key:'service', label:'🤝 Svc', signed: !!ag.service},
+      {key:'nda', label:'🔒 NDA', signed: !!ag.nda},
+      {key:'marketing', label:'📢 Mkt', signed: !!ag.marketing}
+    ];
+    types.forEach(function(t) {
+      var color = t.signed ? 'var(--green)' : 'var(--text-muted)';
+      var bg = t.signed ? '#ecfdf5' : '#f8fafb';
+      var border = t.signed ? 'var(--green)' : 'var(--border)';
+      agHtml += '<span style="display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;color:'+color+';background:'+bg+';border:1px solid '+border+';margin-right:4px;" title="'+t.label+'">'+t.label+'</span>';
+    });
+    
+    // PDF download buttons for signed agreements
+    var pdfBtns = '';
+    if (ag.service) pdfBtns += '<button onclick="downloadAgreementPDF('+r.user_id+',\'service_agreement\')" style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;margin-left:2px;" title="Download Service Agreement PDF">📥Svc</button>';
+    if (ag.nda) pdfBtns += '<button onclick="downloadAgreementPDF('+r.user_id+',\'nda\')" style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;margin-left:2px;" title="Download NDA PDF">📥NDA</button>';
+    if (ag.marketing) pdfBtns += '<button onclick="downloadAgreementPDF('+r.user_id+',\'marketing_auth\')" style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;margin-left:2px;" title="Download Marketing Auth PDF">📥Mkt</button>';
+    
+    return `
+    <div class="table-row">
+      <span class="col-1">#${r.id}</span>
+      <span class="col-2"><strong>${escapeHtml(r.team_name||'')}</strong></span>
+      <span class="col-3">${escapeHtml(r.user_full_name||'—')}</span>
+      <span class="col-4">${escapeHtml(r.contact_email||'—')}</span>
+      <span class="col-5"><span class="status-badge status-${r.status}">${r.status}</span></span>
+      <span style="width:240px;display:flex;align-items:center;gap:2px;flex-wrap:wrap;">${agHtml}${pdfBtns}</span>
+      <span class="col-6">${(r.submitted_at||'').substring(0,10)}</span>
+      <span style="width:120px;display:flex;gap:4px;">
+        <button class="btn btn-sm btn-outline" onclick="showRegDetail(${r.id})">👁</button>
+        <select onchange="updateRegStatus(${r.id},this.value)" style="font-size:10px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--surface);">
+          <option ${r.status==='pending'?'selected':''}>pending</option>
+          <option ${r.status==='reviewed'?'selected':''}>reviewed</option>
+          <option ${r.status==='approved'?'selected':''}>approved</option>
+          <option ${r.status==='rejected'?'selected':''}>rejected</option>
+        </select>
+      </span>
+    </div>`}).join('');
+}
+
+function downloadAgreementPDF(userId, type) {
+  window.open('/api/admin/agreements/' + userId + '/' + type + '/pdf', '_blank');
 }
 
 function renderRegStats() {
@@ -767,28 +812,6 @@ function renderRegStats() {
     <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total Registrations</div></div>
     <div class="stat-card"><div class="stat-num">${pending}</div><div class="stat-label">Pending Review</div></div>
     <div class="stat-card"><div class="stat-num">${registrations.filter(r=>r.status==='approved').length}</div><div class="stat-label">Approved</div></div>`;
-}
-
-function renderRegTable() {
-  const body = document.getElementById('regTableBody');
-  if (registrations.length===0) { body.innerHTML='<div style="padding:48px;text-align:center;color:var(--text-muted);">No registrations yet.</div>'; return; }
-  body.innerHTML = registrations.map(r => `
-    <div class="table-row">
-      <span class="col-1">#${r.id}</span>
-      <span class="col-2"><strong>${escapeHtml(r.team_name||'')}</strong></span>
-      <span class="col-3">${escapeHtml(r.contact_email||'')}</span>
-      <span class="col-4"><span class="status-badge status-${r.status}">${r.status}</span></span>
-      <span class="col-5">${(r.submitted_at||'').substring(0,10)}</span>
-      <span style="width:140px;display:flex;gap:6px;">
-        <button class="btn btn-sm btn-outline" onclick="showRegDetail(${r.id})">👁 View</button>
-        <select onchange="updateRegStatus(${r.id},this.value)" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);">
-          <option ${r.status==='pending'?'selected':''}>pending</option>
-          <option ${r.status==='reviewed'?'selected':''}>reviewed</option>
-          <option ${r.status==='approved'?'selected':''}>approved</option>
-          <option ${r.status==='rejected'?'selected':''}>rejected</option>
-        </select>
-      </span>
-    </div>`).join('');
 }
 
 function showRegDetail(id) {
@@ -1293,53 +1316,9 @@ document.addEventListener('keydown', function(e) {
 var _revokeUserId = null;
 var _revokeType = null;
 
-async function loadAgreements() {
-  try {
-    var resp = await fetch('/api/admin/agreements', { headers: authHeaders() });
-    var data = await resp.json();
-    if (!data.success) return;
-
-    var users = data.users || [];
-    var totalUsers = users.length;
-    var saSigned = 0, ndaSigned = 0, maSigned = 0;
-    users.forEach(function(u) {
-      if (u.agreements.service_agreement) saSigned++;
-      if (u.agreements.nda) ndaSigned++;
-      if (u.agreements.marketing_auth) maSigned++;
-    });
-
-    document.getElementById('agreementStats').innerHTML =
-      '<div class="stat-card"><div class="stat-num">' + totalUsers + '</div><div class="stat-label">总用户</div></div>' +
-      '<div class="stat-card"><div class="stat-num" style="color:var(--accent);">' + saSigned + '</div><div class="stat-label">🤝 服务协议已签</div></div>' +
-      '<div class="stat-card"><div class="stat-num" style="color:#7c3aed;">' + ndaSigned + '</div><div class="stat-label">🔒 保密协议已签</div></div>' +
-      '<div class="stat-card"><div class="stat-num" style="color:#f59e0b;">' + maSigned + '</div><div class="stat-label">📢 营销授权已签</div></div>';
-
-    var types = ['service_agreement', 'nda', 'marketing_auth'];
-    var labels = {'service_agreement':'🤝 服务协议','nda':'🔒 保密协议','marketing_auth':'📢 营销授权'};
-    var html = '';
-    users.forEach(function(u) {
-      html += '<tr style="border-bottom:1px solid var(--border);">';
-      html += '<td style="padding:10px 12px;font-weight:600;">' + escapeHtml(u.full_name || u.email.split('@')[0]) + '</td>';
-      html += '<td style="padding:10px 12px;font-size:12px;color:var(--text-secondary);">' + escapeHtml(u.email) + '</td>';
-      types.forEach(function(t) {
-        var sig = u.agreements[t];
-        if (sig) {
-          html += '<td style="padding:10px 12px;"><span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;">✅ ' + sig.signed_at.substring(0,10) + '</span></td>';
-        } else {
-          html += '<td style="padding:10px 12px;"><span style="background:#f1f5f9;color:#94a3b8;padding:3px 10px;border-radius:10px;font-size:11px;">未签署</span></td>';
-        }
-      });
-      html += '<td style="padding:10px 12px;">';
-      types.forEach(function(t) {
-        if (u.agreements[t]) {
-          html += '<button class="btn btn-outline btn-sm" style="font-size:10px;padding:3px 8px;margin:2px;color:#dc2626;border-color:#fecaca;" onclick="openRevoke(' + u.id + ',\'' + t + '\',\'' + escapeHtml(u.email) + '\',\'' + labels[t] + '\')">取消' + labels[t].split(' ')[1] + '</button> ';
-        }
-      });
-      html += '</td></tr>';
-    });
-    document.getElementById('agreementTbody').innerHTML = html || '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-muted);">暂无用户数据</td></tr>';
-  } catch(e) { console.error('[Agreements] Load failed:', e); }
-}
+// ═══════════ AGREEMENT REVOKE (from Concierge) ═══════════
+var _revokeUserId = null;
+var _revokeType = null;
 
 function openRevoke(userId, type, email, label) {
   _revokeUserId = userId;
@@ -1365,19 +1344,12 @@ async function confirmRevoke() {
     if (data.success) {
       showToast('✅ 已取消签署');
       closeRevokeModal();
-      loadAgreements();
+      loadConcierge();
     } else {
       showToast('❌ ' + (data.message || '操作失败'));
     }
   } catch(e) { showToast('❌ 网络错误'); }
 }
-
-// Extend switchTab to load agreements when tab is clicked
-var _origSwitchTab = switchTab;
-switchTab = function(tab) {
-  _origSwitchTab(tab);
-  if (tab === 'agreements') loadAgreements();
-};
 
 // ═══════════ INIT ═══════════
 init();
