@@ -1606,6 +1606,43 @@ app.post('/api/agreements/sign', verifyToken, (req, res) => {
   } catch(e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// GET /api/admin/agreements — Admin: list all agreement signatures
+app.get('/api/admin/agreements', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  try {
+    const db = getDb();
+    const users = db.prepare('SELECT id, email, full_name FROM users ORDER BY id').all();
+    const signatures = db.prepare('SELECT user_id, agreement_type, full_name, signed_at FROM agreement_signatures ORDER BY signed_at DESC').all();
+    db.close();
+    // Build per-user agreement map
+    const userMap = {};
+    users.forEach(u => {
+      userMap[u.id] = { id: u.id, email: u.email, full_name: u.full_name || '', agreements: {} };
+    });
+    signatures.forEach(s => {
+      if (userMap[s.user_id]) {
+        userMap[s.user_id].agreements[s.agreement_type] = { full_name: s.full_name, signed_at: s.signed_at };
+      }
+    });
+    res.json({ success: true, users: Object.values(userMap) });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// DELETE /api/admin/agreements/:userId/:type — Admin: revoke an agreement
+app.delete('/api/admin/agreements/:userId/:type', verifyToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ success: false, message: 'Admin access required.' });
+  const { userId, type } = req.params;
+  if (!['service_agreement', 'nda', 'marketing_auth'].includes(type)) {
+    return res.status(400).json({ success: false, message: 'Invalid agreement type.' });
+  }
+  try {
+    const db = getDb();
+    const result = db.prepare('DELETE FROM agreement_signatures WHERE user_id = ? AND agreement_type = ?').run(userId, type);
+    db.close();
+    res.json({ success: true, deleted: result.changes, message: 'Agreement revoked.' });
+  } catch(e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
 // ════════════════════════════════════════════════════
 //  FALLBACK — serve index.html for all routes
 // ════════════════════════════════════════════════════

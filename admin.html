@@ -302,6 +302,7 @@
   <button class="tab-btn" onclick="switchTab('organizers')">📝 Organizers</button>
   <button class="tab-btn" onclick="switchTab('tracking')">📋 赛事追踪</button>
   <button class="tab-btn" onclick="switchTab('content')">🎨 Site Content</button>
+  <button class="tab-btn" onclick="switchTab('agreements')">📝 协议签署</button>
 </div>
 
 <!-- ═══ Tab: Competitions ═══ -->
@@ -423,6 +424,37 @@
   <div style="margin-top:24px;">
     <button class="btn btn-primary" onclick="saveAllConfig()">💾 Save All Site Content</button>
     <span class="status-msg status-saved" id="configStatus" style="display:none;margin-left:12px;">Saved ✓</span>
+  </div>
+</div>
+
+<!-- ═══ Tab: Agreements (协议签署) ═══ -->
+<div class="tab-content" id="tab-agreements" style="padding:24px 32px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <h2 style="font-size:16px;font-weight:700;">📝 协议签署状态</h2>
+    <button class="btn btn-outline btn-sm" onclick="loadAgreements()">🔄 刷新</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;" id="agreementStats"></div>
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;" id="agreementTable">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);text-align:left;">
+          <th style="padding:10px 12px;">用户</th><th style="padding:10px 12px;">邮箱</th>
+          <th style="padding:10px 12px;">🤝 服务协议</th><th style="padding:10px 12px;">🔒 保密协议</th><th style="padding:10px 12px;">📢 营销授权</th>
+          <th style="padding:10px 12px;">操作</th>
+        </tr>
+      </thead>
+      <tbody id="agreementTbody"></tbody>
+    </table>
+  </div>
+  <div class="modal-overlay" id="revokeModal" style="display:none;" onclick="closeRevokeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;">
+      <h3 style="margin-bottom:12px;">取消签署确认</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;" id="revokeInfo"></p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-outline btn-sm" onclick="closeRevokeModal()">取消</button>
+        <button class="btn btn-sm" style="background:#dc2626;color:#fff;border:none;border-radius:6px;" id="revokeConfirmBtn" onclick="confirmRevoke()">确认取消签署</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1256,6 +1288,96 @@ document.addEventListener('keydown', function(e) {
   if ((e.ctrlKey||e.metaKey) && e.key==='n') { e.preventDefault(); addNew(); }
   if (e.key==='Escape') { cancelEdit(); }
 });
+
+// ═══════════ AGREEMENTS MANAGEMENT ═══════════
+var _revokeUserId = null;
+var _revokeType = null;
+
+async function loadAgreements() {
+  try {
+    var resp = await fetch('/api/admin/agreements', { headers: authHeaders() });
+    var data = await resp.json();
+    if (!data.success) return;
+
+    var users = data.users || [];
+    var totalUsers = users.length;
+    var saSigned = 0, ndaSigned = 0, maSigned = 0;
+    users.forEach(function(u) {
+      if (u.agreements.service_agreement) saSigned++;
+      if (u.agreements.nda) ndaSigned++;
+      if (u.agreements.marketing_auth) maSigned++;
+    });
+
+    document.getElementById('agreementStats').innerHTML =
+      '<div class="stat-card"><div class="stat-num">' + totalUsers + '</div><div class="stat-label">总用户</div></div>' +
+      '<div class="stat-card"><div class="stat-num" style="color:var(--accent);">' + saSigned + '</div><div class="stat-label">🤝 服务协议已签</div></div>' +
+      '<div class="stat-card"><div class="stat-num" style="color:#7c3aed;">' + ndaSigned + '</div><div class="stat-label">🔒 保密协议已签</div></div>' +
+      '<div class="stat-card"><div class="stat-num" style="color:#f59e0b;">' + maSigned + '</div><div class="stat-label">📢 营销授权已签</div></div>';
+
+    var types = ['service_agreement', 'nda', 'marketing_auth'];
+    var labels = {'service_agreement':'🤝 服务协议','nda':'🔒 保密协议','marketing_auth':'📢 营销授权'};
+    var html = '';
+    users.forEach(function(u) {
+      html += '<tr style="border-bottom:1px solid var(--border);">';
+      html += '<td style="padding:10px 12px;font-weight:600;">' + escapeHtml(u.full_name || u.email.split('@')[0]) + '</td>';
+      html += '<td style="padding:10px 12px;font-size:12px;color:var(--text-secondary);">' + escapeHtml(u.email) + '</td>';
+      types.forEach(function(t) {
+        var sig = u.agreements[t];
+        if (sig) {
+          html += '<td style="padding:10px 12px;"><span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;">✅ ' + sig.signed_at.substring(0,10) + '</span></td>';
+        } else {
+          html += '<td style="padding:10px 12px;"><span style="background:#f1f5f9;color:#94a3b8;padding:3px 10px;border-radius:10px;font-size:11px;">未签署</span></td>';
+        }
+      });
+      html += '<td style="padding:10px 12px;">';
+      types.forEach(function(t) {
+        if (u.agreements[t]) {
+          html += '<button class="btn btn-outline btn-sm" style="font-size:10px;padding:3px 8px;margin:2px;color:#dc2626;border-color:#fecaca;" onclick="openRevoke(' + u.id + ',\'' + t + '\',\'' + escapeHtml(u.email) + '\',\'' + labels[t] + '\')">取消' + labels[t].split(' ')[1] + '</button> ';
+        }
+      });
+      html += '</td></tr>';
+    });
+    document.getElementById('agreementTbody').innerHTML = html || '<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--text-muted);">暂无用户数据</td></tr>';
+  } catch(e) { console.error('[Agreements] Load failed:', e); }
+}
+
+function openRevoke(userId, type, email, label) {
+  _revokeUserId = userId;
+  _revokeType = type;
+  document.getElementById('revokeInfo').textContent = '用户: ' + email + ' | 协议: ' + label;
+  document.getElementById('revokeModal').style.display = 'flex';
+}
+
+function closeRevokeModal(e) {
+  if (e && e.target !== document.getElementById('revokeModal')) return;
+  document.getElementById('revokeModal').style.display = 'none';
+  _revokeUserId = null;
+  _revokeType = null;
+}
+
+async function confirmRevoke() {
+  if (!_revokeUserId || !_revokeType) return;
+  try {
+    var resp = await fetch('/api/admin/agreements/' + _revokeUserId + '/' + _revokeType, {
+      method: 'DELETE', headers: authHeaders()
+    });
+    var data = await resp.json();
+    if (data.success) {
+      showToast('✅ 已取消签署');
+      closeRevokeModal();
+      loadAgreements();
+    } else {
+      showToast('❌ ' + (data.message || '操作失败'));
+    }
+  } catch(e) { showToast('❌ 网络错误'); }
+}
+
+// Extend switchTab to load agreements when tab is clicked
+var _origSwitchTab = switchTab;
+switchTab = function(tab) {
+  _origSwitchTab(tab);
+  if (tab === 'agreements') loadAgreements();
+};
 
 // ═══════════ INIT ═══════════
 init();
