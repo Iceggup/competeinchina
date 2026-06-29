@@ -684,7 +684,7 @@ app.get('/api/competitions', async (c) => {
       highlights: typeof c.highlights === 'string' ? JSON.parse(c.highlights || '[]') : (c.highlights || [])
     }));
 
-    return c.json({ success: true, competitions: comps });
+    return c.json(comps);
   } catch (error) {
     return c.json({ success: false, message: 'Load failed.' }, 500);
   }
@@ -716,7 +716,7 @@ app.get('/api/admin/competitions', adminRequired, async (c) => {
       industries: typeof c.industries === 'string' ? JSON.parse(c.industries || '[]') : (c.industries || []),
       highlights: typeof c.highlights === 'string' ? JSON.parse(c.highlights || '[]') : (c.highlights || [])
     }));
-    return c.json({ success: true, competitions: comps });
+    return c.json(comps);
   } catch (e) { return c.json({ success: false, message: e.message }, 500); }
 });
 
