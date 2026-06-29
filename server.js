@@ -1054,7 +1054,7 @@ app.get('/api/competitions', (req, res) => {
       highlights: typeof c.highlights === 'string' ? JSON.parse(c.highlights || '[]') : c.highlights
     }));
 
-    res.json({ success: true, competitions: results });
+    res.json(results);
   } catch (error) {
     console.error('[competitions] Error:', error);
     res.status(500).json({ success: false, message: 'Load failed.' });

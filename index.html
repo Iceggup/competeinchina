@@ -2365,19 +2365,22 @@ async function loadCompetitions() {
   try {
     const resp = await fetch('/api/competitions');
     if (resp.ok) {
-      competitions = await resp.json();
+      const data = await resp.json();
+      // API returns { success: true, competitions: [...] }
+      competitions = Array.isArray(data) ? data : (data.competitions || data.data || []);
       console.log(`Loaded ${competitions.length} competitions from API`);
       window.competitions = competitions;
       renderCards(competitions);
       renderCarousel();
       return;
     }
-  } catch(e) {}
+  } catch(e) { console.warn('API load failed, trying fallback:', e.message); }
   // Fallback to JSON file
   try {
     const resp = await fetch('competitions.json');
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    competitions = await resp.json();
+    const data = await resp.json();
+    competitions = Array.isArray(data) ? data : (data.competitions || data.data || []);
     console.log(`Loaded ${competitions.length} competitions from competitions.json`);
   } catch (e) {
     console.warn('Could not load competitions, using built-in data:', e.message);
