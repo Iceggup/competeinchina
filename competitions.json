@@ -261,5 +261,30 @@
     "englishUrl": "",
     "stage": "Closed",
     "titleCN": "2026 广东「侨创赛」(AI+) 海外侨界创新创业大赛"
+  },
+  {
+    "title": "2026 Longquan Thermal Management Industry Innovation & Entrepreneurship Competition",
+    "titleCN": "2026龙泉热管理产业创新创业大赛",
+    "city": "Longquan, Zhejiang",
+    "deadline": "2026-08-31",
+    "prize": "Not disclosed — industry landing support + government incentives",
+    "prize_category": "Cash + Landing Support",
+    "industries": [
+      "New Energy",
+      "New Materials",
+      "Advanced Manufacturing"
+    ],
+    "level": "City",
+    "desc": "Focused on thermal management industry upgrade in Longquan. Three key directions: NEV thermal management, cross-domain thermal management applications, and thermal management core components & materials. Aiming to attract high-growth tech projects through competition-driven investment.",
+    "highlights": [
+      "Thermal management focus",
+      "NEV + cross-domain applications",
+      "Industry chain integration",
+      "Government landing support"
+    ],
+    "stage": "Registration",
+    "featured": 1,
+    "sort_order": 10,
+    "source_url": "https://mp.weixin.qq.com/s/mbzejkdyP_zu-75vvOrFKQ"
   }
 ]
