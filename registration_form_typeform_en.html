@@ -804,6 +804,14 @@ function submitForm() {
       var val = rawData[key];
       // 保留布尔值，对于字符串只保留非空值
       if (typeof val === 'boolean' || (typeof val === 'string' && val.trim() !== '')) {
+        // ═══════════ 清理文本：移除多余的空格和换行 ═══════════
+        if (typeof val === 'string') {
+          val = val
+            .replace(/\r\n/g, '\n')       // 统一换行符
+            .replace(/\n{3,}/g, '\n\n')   // 最多保留两个换行
+            .replace(/[ \t]{2,}/g, ' ')   // 合并多个空格
+            .trim();
+        }
         data[key] = val;
       }
     }
