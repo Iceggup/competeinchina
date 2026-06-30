@@ -813,6 +813,41 @@ function submitForm() {
   var dataSize = JSON.stringify(data).length;
   console.log('[Submit] Data size:', dataSize, 'bytes', dataSize > 100000 ? '(WARNING: > 100KB, may exceed Cloudflare limit!)' : '');
 
+  // ═══════════ 激进压缩：如果数据接近 100KB 限制，自动截断长文本字段 ═══════════
+  if (dataSize > 80000) {
+    console.warn('[Submit] Data size > 80KB, auto-truncating long text fields...');
+    // 定义长文本字段及其最大长度（更激进的限制）
+    var truncationRules = {
+      product_desc: 1000,
+      business_model: 1000,
+      roadmap: 500,
+      team_members: 800,
+      team_stability: 300
+    };
+    for (var key in truncationRules) {
+      if (data[key] && data[key].length > truncationRules[key]) {
+        console.warn('[Submit] Truncating', key, 'from', data[key].length, 'to', truncationRules[key], 'chars');
+        data[key] = data[key].substring(0, truncationRules[key]) + '... [truncated]';
+      }
+    }
+    // 重新计算大小
+    dataSize = JSON.stringify(data).length;
+    console.log('[Submit] Data size after truncation:', dataSize, 'bytes');
+  }
+
+  // ═══════════ 最终检查：如果数据仍然超过 95KB，拒绝提交 ═══════════
+  if (dataSize > 95000) {
+    var errorEl = document.getElementById('submitError');
+    if (errorEl) {
+      errorEl.style.display = 'block';
+      errorEl.innerHTML = '<strong>Error: Submission data too large (' + Math.round(dataSize/1024) + 'KB).</strong><br>Please reduce the length of text fields (product description, business model, etc.) to under 100KB total.';
+    }
+    showToast('Submission data too large. Please shorten text fields.', 5000);
+    btn.disabled = false;
+    btn.textContent = 'Submit Registration';
+    return;
+  }
+
   // Validation: required fields (all except those marked "if any" or "optional")
   // Clear previous error states
   document.querySelectorAll('.field.error').forEach(function(f) { f.classList.remove('error'); });
