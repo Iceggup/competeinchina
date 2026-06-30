@@ -487,7 +487,14 @@ app.post('/api/registrations', authRequired, async (c) => {
     }, 201);
   } catch (error) {
     console.error('[registration] Error:', error);
-    return c.json({ success: false, message: 'Submission failed. Please try again.' }, 500);
+    // 返回详细错误信息用于调试
+    const errMsg = error.message || String(error);
+    console.error('[registration] Error details:', errMsg);
+    return c.json({
+      success: false,
+      message: 'Submission failed: ' + errMsg,
+      debug: errMsg.substring(0, 500)
+    }, 500);
   }
 });
 
