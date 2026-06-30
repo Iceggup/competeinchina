@@ -821,6 +821,18 @@ function submitForm() {
   var dataSize = JSON.stringify(data).length;
   console.log('[Submit] Data size:', dataSize, 'bytes', dataSize > 100000 ? '(WARNING: > 100KB, may exceed Cloudflare limit!)' : '');
 
+  // ═══════════ 调试：显示每个字段的大小 ═══════════
+  console.log('[Submit] Data size breakdown by field:');
+  for (var key in data) {
+    if (data.hasOwnProperty(key)) {
+      var val = data[key];
+      var size = (typeof val === 'string') ? val.length : JSON.stringify(val).length;
+      if (size > 1000) {
+        console.warn('  ', key + ':', size, 'chars');
+      }
+    }
+  }
+
   // ═══════════ 激进压缩：如果数据接近 100KB 限制，自动截断长文本字段 ═══════════
   if (dataSize > 80000) {
     console.warn('[Submit] Data size > 80KB, auto-truncating long text fields...');
