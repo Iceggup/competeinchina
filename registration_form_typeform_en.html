@@ -602,6 +602,7 @@
         <button class="btn btn-ghost" onclick="goToStep(6)">← Back</button>
         <button class="btn btn-primary" style="flex:1;" id="btnSubmit" onclick="submitForm()">Submit Registration</button>
       </div>
+      <div id="submitError" style="display:none;background:#fef2f2;color:#dc2626;padding:12px 16px;border-radius:8px;font-size:13px;margin-top:12px;line-height:1.5;"></div>
     </div>
 
     <!-- SUCCESS: After Submit -->
@@ -798,6 +799,8 @@ function submitForm() {
   // Validation: required fields (all except those marked "if any" or "optional")
   // Clear previous error states
   document.querySelectorAll('.field.error').forEach(function(f) { f.classList.remove('error'); });
+  var submitErrorEl = document.getElementById('submitError');
+  if (submitErrorEl) submitErrorEl.style.display = 'none';
   
   var firstErrorField = null;
   var requiredFields = [
@@ -843,6 +846,11 @@ function submitForm() {
   }
   
   if (firstErrorField) {
+    var errorEl = document.getElementById('submitError');
+    if (errorEl) {
+      errorEl.style.display = 'block';
+      errorEl.innerHTML = '<strong>Please fill in all required fields (marked in red).</strong>';
+    }
     showToast('Please fill in all required fields (marked in red).', 4000);
     firstErrorField.focus();
     btn.disabled = false;
@@ -852,22 +860,26 @@ function submitForm() {
 
   // Check chip-based required fields
   var chipError = null;
+  var chipErrorMsg = '';
   if (!chipSelections['chipIndustry'] || chipSelections['chipIndustry'].length === 0) {
     chipError = 'chipIndustry';
-    showToast('Please select at least one Industry Track.', 4000);
+    chipErrorMsg = 'Please select at least one Industry Track.';
   } else if (!chipSelections['chipFunded'] || chipSelections['chipFunded'].length === 0) {
     chipError = 'chipFunded';
-    showToast('Please select whether you have raised funding.', 4000);
+    chipErrorMsg = 'Please select whether you have raised funding.';
   } else if (!chipSelections['chipRegister'] || chipSelections['chipRegister'].length === 0) {
     chipError = 'chipRegister';
-    showToast('Please select your interest in setting up a China entity.', 4000);
+    chipErrorMsg = 'Please select your interest in setting up a China entity.';
   }
   
   if (chipError) {
-    // Highlight the chip group
-    var chipEl = document.getElementById('chipIndustry') || 
-                 document.getElementById('chipFunded') || 
-                 document.getElementById('chipRegister');
+    var errorEl = document.getElementById('submitError');
+    if (errorEl) {
+      errorEl.style.display = 'block';
+      errorEl.innerHTML = '<strong>' + chipErrorMsg + '</strong>';
+    }
+    showToast(chipErrorMsg, 4000);
+    var chipEl = document.getElementById(chipError);
     if (chipEl) {
       var fieldEl = chipEl.closest('.field');
       if (fieldEl) fieldEl.classList.add('error');
@@ -894,7 +906,14 @@ function submitForm() {
     })
   })
   .then(function(res) {
-    if (!res.ok) throw new Error('Authentication failed (HTTP ' + res.status + ')');
+    if (!res.ok) {
+      // Try to get error details from response
+      return res.json().then(function(errData) {
+        throw new Error('Auth failed (HTTP ' + res.status + '): ' + (errData.message || 'Unknown error'));
+      }).catch(function() {
+        throw new Error('Authentication failed (HTTP ' + res.status + ')');
+      });
+    }
     return res.json();
   })
   .then(function(authResult) {
@@ -909,7 +928,16 @@ function submitForm() {
         'Authorization': 'Bearer ' + authToken
       },
       body: JSON.stringify(data)
-    }).then(function(r) { return r.json(); });
+    }).then(function(res) {
+      if (!res.ok) {
+        return res.json().then(function(errData) {
+          throw new Error('Submission failed (HTTP ' + res.status + '): ' + (errData.message || 'Unknown error'));
+        }).catch(function() {
+          throw new Error('Submission failed (HTTP ' + res.status + ')');
+        });
+      }
+      return res.json();
+    });
   })
   .then(function(regResult) {
     if (!regResult.success) throw new Error(regResult.message || 'Submission failed');
@@ -920,6 +948,8 @@ function submitForm() {
     localStorage.setItem('cic_last_submission_id', regResult.registrationId);
 
     // Show success screen with summary
+    var errorEl = document.getElementById('submitError');
+    if (errorEl) errorEl.style.display = 'none';
     document.getElementById('confirmEmail').textContent = data.contact_email || 'your email';
     renderSubmissionSummary(data);
     document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
@@ -933,13 +963,16 @@ function submitForm() {
   })
   .catch(function(err) {
     console.error('[submitForm] Error:', err);
-    // Show detailed error message to user
-    var errorMsg = err.message || 'Submission failed. Please try again.';
-    showToast('Submission failed: ' + errorMsg, 8000);
-    // Also log to console for debugging
+    // Show detailed error message in dedicated error area
+    var errorEl = document.getElementById('submitError');
+    if (errorEl) {
+      errorEl.style.display = 'block';
+      errorEl.innerHTML = '<strong>Submission failed:</strong><br>' + (err.message || 'Unknown error. Please try again.');
+      errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    showToast('Submission failed. See error details below.', 8000);
     console.error('[submitForm] Full error details:', err);
-    btn.disabled = false;
-    btn.textContent = 'Submit Registration';
+    if (btn) { btn.disabled = false; btn.textContent = 'Submit Registration'; }
   });
 }
 
