@@ -499,8 +499,8 @@ export default {
             register_cn, cn_setup, roadmap, support_needed,
             team_members, team_stability, resume, website,
             auth_agree, pitch_deck,
-            extra_links, notes, competition_ids, status, submitted_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "pending", datetime("now"))
+            extra_links, notes, competition_ids, status
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "pending", )
         `).bind(
           authUser.userId, data.team_name, data.country || '', data.team_size || '',
           data.stage || '', data.oneliner || '', data.contact_name || '',
