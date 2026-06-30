@@ -99,6 +99,12 @@
   .field label .req { color: #ef4444; margin-left: 2px; }
   .field label .opt { color: var(--text3); font-weight: 400; font-size: 12px; margin-left: 4px; }
   .field .hint { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .field .field-error { font-size: 12px; color: #ef4444; margin-top: 4px; display: none; }
+  .field.error input,
+  .field.error textarea,
+  .field.error select { border-color: #ef4444; background: #fef2f2; }
+  .field.error label { color: #ef4444; }
+  .field.error .field-error { display: block; }
   .field input[type="text"],
   .field input[type="email"],
   .field input[type="tel"],
@@ -380,7 +386,7 @@
       <div class="row">
         <div class="field">
           <label>Passport Number <span class="req">*</span></label>
-          <input type="text" id="f_passport" placeholder="Your passport number">
+          <input type="text" id="f_passport" placeholder="Your passport or ID number (optional)">
           <div class="hint" style="font-size:11px;color:#d97706;margin-top:4px;">
             ⚠️ Some competitions require a passport photo page for identity verification. 
             If needed, our staff will contact you one-on-one to explain the purpose and guide you through the process.
@@ -790,6 +796,10 @@ function submitForm() {
   };
 
   // Validation: required fields (all except those marked "if any" or "optional")
+  // Clear previous error states
+  document.querySelectorAll('.field.error').forEach(function(f) { f.classList.remove('error'); });
+  
+  var firstErrorField = null;
   var requiredFields = [
     { id: 'f_team_name', label: 'Project / Team Name' },
     { id: 'f_country', label: 'Country / Region' },
@@ -801,7 +811,6 @@ function submitForm() {
     { id: 'f_contact_email', label: 'Email' },
     { id: 'f_contact_phone', label: 'WhatsApp / Phone' },
     { id: 'f_contact_linkedin', label: 'LinkedIn Profile' },
-    { id: 'f_passport', label: 'Passport Number' },
     { id: 'f_keywords', label: 'Keyword Tags' },
     { id: 'f_product_desc', label: 'Product / Service Description' },
     { id: 'f_business_model', label: 'Business Model & Market Potential' },
@@ -817,28 +826,52 @@ function submitForm() {
   for (var i = 0; i < requiredFields.length; i++) {
     var el = document.getElementById(requiredFields[i].id);
     if (!el || !el.value || !el.value.trim()) {
-      showToast('Please fill in: ' + requiredFields[i].label + ' (required field).', 4000);
-      btn.disabled = false;
-      btn.textContent = 'Submit Registration';
-      return;
+      // Mark field as error
+      var fieldEl = el.closest('.field');
+      if (fieldEl) {
+        fieldEl.classList.add('error');
+        var errEl = fieldEl.querySelector('.field-error');
+        if (!errEl) {
+          errEl = document.createElement('div');
+          errEl.className = 'field-error';
+          el.parentNode.appendChild(errEl);
+        }
+        errEl.textContent = 'This field is required.';
+      }
+      if (!firstErrorField) firstErrorField = el;
     }
+  }
+  
+  if (firstErrorField) {
+    showToast('Please fill in all required fields (marked in red).', 4000);
+    firstErrorField.focus();
+    btn.disabled = false;
+    btn.textContent = 'Submit Registration';
+    return;
   }
 
   // Check chip-based required fields
+  var chipError = null;
   if (!chipSelections['chipIndustry'] || chipSelections['chipIndustry'].length === 0) {
+    chipError = 'chipIndustry';
     showToast('Please select at least one Industry Track.', 4000);
-    btn.disabled = false;
-    btn.textContent = 'Submit Registration';
-    return;
-  }
-  if (!chipSelections['chipFunded'] || chipSelections['chipFunded'].length === 0) {
+  } else if (!chipSelections['chipFunded'] || chipSelections['chipFunded'].length === 0) {
+    chipError = 'chipFunded';
     showToast('Please select whether you have raised funding.', 4000);
-    btn.disabled = false;
-    btn.textContent = 'Submit Registration';
-    return;
-  }
-  if (!chipSelections['chipRegister'] || chipSelections['chipRegister'].length === 0) {
+  } else if (!chipSelections['chipRegister'] || chipSelections['chipRegister'].length === 0) {
+    chipError = 'chipRegister';
     showToast('Please select your interest in setting up a China entity.', 4000);
+  }
+  
+  if (chipError) {
+    // Highlight the chip group
+    var chipEl = document.getElementById('chipIndustry') || 
+                 document.getElementById('chipFunded') || 
+                 document.getElementById('chipRegister');
+    if (chipEl) {
+      var fieldEl = chipEl.closest('.field');
+      if (fieldEl) fieldEl.classList.add('error');
+    }
     btn.disabled = false;
     btn.textContent = 'Submit Registration';
     return;
@@ -900,7 +933,11 @@ function submitForm() {
   })
   .catch(function(err) {
     console.error('[submitForm] Error:', err);
-    showToast(err.message || 'Submission failed. Please try again.', 5000);
+    // Show detailed error message to user
+    var errorMsg = err.message || 'Submission failed. Please try again.';
+    showToast('Submission failed: ' + errorMsg, 8000);
+    // Also log to console for debugging
+    console.error('[submitForm] Full error details:', err);
     btn.disabled = false;
     btn.textContent = 'Submit Registration';
   });
@@ -1098,6 +1135,16 @@ function showToast(msg, dur) {
 // ═══════════ INIT ═══════════
 document.addEventListener('DOMContentLoaded', function() {
   goToStep(0);
+  
+  // Clear error state on input
+  document.querySelectorAll('.field input, .field textarea, .field select').forEach(function(el) {
+    el.addEventListener('input', function() {
+      var fieldEl = this.closest('.field');
+      if (fieldEl && fieldEl.classList.contains('error')) {
+        fieldEl.classList.remove('error');
+      }
+    });
+  });
 });
 </script>
 
