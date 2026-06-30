@@ -426,12 +426,12 @@
 
       <div class="field">
         <label>Product / Service Description <span class="req">*</span></label>
-        <textarea id="f_product_desc" placeholder="Briefly introduce your product, application areas, innovation highlights, and competitive differentiation. Keep it concise."></textarea>
+        <textarea id="f_product_desc" placeholder="Briefly introduce your product, application areas, innovation highlights, and competitive differentiation. Keep it concise. (Max 2000 characters)" maxlength="2000"></textarea>
       </div>
 
       <div class="field">
         <label>Business Model & Market Potential <span class="req">*</span></label>
-        <textarea id="f_business_model" placeholder="Target customers, market size, competitive advantages, growth opportunities. Brief is fine."></textarea>
+        <textarea id="f_business_model" placeholder="Target customers, market size, competitive advantages, growth opportunities. Brief is fine. (Max 2000 characters)" maxlength="2000"></textarea>
       </div>
 
       <div class="btn-row">
@@ -523,7 +523,7 @@
 
       <div class="field">
         <label>Next 6–12 Months Roadmap <span class="req">*</span></label>
-        <textarea id="f_roadmap" placeholder="Key goals, milestones, support needed in the next 6–12 months." rows="3"></textarea>
+        <textarea id="f_roadmap" placeholder="Key goals, milestones, support needed in the next 6–12 months. (Max 1000 characters)" rows="3" maxlength="1000"></textarea>
       </div>
 
       <div class="field">
@@ -551,12 +551,12 @@
 
       <div class="field">
         <label>Core Members <span class="req">*</span></label>
-        <textarea id="f_team_members" placeholder="Briefly introduce 2–3 key members: name, role, highest degree (institution), expertise, and responsibilities. No need to list everyone." rows="4"></textarea>
+        <textarea id="f_team_members" placeholder="Briefly introduce 2–3 key members: name, role, highest degree (institution), expertise, and responsibilities. No need to list everyone. (Max 1500 characters)" rows="4" maxlength="1500"></textarea>
       </div>
 
       <div class="field">
         <label>Team Stability & Collaboration History <span class="req">*</span></label>
-        <input type="text" id="f_team_stability" placeholder="e.g. Co-founders worked together at MIT for 5 years / Team has been together 3+ years. Keep it brief.">
+        <input type="text" id="f_team_stability" placeholder="e.g. Co-founders worked together at MIT for 5 years / Team has been together 3+ years. Keep it brief. (Max 500 characters)" maxlength="500">
       </div>
 
       <div class="field">
@@ -758,7 +758,8 @@ function submitForm() {
   }
 
   // Collect all form data
-  var data = {
+  // ═══════════ 修复：移除空字段以减少请求体大小 ═══════════
+  var rawData = {
     team_name:      document.getElementById('f_team_name')?.value || '',
     country:        document.getElementById('f_country')?.value || '',
     team_size:      document.getElementById('f_team_size')?.value || '',
@@ -795,6 +796,22 @@ function submitForm() {
     extra_links:    document.getElementById('f_extra_links')?.value || '',
     notes:          document.getElementById('f_notes')?.value || ''
   };
+
+  // ═══════════ 修复：只保留非空字段 ═══════════
+  var data = {};
+  for (var key in rawData) {
+    if (rawData.hasOwnProperty(key)) {
+      var val = rawData[key];
+      // 保留布尔值，对于字符串只保留非空值
+      if (typeof val === 'boolean' || (typeof val === 'string' && val.trim() !== '')) {
+        data[key] = val;
+      }
+    }
+  }
+
+  // 调试：显示数据大小
+  var dataSize = JSON.stringify(data).length;
+  console.log('[Submit] Data size:', dataSize, 'bytes', dataSize > 100000 ? '(WARNING: > 100KB, may exceed Cloudflare limit!)' : '');
 
   // Validation: required fields (all except those marked "if any" or "optional")
   // Clear previous error states
@@ -897,6 +914,7 @@ function submitForm() {
   // Step 1: Authenticate (register or login) using form-specific auth endpoint
   // This endpoint auto-creates user if not exists, or returns token if already registered.
   var authToken = null;
+  console.log('[Submit] Step 1: Authenticating...');
   fetch('/api/users/auth-for-form', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -906,12 +924,17 @@ function submitForm() {
     })
   })
   .then(function(res) {
+    console.log('[Submit] Auth response status:', res.status);
     if (!res.ok) {
-      // Try to get error details from response
-      return res.json().then(function(errData) {
-        throw new Error('Auth failed (HTTP ' + res.status + '): ' + (errData.message || 'Unknown error'));
-      }).catch(function() {
-        throw new Error('Authentication failed (HTTP ' + res.status + ')');
+      return res.text().then(function(text) {
+        var errMsg = 'Auth failed (HTTP ' + res.status + ')';
+        try {
+          var errData = JSON.parse(text);
+          errMsg += ': ' + (errData.message || text);
+        } catch(e) {
+          errMsg += ': ' + text.substring(0, 200);
+        }
+        throw new Error(errMsg);
       });
     }
     return res.json();
@@ -919,8 +942,14 @@ function submitForm() {
   .then(function(authResult) {
     if (!authResult.success || !authResult.token) throw new Error('Auth failed');
     authToken = authResult.token;
+    console.log('[Submit] Auth success, token received');
 
     // Step 2: Submit registration data with token
+    var dataSize = JSON.stringify(data).length;
+    console.log('[Submit] Step 2: Submitting registration data, size:', dataSize, 'bytes');
+    if (dataSize > 80000) {
+      console.warn('[Submit] WARNING: Data size > 80KB, close to Cloudflare 100KB limit!');
+    }
     return fetch('/api/registrations', {
       method: 'POST',
       headers: {
@@ -929,11 +958,22 @@ function submitForm() {
       },
       body: JSON.stringify(data)
     }).then(function(res) {
+      console.log('[Submit] Registration response status:', res.status);
       if (!res.ok) {
-        return res.json().then(function(errData) {
-          throw new Error('Submission failed (HTTP ' + res.status + '): ' + (errData.message || 'Unknown error'));
-        }).catch(function() {
-          throw new Error('Submission failed (HTTP ' + res.status + ')');
+        return res.text().then(function(text) {
+          var errMsg = 'Submission failed (HTTP ' + res.status + ')';
+          // 检查是否是请求体过大错误
+          if (res.status === 400 && text.includes('input length')) {
+            errMsg = 'Submission failed: Data too large (over 100KB). Please reduce the length of text fields (product description, business model, etc.).';
+          } else {
+            try {
+              var errData = JSON.parse(text);
+              errMsg += ': ' + (errData.message || text);
+            } catch(e) {
+              errMsg += ': ' + text.substring(0, 200);
+            }
+          }
+          throw new Error(errMsg);
         });
       }
       return res.json();

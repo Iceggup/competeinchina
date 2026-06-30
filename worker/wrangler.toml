@@ -18,7 +18,7 @@ JWT_SECRET = "competeinchina_jwt_secret_key_2026"
 [[d1_databases]]
 binding = "DB"
 database_name = "competeinchina-db"
-database_id = "YOUR_DATABASE_ID_HERE"
+database_id = "d94794c1-f7de-4ac0-b2be-68fb50c24f63"
 
 # ─── 路由 ──────────────────────────────────────
 # Workers 将绑定到 api.competeinchina.com
