@@ -285,6 +285,159 @@
     "stage": "Registration",
     "featured": 1,
     "sort_order": 10,
-    "source_url": "https://mp.weixin.qq.com/s/mbzejkdyP_zu-75vvOrFKQ"
+    "source_url": "https://mp.weixin.qq.com/s/mbzejkdyP_zu-75vvOrFKQ",
+    "id": 10
+  },
+  {
+    "title": "2026 Hanshan County Innovation & Entrepreneurship Competition",
+    "titleCN": "2026含山县创新创业大赛",
+    "city": "Hanshan, Anhui",
+    "deadline": "2026-06-30",
+    "prize": "Not disclosed — county-level talent support",
+    "prize_category": "Cash + Landing Support",
+    "industries": [
+      "General",
+      "Advanced Manufacturing",
+      "Modern Agriculture"
+    ],
+    "level": "County",
+    "desc": "Hanshan County aims to attract high-quality projects in advanced manufacturing and modern agriculture through competition-based talent recruitment.",
+    "highlights": [
+      "County-level competition",
+      "Landing support for winners",
+      "Focus on manufacturing & agriculture"
+    ],
+    "stage": "Closed",
+    "featured": 0,
+    "sort_order": 11,
+    "source_url": "https://mp.weixin.qq.com/s/4Pr6McP5fq2PW_u9woj3UQ",
+    "id": 11
+  },
+  {
+    "title": "2026 Jiangxi Province 2nd High-Level Talent Innovation & Entrepreneurship Competition",
+    "titleCN": "2026江西省第二届高层次人才创新创业大赛",
+    "city": "Nanchang, Jiangxi",
+    "deadline": "2026-08-10",
+    "prize": "¥1M–¥3M per prizeinner + landing subsidies",
+    "prize_category": "Large",
+    "industries": [
+      "AI",
+      "Biotech & Pharma",
+      "Advanced Manufacturing",
+      "New Energy"
+    ],
+    "level": "Provincial",
+    "desc": "Second edition of Jiangxi's provincial-level talent competition. Open to global high-level talents. Focus on AI, biotech, advanced manufacturing.",
+    "highlights": [
+      "Provincial-level competition",
+      "¥1–3M per award + landing subsidies",
+      "Global talent recruitment"
+    ],
+    "stage": "Registration",
+    "featured": 1,
+    "sort_order": 12,
+    "source_url": "https://mp.weixin.qq.com/s/BBjXkKmPBdOkXPdAvwXYA",
+    "id": 12
+  },
+  {
+    "title": "2026 Zhihui Taicang International Innovation & Entrepreneurship Competition",
+    "titleCN": "2026智汇太仓国际创新创业大赛",
+    "city": "Taicang, Jiangsu",
+    "deadline": "2026-07-31",
+    "prize": "Up to ¥1M per award + 50M industrial fund access",
+    "prize_category": "Medium",
+    "industries": [
+      "Advanced Manufacturing",
+      "New Materials",
+      "Intelligent Equipment"
+    ],
+    "level": "City",
+    "desc": "Taicang's international talent competition. Winners get direct access to 50M industrial fund and priority for local landing support.",
+    "highlights": [
+      "50M industrial fund access",
+      "Priority landing support",
+      "Advanced manufacturing focus"
+    ],
+    "stage": "Registration",
+    "featured": 0,
+    "sort_order": 13,
+    "source_url": "https://mp.weixin.qq.com/s/U7JuMVQ2eqmFySvoEeowkw",
+    "id": 13
+  },
+  {
+    "title": "2026 Global Innovation & Entrepreneurship Competition — Gathering Talents in Xiamen",
+    "titleCN": "2026全球创新创业大赛——聚才汇鹭",
+    "city": "Xiamen, Fujian",
+    "deadline": "2026-06-30",
+    "prize": "Cash prizes + Xiamen talent policy benefits",
+    "prize_category": "Medium",
+    "industries": [
+      "AI",
+      "Marine Economy",
+      "Cultural Tourism",
+      "New Materials"
+    ],
+    "level": "City",
+    "desc": "Xiamen's global talent attraction competition. Integrates talent policies with entrepreneurship support. Focus on marine economy and cultural tourism.",
+    "highlights": [
+      "Xiamen talent policy integration",
+      "Marine economy focus",
+      "Policy + funding combo"
+    ],
+    "stage": "Closed",
+    "featured": 0,
+    "sort_order": 14,
+    "source_url": "https://www.jinxuebao.com/",
+    "id": 14
+  },
+  {
+    "title": "2026 Ningbo Qianwan New Area High-Quality Development Innovation & Entrepreneurship Competition",
+    "titleCN": "2026宁波前湾新区高质量发展创新创业大赛",
+    "city": "Ningbo, Zhejiang",
+    "deadline": "2026-10-31",
+    "prize": "¥500K–¥2M per award + Qianwan New Area landing package",
+    "prize_category": "Medium",
+    "industries": [
+      "New Energy",
+      "High-end Equipment",
+      "Digital Economy"
+    ],
+    "level": "District",
+    "desc": "Qianwan New Area (Ningbo) innovation competition. Focus on new energy and high-end equipment. Winners receive comprehensive landing package including housing and R&D subsidies.",
+    "highlights": [
+      "Qianwan New Area exclusive benefits",
+      "Housing + R&D subsidies",
+      "New energy & equipment focus"
+    ],
+    "stage": "Registration",
+    "featured": 0,
+    "sort_order": 15,
+    "source_url": "https://hitech.5050plan.com/#/index?code=STgnuOFy6jeX4SCJgvNtcQ%3D%3D%0D%0A",
+    "id": 15
+  },
+  {
+    "title": "2026 Shangcheng 5th Golden Boot Running Innovation & Entrepreneurship Competition",
+    "titleCN": "2026上城区第五届金靴奔跑创新创业大赛",
+    "city": "Hangzhou, Zhejiang",
+    "deadline": "2026-07-31",
+    "prize": "¥100K–¥500K + Shangcheng District talent benefits",
+    "prize_category": "Small",
+    "industries": [
+      "Digital Economy",
+      "Cultural Creativity",
+      "Smart City"
+    ],
+    "level": "District",
+    "desc": "Shangcheng District (Hangzhou) 5th edition golden boot competition. Supports digital economy and cultural creativity projects with district-level talent benefits.",
+    "highlights": [
+      "5th edition (Shangcheng District)",
+      "Digital economy & cultural creativity",
+      "District-level talent benefits"
+    ],
+    "stage": "Registration",
+    "featured": 0,
+    "sort_order": 16,
+    "source_url": "https://cxcy.jxcit.gov.cn/",
+    "id": 16
   }
 ]
