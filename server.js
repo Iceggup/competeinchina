@@ -686,8 +686,8 @@ app.post('/api/registrations', verifyToken, (req, res) => {
         register_cn, cn_setup, roadmap, support_needed,
         team_members, team_stability, resume, website,
         auth_agree, pitch_deck,
-        extra_links, notes, competition_ids, status, submitted_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+        extra_links, notes, competition_ids, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       req.user.userId, data.team_name, data.country || '', data.team_size || '',
       data.stage || '', data.oneliner || '', data.contact_name || '',
@@ -723,7 +723,7 @@ app.post('/api/registrations', verifyToken, (req, res) => {
     console.error('[registration] Error:', error);
     return res.status(500).json({
       success: false,
-      message: 'Submission failed. Please try again.'
+      message: 'Submission failed: ' + (error.message || 'Unknown error. Please try again.')
     });
   }
 });
