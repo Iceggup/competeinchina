@@ -511,7 +511,8 @@ let currentTab = 'competitions';
 async function apiFetch(path, opts = {}) {
   const token = localStorage.getItem('cic_admin_token');
   if (!token) { doLogout(); throw new Error('Not authenticated'); }
-  const resp = await fetch('/api/admin' + path, {
+  const url = window.API_BASE + '/api/admin' + path;
+  const resp = await fetch(url, {
     ...opts,
     headers: { 'Authorization': 'Bearer ' + token, ...(opts.headers||{}) }
   });
@@ -530,7 +531,7 @@ async function doLogin() {
   const errEl = document.getElementById('loginErr');
   if (!user || !pass) { errEl.textContent='Please enter username and password'; errEl.style.display='block'; return; }
   try {
-    const resp = await fetch('/api/admin/login', {
+    const resp = await fetch(window.API_BASE + '/api/admin/login', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({username:user, password:pass})
     });
