@@ -4401,8 +4401,134 @@ async function saveApplicationEdit() {
 }
 
 function viewApplicationDetail(id) {
-  // Redirect to the registration form page with the application data
-  window.open('registration_form_typeform_en.html?edit=' + id, '_blank');
+  // Show application detail modal with all filled content
+  var overlay = document.getElementById('appDetailOverlay');
+  var body = document.getElementById('appDetailBody');
+  var title = document.getElementById('appDetailTitle');
+  overlay.style.display = 'flex';
+  body.innerHTML = '<p style="color:var(--text-muted);padding:20px;">Loading...</p>';
+  document.body.style.overflow = 'hidden';
+
+  var token = getToken();
+  if (!token) {
+    body.innerHTML = '<p style="color:var(--red);padding:20px;">Please log in to view details.</p>';
+    return;
+  }
+
+  fetch('/api/users/my-applications', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var app = (data.applications || []).find(function(a) { return a.id === id; });
+      if (!app) {
+        body.innerHTML = '<p style="color:var(--red);padding:20px;">Application not found.</p>';
+        return;
+      }
+      if (title) title.textContent = '📋 ' + (app.team_name || 'Application #' + id);
+      renderApplicationDetail(app, body);
+    })
+    .catch(function(e) {
+      body.innerHTML = '<p style="color:var(--red);padding:20px;">Failed to load details.</p>';
+    });
+}
+
+function closeAppDetail(e) {
+  if (e && e.target !== document.getElementById('appDetailOverlay')) return;
+  var overlay = document.getElementById('appDetailOverlay');
+  if (overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function renderApplicationDetail(app, bodyEl) {
+  var statusLabels = {'pending':'Pending','reviewed':'Reviewed','approved':'✅ Approved','rejected':'❌ Rejected'};
+  var statusColors = {'pending':'#f59e0b','reviewed':'#3b82f6','approved':'#10b981','rejected':'#ef4444'};
+  var status = app.status || 'pending';
+
+  function field(label, value, full) {
+    if (!value && value !== 0) return '';
+    var val = String(value).trim();
+    if (!val || val === '—') return '';
+    if (full) {
+      return '<div style="margin-bottom:14px;"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">' + label + '</div><div style="background:var(--bg);border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;">' + escapeHtml(val) + '</div></div>';
+    }
+    return '<div style="margin-bottom:10px;"><span style="font-size:11px;color:var(--text-muted);">' + label + '</span><div style="font-size:13.5px;color:var(--text);margin-top:2px;">' + escapeHtml(val) + '</div></div>';
+  }
+
+  var html = '';
+
+  // Status banner
+  html += '<div style="display:inline-block;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;background:' + (statusColors[status]||'#94a3b8') + '18;color:' + (statusColors[status]||'#64748b') + ';margin-bottom:18px;border:1px solid ' + (statusColors[status]||'#94a3b8') + '30;">' + (statusLabels[status]||status) + '</div>';
+
+  // Section: Basic Info
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">🏢 Basic Information</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;">';
+  html += field('Team / Company Name', app.team_name);
+  html += field('Country / Region', app.country);
+  html += field('Team Size', app.team_size);
+  html += field('Stage', app.stage);
+  html += field('One-liner', app.oneliner);
+  html += field('Industry', app.industry);
+  html += field('Keywords', app.keywords);
+  html += field('Competition IDs', app.competition_ids);
+  html += '</div></div>';
+
+  // Section: Contact Info
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">👤 Contact Information</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;">';
+  html += field('Contact Name', app.contact_name);
+  html += field('Contact Role', app.contact_role);
+  html += field('Contact Email', app.contact_email);
+  html += field('Contact Phone', app.contact_phone);
+  html += field('LinkedIn', app.contact_linkedin);
+  html += field('WeChat', app.contact_wechat);
+  html += field('Passport / ID', app.passport);
+  html += '</div></div>';
+
+  // Section: Project Details (full width)
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">📝 Project Details</div>';
+  html += field('Product Description', app.product_desc, true);
+  html += field('Business Model', app.business_model, true);
+  html += field('Roadmap', app.roadmap, true);
+  html += field('Support Needed', app.support_needed, true);
+  html += '</div>';
+
+  // Section: Funding Info
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">💰 Funding Information</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;">';
+  html += field('Funded?', app.funded);
+  html += field('Funding Round', app.funding_round);
+  html += field('Funding Amount', app.funding_amount);
+  html += field('Investors', app.investors);
+  html += field('IP / Patents', app.ip);
+  html += field('China Funding', app.cn_funding);
+  html += '</div></div>';
+
+  // Section: China Landing
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">🇨🇳 China Landing Plan</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;">';
+  html += field('Target Cities', app.cn_cities);
+  html += field('Register in China?', app.register_cn);
+  html += field('China Setup Needed', app.cn_setup);
+  html += '</div></div>';
+
+  // Section: Team & Files
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">👥 Team & Attachments</div>';
+  html += field('Team Members', app.team_members, true);
+  html += field('Team Stability', app.team_stability, true);
+  html += field('Resume / CV', app.resume);
+  html += field('Website', app.website);
+  html += field('Pitch Deck', app.pitch_deck);
+  html += field('Extra Links', app.extra_links);
+  html += '</div>';
+
+  // Section: Other
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">📎 Other</div>';
+  html += field('Notes', app.notes, true);
+  html += field('Auth Agree', app.auth_agree);
+  html += field('Submitted At', app.submitted_at);
+  html += field('Status', app.status);
+  html += '</div>';
+
+  bodyEl.innerHTML = html;
 }
 
 // ═══════════ DASHBOARD — Competition Tracking Board ═══════════
@@ -5127,6 +5253,20 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 </script>
+
+
+<!-- ═══════════ Application Detail Modal ═══════════ -->
+<div class="modal-overlay" id="appDetailOverlay" style="display:none;" onclick="closeAppDetail(event)">
+  <div onclick="event.stopPropagation()" style="background:var(--surface);border-radius:16px;max-width:720px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.18);padding:0;">
+    <div style="position:sticky;top:0;background:var(--surface);padding:20px 24px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;z-index:2;">
+      <h3 style="font-size:16px;font-weight:700;" id="appDetailTitle">📋 Application Details</h3>
+      <button onclick="closeAppDetail()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);line-height:1;">&times;</button>
+    </div>
+    <div id="appDetailBody" style="padding:20px 24px 28px;font-size:13px;line-height:1.7;">
+      <p style="color:var(--text-muted);">Loading...</p>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
