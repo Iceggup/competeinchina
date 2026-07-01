@@ -1606,10 +1606,18 @@
     <button class="btn-primary" onclick="changePassword()" style="font-size:13px;padding:9px 18px;">Update Password</button>
   </div>
 
-  <!-- My Applications -->
+  <!-- My Competition Applications -->
   <div class="dash-card" style="margin-bottom:20px;">
-    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">📋 My Concierge Applications</h3>
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">📋 My Competition Applications</h3>
     <div id="profileAppsList">
+      <p style="font-size:13px;color:var(--text-muted);">Loading...</p>
+    </div>
+  </div>
+
+  <!-- My Concierge Service Requests -->
+  <div class="dash-card" style="margin-bottom:20px;">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">🛎️ My Concierge Service Requests</h3>
+    <div id="profileConciergeList">
       <p style="font-size:13px;color:var(--text-muted);">Loading...</p>
     </div>
   </div>
@@ -3658,6 +3666,7 @@ async function loadProfile() {
 
   // Load applications
   loadProfileApplications();
+  loadProfileConcierge();
   // Load agreement status
   loadAgreementStatus();
 }
@@ -3838,6 +3847,134 @@ async function loadProfileApplications() {
     console.error('[Profile] Failed to load applications:', e);
     listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Failed to load applications. Please try again later.</p>';
   }
+}
+
+async function loadProfileConcierge() {
+  var token = getToken();
+  var listEl = document.getElementById('profileConciergeList');
+  if (!token) {
+    listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Please log in to view your Concierge service requests.</p>';
+    return;
+  }
+
+  try {
+    var resp = await fetch('/api/concierge/my', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    var data = await resp.json();
+
+    if (data.success && data.applications && data.applications.length > 0) {
+      var statusLabels = {'pending':'⏳ Pending','reviewed':'👀 Reviewed','approved':'✅ Approved','rejected':'❌ Rejected'};
+      var statusColors = {'pending':'#f59e0b','reviewed':'#3b82f6','approved':'#10b981','rejected':'#ef4444'};
+
+      var html = '';
+      data.applications.forEach(function(app, idx) {
+        var status = app.status || 'pending';
+        html += '<div style="background:#f8fafb;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;">';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+        html += '<strong style="font-size:14px;">' + escapeHtml(app.company_name || 'Untitled') + '</strong>';
+        html += '<span style="display:inline-block;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:600;background:' + (statusColors[status] || '#94a3b8') + '15;color:' + (statusColors[status] || '#64748b') + ';">' + (statusLabels[status] || status) + '</span>';
+        html += '</div>';
+        html += '<div style="font-size:12px;color:var(--text-secondary);line-height:1.8;">';
+        html += '<div><span style="color:var(--text-muted);">Contact:</span> ' + escapeHtml(app.contact_person || '—') + ' · ' + escapeHtml(app.email || '—') + '</div>';
+        html += '<div><span style="color:var(--text-muted);">Industry:</span> ' + escapeHtml(app.industry || '—') + '</div>';
+        html += '<div><span style="color:var(--text-muted);">Submitted:</span> ' + (app.created_at || '—') + '</div>';
+        html += '</div>';
+
+        // Actions row
+        html += '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">';
+        html += '<button class="btn-ghost" style="font-size:11px;padding:6px 14px;" onclick="viewConciergeDetail(' + app.id + ')">👁 View Details</button>';
+        html += '</div>';
+        html += '</div>';
+      });
+      listEl.innerHTML = html;
+    } else {
+      listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">No Concierge service requests yet. <a href="#" onclick="showPage(\'how\')" style="color:var(--accent);">Learn about our Concierge service →</a></p>';
+    }
+  } catch(e) {
+    console.error('[Profile] Failed to load concierge applications:', e);
+    listEl.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Failed to load Concierge requests. Please try again later.</p>';
+  }
+}
+
+function viewConciergeDetail(id) {
+  // Show concierge application detail modal
+  var overlay = document.getElementById('appDetailOverlay');
+  var body = document.getElementById('appDetailBody');
+  var title = document.getElementById('appDetailTitle');
+  overlay.style.display = 'flex';
+  body.innerHTML = '<p style="color:var(--text-muted);padding:20px;">Loading...</p>';
+  document.body.style.overflow = 'hidden';
+
+  var token = getToken();
+  if (!token) {
+    body.innerHTML = '<p style="color:var(--red);padding:20px;">Please log in to view details.</p>';
+    return;
+  }
+
+  fetch('/api/concierge/my', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var app = (data.applications || []).find(function(a) { return a.id === id; });
+      if (!app) {
+        body.innerHTML = '<p style="color:var(--red);padding:20px;">Concierge request not found.</p>';
+        return;
+      }
+      if (title) title.textContent = '🛎️ ' + (app.company_name || 'Concierge Request #' + id);
+      renderConciergeDetail(app, body);
+    })
+    .catch(function(e) {
+      body.innerHTML = '<p style="color:var(--red);padding:20px;">Failed to load details.</p>';
+    });
+}
+
+function renderConciergeDetail(app, bodyEl) {
+  var statusLabels = {'pending':'Pending','reviewed':'Reviewed','approved':'✅ Approved','rejected':'❌ Rejected'};
+  var statusColors = {'pending':'#f59e0b','reviewed':'#3b82f6','approved':'#10b981','rejected':'#ef4444'};
+  var status = app.status || 'pending';
+
+  function field(label, value, full) {
+    if (!value && value !== 0) return '';
+    var val = String(value).trim();
+    if (!val || val === '—') return '';
+    if (full) {
+      return '<div style="margin-bottom:14px;"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">' + label + '</div><div style="background:var(--bg);border-radius:8px;padding:10px 14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;">' + escapeHtml(val) + '</div></div>';
+    }
+    return '<div style="margin-bottom:10px;"><span style="font-size:11px;color:var(--text-muted);">' + label + '</span><div style="font-size:13.5px;color:var(--text);margin-top:2px;">' + escapeHtml(val) + '</div></div>';
+  }
+
+  var html = '';
+
+  // Status banner
+  html += '<div style="display:inline-block;padding:5px 16px;border-radius:20px;font-size:12px;font-weight:700;background:' + (statusColors[status]||'#94a3b8') + '18;color:' + (statusColors[status]||'#64748b') + ';margin-bottom:18px;border:1px solid ' + (statusColors[status]||'#94a3b8') + '30;">' + (statusLabels[status]||status) + '</div>';
+
+  // Section: Basic Info
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">🏢 Company Information</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;">';
+  html += field('Company Name', app.company_name);
+  html += field('Contact Person', app.contact_person);
+  html += field('Email', app.email);
+  html += field('Phone', app.phone);
+  html += field('WhatsApp', app.whatsapp);
+  html += field('Industry', app.industry);
+  html += '</div></div>';
+
+  // Section: Service Requirements
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">🎯 Service Requirements</div>';
+  html += field('Target Competitions', app.target_competitions, true);
+  html += field('Timeline', app.timeline, true);
+  html += field('Budget Range', app.budget_range);
+  html += field('Special Requirements', app.special_requirements, true);
+  html += '</div>';
+
+  // Section: Notes
+  html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">📝 Notes</div>';
+  html += field('Notes', app.notes, true);
+  html += field('Status', app.status);
+  html += field('Created At', app.created_at);
+  html += '</div>';
+
+  bodyEl.innerHTML = html;
 }
 
 // ═══════════ AGREEMENT SIGNING ═══════════
